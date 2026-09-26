@@ -87,8 +87,19 @@ body.docked #app{ padding-bottom:var(--dockh, 280px); }
 .foe .fhp i{ display:block; height:100%; background:var(--coral); transition:width .35s; }
 .foe .fnum{ font-size:12px; font-weight:700; text-shadow:0 1px 2px #000; }
 .foe .traits{ display:flex; gap:2px; justify-content:center; margin-top:-2px; }
-.foe .traits i{ font-style:normal; font-size:12px; line-height:1; padding:2px 3px; border-radius:7px; background:rgba(10,20,26,.7); border:1px solid rgba(255,214,107,.5); }
-.foe.min .traits i{ font-size:10px; }
+.foe .traits i{ cursor:pointer; font-style:normal; font-size:13px; line-height:1; padding:3px 5px; border-radius:7px; background:rgba(10,20,26,.7); border:1px solid rgba(255,214,107,.5); }
+.foe.min .traits i{ font-size:11px; padding:2px 4px; }
+.foe .traits i:hover{ border-color:var(--brass); background:rgba(40,60,70,.9); }
+.foeinfo{ text-align:left; }
+.foeinfo .fi-head{ display:flex; gap:12px; align-items:center; margin-bottom:10px; }
+.foeinfo .fi-ic{ font-size:38px; line-height:1; }
+.foeinfo h3{ margin:0; font-size:20px; } .foeinfo h3 small{ font-size:11px; padding:2px 6px; border-radius:8px; background:#8a2f25; color:#fff; vertical-align:middle; }
+.foeinfo .fi-hp{ margin:2px 0 0; color:var(--muted); font-size:13px; }
+.foeinfo .fi-int, .foeinfo .fi-role{ margin:6px 0; font-size:14px; line-height:1.4; }
+.foeinfo h4{ margin:12px 0 6px; font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--brass); }
+.foeinfo .fi-list{ list-style:none; margin:0; padding:0; display:grid; gap:8px; }
+.foeinfo .fi-list li{ display:flex; gap:10px; align-items:flex-start; font-size:14px; line-height:1.35; }
+.foeinfo .fi-list li > span{ font-size:20px; line-height:1.2; }
 .mate.bound{ filter:grayscale(.7) brightness(.8); }
 .mate.bound::after{ content:"⛓"; position:absolute; inset:0; display:grid; place-items:center; font-size:calc(var(--ms) * .55); filter:drop-shadow(0 1px 1px #000); }
 .foe .atk{ position:absolute; top:44%; right:-2px; z-index:2; font-size:12px; font-weight:700; background:var(--coral); color:#fff; border-radius:10px; padding:2px 7px; box-shadow:0 2px 0 rgba(0,0,0,.35); }
@@ -1838,7 +1849,19 @@ function passiveList(e){
   return l;
 }
 const passiveText = e => passiveList(e).map(x => ` ${x[1]} : ${x[2]}.`).join('');
-const traitChips = e => { const l = passiveList(e); return l.length ? `<span class="traits">${l.map(x => `<i title="${esc(x[1] + ' : ' + x[2])}">${x[0]}</i>`).join('')}</span>` : ''; };
+const traitChips = (e, i) => { const l = passiveList(e); return l.length ? `<span class="traits">${l.map(x => `<i role="button" tabindex="0" data-act="foe-info" data-e="${i}" title="${esc(x[1] + ' : ' + x[2])}" aria-label="${esc(x[1])} : voir le détail">${x[0]}</i>`).join('')}</span>` : ''; };
+// tapping a trait opens the enemy's sheet: what it will do and all its special abilities
+function openFoeInfo(i){
+  const e = pv && pv.en[i]; if(!e) return; const F = FOES[e.t], it = intentOf(e), l = passiveList(e);
+  const role = F.guard ? '<p class="fi-role">🛡 <b>Gardien</b> : tant qu\'il vit, les autres menaces sont intouchables.</p>' : F.sup ? '<p class="fi-role">🔗 <b>Soutien</b> : il ne protège personne, mais aide les autres menaces.</p>' : '';
+  const d = document.createElement('div'); d.className = 'collmodal'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
+  d.innerHTML = `<div class="cm-box foeinfo"><button class="close" data-act="coll-close" aria-label="Fermer">✕</button>
+    <div class="fi-head"><span class="fi-ic">${F.ic}</span><div><h3>${esc(F.n)}${F.boss ? ' <small>Boss</small>' : ''}</h3><p class="fi-hp">❤ ${e.hp}/${e.mx}${e.blk ? ` · 🛡 ${e.blk}` : ''}${e.str ? ` · 💪 +${e.str}` : ''}${e.rg ? ' · 😡 enragé' : ''}</p></div></div>
+    <p class="fi-int"><b>Prochaine action</b> : ${esc(it.full)}</p>${role}
+    ${l.length ? `<h4>Capacités</h4><ul class="fi-list">${l.map(x => `<li><span>${x[0]}</span><div><b>${esc(x[1])}</b><br>${esc(x[2])}</div></li>`).join('')}</ul>` : ''}</div>`;
+  d.addEventListener('click', ev => { if(ev.target === d) d.remove(); });
+  document.body.appendChild(d);
+}
 function crewFactionCount(f){ let n = 0; pv.seats.forEach(S => { S.play.forEach(p => { if(CARDS[p.c].f === f) n++; }); S.champ.forEach(p => { if(CARDS[p.c].f === f) n++; }); }); return n; }
 
 const SHIP_SVG = `<svg viewBox="0 0 140 110" aria-hidden="true">
@@ -2202,7 +2225,7 @@ function renderFight(app){
         <span class="intent ${it.calm ? 'calm' : ''}">${it.t}</span>
         <span class="fi">${F.ic}${badge}${prot ? '<span class="gshield" aria-hidden="true"></span>' : ''}</span>
         <span class="fhp"><i style="width:${e.hp / e.mx * 100}%"></i></span>
-        <span class="fnum">${F.min || mins ? '' : F.n + ' '}${e.hp}/${e.mx}${e.blk ? `  🛡${e.blk}` : ''}${e.str ? `  💪+${e.str}` : ''}${e.rg ? ' 😡' : ''}</span>${traitChips(e)}</button>`;
+        <span class="fnum">${F.min || mins ? '' : F.n + ' '}${e.hp}/${e.mx}${e.blk ? `  🛡${e.blk}` : ''}${e.str ? `  💪+${e.str}` : ''}${e.rg ? ' 😡' : ''}</span>${traitChips(e, i)}</button>`;
     }).join('')}</div>`;
   ui.spawned = null;
   const hull = `<div class="hullbox" id="hull"><div class="hbar"><i style="width:${pv.hull / pv.maxHull * 100}%"></i></div>
@@ -2238,7 +2261,7 @@ function renderFight(app){
     <div class="pools"><span class="who">${R2.ic} ${esc(S.n)}</span>
       <button class="btn ghost small" data-act="all" title="Joue toute ta main et active tes serviteurs" ${(S.hand.some(c => c !== 'bl') || S.champ.some(p => !p.u)) && !S.rd ? '' : 'disabled'}>Tout jouer</button>
       <button class="btn ghost small purgebtn ${ui.purge ? 'on' : ''}" data-act="purge-mode" title="Jeter une carte de ta main par-dessus bord : elle quitte ton deck pour de bon" ${!S.rd && (ui.purge || (S.ft && S.hand.length) || (S.g >= PURGE_COST(S) && S.hand.some(c => c !== 'bl'))) ? '' : 'disabled'}>${S.ft ? `🗑 gratuit${S.ft > 1 ? ' ×' + S.ft : ''}` : `🗑 🪙${PURGE_COST(S)}`}</button>
-      <button class="pile deckbtn" id="pile" data-act="deck" data-s="${s}" title="Voir ton deck (touche D)" aria-label="Voir ton deck, ${S.dk} cartes"><span class="dk-stack" aria-hidden="true"><i></i><i></i><i></i></span><b>Deck</b><span>${S.dk}</span><small class="drw ${S.dr + S.di ? '' : 'empty'}" title="${S.dr + S.di ? `${S.dr + S.di} carte(s) encore à piocher (pioche + défausse)` : 'Pioche vide : toutes tes cartes sont en main, en jeu ou à bord'}">${S.dr + S.di ? '🂠 ' + (S.dr + S.di) : '🂠 vide'}</small></button>
+      <button class="pile deckbtn" id="pile" data-act="deck" data-s="${s}" title="Voir ton deck (touche D)" aria-label="Voir ton deck, ${S.dk} cartes"><span class="dk-stack" aria-hidden="true"><i></i><i></i><i></i></span><b>Deck</b><span>${S.dk}</span><small class="drw ${S.dr ? '' : 'empty'}" title="Pioche : ${S.dr} carte${S.dr > 1 ? 's' : ''} · Défausse : ${S.di} carte${S.di > 1 ? 's' : ''}. La défausse est remélangée dans la pioche au début d'un tour, quand la pioche ne suffit plus.">🂠 ${S.dr}${S.di ? ` · ♻️ ${S.di}` : ''}</small></button>
       ${S.rb ? `<span class="rbchip" title="Pot-de-vin : ton prochain achat coûte ${S.rb} or de moins">🤝 −${S.rb}🪙</span>` : ''}<span class="resg"><span class="pool g" id="gold" ${S.dt ? `title="Volé : les ${S.dt} prochains ors gagnés ce tour iront au voleur"` : ''}><span class="ico">🪙</span>${S.g}${S.dt ? `<small class="debt">−${S.dt}</small>` : ''}</span><span class="pool c" id="combat"><span class="ico">⚔</span>${S.c}</span></span></div>
     <div class="cards ${ui.purge ? 'purging' : ''}" id="hand">${S.hand.map((c, i) => cardHTML(c, c === 'bl' ? `data-act="sach" data-h="${i}"` : `data-act="play" data-h="${i}"`, `${S.rd ? 'off' : ''} ${deal ? 'deal' : ''}`, {allyOn: CARDS[c].f && crewFactionCount(CARDS[c].f) >= 1, style:`--i:${i}`})).join('') || '<span class="note">Main vide. Achète, attaque, puis termine ton tour.</span>'}</div>
     <div class="bar">
@@ -2919,7 +2942,7 @@ document.addEventListener('keydown', ev => {
 document.addEventListener('input', ev => { if(ev.target.id === 'nick') ui.nick = ev.target.value; });
 document.addEventListener('click', ev => {
   const b = ev.target.closest('[data-act]'); if(!b || b.disabled) return;
-  if(ui.playing && !['menu','quit'].includes(b.dataset.act)) return; // the enemy turn is being replayed
+  if(ui.playing && !['menu','quit','foe-info','coll-close'].includes(b.dataset.act)) return; // the enemy turn is being replayed
   const A = b.dataset.act, s = activeSeat(), S = s >= 0 && pv ? pv.seats[s] : null;
   const busy = () => { if(S && S.rd){ toast('Tu as terminé ton tour. Touche « Annuler » pour rejouer.'); return true; } return false; };
   switch(A){
@@ -2930,6 +2953,7 @@ document.addEventListener('click', ev => {
     case 'coll-end': quitToMenu(); ui.screen = 'coll'; ui.collTab = 'tro'; render(); window.scrollTo(0, 0); break;
     case 'coll-tab': ui.collTab = b.dataset.t; render(); break;
     case 'coll-info': openCollInfo(b.dataset.k, b.dataset.id); break;
+    case 'foe-info': ev.stopPropagation(); openFoeInfo(+b.dataset.e); break;
     case 'coll-close': { const m = b.closest('.collmodal'); if(m) m.remove(); break; }
     case 'bots-setup': quitToMenu(); ui.screen = 'bots-setup'; render(); break;
     case 'bots-me': ui.botMe = b.dataset.r; ui.botMates = ui.botMates.filter(r => r !== ui.botMe); if(!ui.botMates.length) ui.botMates = [Object.keys(ROLES).find(r => r !== ui.botMe)]; render(); break;
