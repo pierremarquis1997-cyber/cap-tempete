@@ -152,6 +152,10 @@ body.docked #app{ padding-bottom:var(--dockh, 280px); }
 .voyfx .vdest b{ font-family:"Pirata One", Georgia, serif; font-weight:400; font-size:clamp(26px, 8vw, 34px); }
 .voyfx .vdest small{ color:var(--muted); font-size:14px; }
 .voyfx .vhull{ font-size:13px; font-weight:700; color:#cfe3c4; }
+.voyfx .vmk{ font-size:14px; color:#ffe7a8; background:rgba(217,164,65,.14); border:1px solid rgba(217,164,65,.5); border-radius:12px; padding:7px 12px; animation:fadeUp .6s .5s both; }
+.voyfx .vmk b{ color:#ffd66b; }
+.voyfx .vmk-ic{ display:flex; flex-wrap:wrap; justify-content:center; gap:4px; margin-top:6px; font-size:20px; }
+.voyfx .vmk-ic i{ font-style:normal; }
 .voyfx .vskip{ font-size:12px; color:var(--muted); opacity:.7; }
 .scene.arrive .foe .fi{ animation:riseIn 1s cubic-bezier(.3,1.3,.5,1) both; }
 .scene.arrive .foe .intent, .scene.arrive .foe .fhp, .scene.arrive .foe .fnum{ animation:fadeUp .6s .6s both; }
@@ -700,94 +704,94 @@ const FACTIONS = {
 // ecl: the role's special skill, usable once per fight
 const ROLES = {
   cap:{n:'Capitaine', ic:'👑', col:'#e8b64c', d:"Soutient tout l'équipage.", card:'rcap',
-    ecl:{n:'Hissez les voiles', ic:'⛵', fx:{d:2, od:2, og:2, p:8}, t:'Toi et tes coéquipiers piochez 2 cartes, chacun d’eux gagne 2 or, +8 protection'}},
+    ecl:{n:'Hissez les voiles', ic:'⛵', fx:{d:2, od:1, og:1, p:8}, t:'Tu pioches 2 cartes, chaque coéquipier pioche 1 carte et gagne 1 or, +8 protection'}},
   can:{n:'Canonnier', ic:'💣', col:'#e0584a', d:'Les gros dégâts.', card:'rcan',
     ecl:{n:'Bordée totale', ic:'💥', fx:{aoe:12, p:8, d:2}, t:'12 dégâts à chaque menace, +8 protection et pioche 2 cartes'}},
   cha:{n:'Charpentier', ic:'🔨', col:'#c08a55', d:'Protège et répare la coque.', card:'rcha',
-    ecl:{n:'Grand radoub', ic:'🛠️', fx:{h:6, p:8, c:4}, t:'Répare 6 coque, donne 8 protection et +4 combat'}},
+    ecl:{n:'Grand radoub', ic:'🛠️', fx:{h:6, p:8, c:4, d:2}, t:'Répare 6 coque, donne 8 protection, +4 combat et pioche 2 cartes'}},
   car:{n:'Cartographe', ic:'🧭', col:'#4fc1b0', d:'Pioche et esquive les coups.', card:'rcar',
-    ecl:{n:'Contre-courant', ic:'🌀', fx:{half:1, d:1}, t:"Pioche 1 carte. Ce tour, les dégâts sur la coque sont réduits d'un quart"}},
+    ecl:{n:'Contre-courant', ic:'🌀', fx:{half:1, d:2}, t:"Pioche 2 cartes. Ce tour, les dégâts sur la coque sont réduits d'un quart"}},
 };
 
 // pl: when played · al: ally bonus (another card of the same faction in play in the whole crew) · sac: sacrifice bonus · ch: champion defence, ex: its effect each turn
 const CARDS = {
   dou:{n:"Piécette d'or", pl:{g:1}}, ec:{n:'Écoper', pl:{p:3}}, bou:{n:'Bourse', pl:{g:2}}, dag:{n:'Dague', pl:{c:1}}, sab:{n:'Sabre', pl:{c:2}},
-  rcap:{n:'Ordres du capitaine', role:'cap', pl:{g:1, og:1, p:3}},
+  rcap:{n:'Ordres du capitaine', role:'cap', pl:{g:1, og:1, p:2, d:1}},
   rcan:{n:'Canon de bord', role:'can', pl:{c:3, p:2, g:1}},
-  rcha:{n:'Caisse à outils', role:'cha', pl:{p:3, h:1, d:1}},
-  rcar:{n:'Carte marine', role:'car', pl:{g:1, d:1, p:2}},
+  rcha:{n:'Caisse à outils', role:'cha', pl:{p:2, h:1, d:1, g:1}},
+  rcar:{n:'Carte marine', role:'car', pl:{g:2, d:1, p:1}},
   rhu:{n:'Rhum', $:2, pl:{g:2}, sac:{c:4}},
   bl:{n:'Blessure', junk:1, pl:{}, sac:{}},
   f1:{n:'Mousse chapardeur', f:'F', $:2, pl:{g:2}, al:{c:1}, k:3},
   f2:{n:'Receleur', f:'F', $:3, pl:{g:2}, al:{g:2}, k:2},
-  f3:{n:'Pistolet à silex', f:'F', $:3, pl:{c:3}, al:{g:1}, k:2},
-  f4:{n:'Coffre au trésor', f:'F', $:4, pl:{g:3}, sac:{c:5}, k:2},
-  f5:{n:'Quartier-maître', f:'F', $:5, ch:4, ex:{g:2}, k:1},
-  f6:{n:'Contrebandière', f:'F', $:6, ch:5, ex:{g:1, c:2}, k:1},
-  f7:{n:'Butin royal', f:'F', $:6, pl:{g:4}, al:{og:1}, k:1},
-  f8:{n:'Roi des pirates', f:'F', $:8, ch:6, ex:{c:3, g:2}, k:1},
+  f3:{n:'Pistolet à silex', f:'F', $:4, pl:{c:3}, al:{g:1}, k:2},
+  f4:{n:'Coffre au trésor', f:'F', $:5, pl:{g:4}, sac:{c:5}, k:2},
+  f5:{n:'Quartier-maître', f:'F', $:7, ch:4, ex:{g:3}, k:1},
+  f6:{n:'Contrebandière', f:'F', $:9, ch:5, ex:{g:1, c:2}, k:1},
+  f7:{n:'Butin royal', f:'F', $:8, pl:{g:5}, al:{og:1}, k:1},
+  f8:{n:'Roi des pirates', f:'F', $:13, ch:6, ex:{c:3, g:2}, k:1},
   m1:{n:'Recrue', f:'M', $:2, pl:{p:2, c:1}, al:{h:2}, k:3},
-  m2:{n:'Mousquetaire', f:'M', $:3, pl:{c:3}, al:{p:3}, k:1},
-  m3:{n:'Chirurgien de bord', f:'M', $:3, pl:{h:4}, al:{d:1}, k:2},
-  m4:{n:'Bastingage renforcé', f:'M', $:4, pl:{p:6}, al:{h:2}, k:2},
-  m5:{n:'Sergent', f:'M', $:5, ch:5, ex:{c:2, p:2}, k:1},
-  m6:{n:'Amiral', f:'M', $:7, ch:6, ex:{c:3, p:3}, k:1},
-  m7:{n:"Frégate d'escorte", f:'M', $:7, pl:{p:8, h:5}, al:{oc:2}, k:1},
+  m2:{n:'Mousquetaire', f:'M', $:4, pl:{c:3}, al:{p:3}, k:1},
+  m3:{n:'Chirurgien de bord', f:'M', $:4, pl:{h:4}, al:{d:1}, k:2},
+  m4:{n:'Bastingage renforcé', f:'M', $:5, pl:{p:6}, al:{h:2}, k:2},
+  m5:{n:'Sergent', f:'M', $:8, ch:5, ex:{c:2, p:2}, k:1},
+  m6:{n:'Amiral', f:'M', $:11, ch:6, ex:{c:3, p:3}, k:1},
+  m7:{n:"Frégate d'escorte", f:'M', $:11, pl:{p:8, h:5}, al:{oc:2}, k:1},
   c1:{n:'Acolyte noyé', f:'C', $:1, pl:{c:2}, sac:{g:3}, k:3},
   c2:{n:'Encre maudite', f:'C', $:2, pl:{c:2}, al:{d:1}, k:2},
-  c3:{n:'Rituel de sang', f:'C', $:3, pl:{c:4}, al:{c:2}, k:1},
-  c4:{n:'Idole des profondeurs', f:'C', $:4, pl:{c:2}, sac:{c:8}, k:2},
-  c5:{n:'Grand prêtre', f:'C', $:6, ch:5, ex:{c:3}, k:1},
-  c6:{n:'Appel du Kraken', f:'C', $:6, pl:{c:7}, al:{c:3}, k:1},
-  c7:{n:'Liche des mers', f:'C', $:8, ch:7, ex:{c:5}, k:1},
-  t1:{n:'Guetteur', f:'T', $:3, pl:{c:1, d:1}, al:{c:1}, k:3},
-  t2:{n:'Lance tribale', f:'T', $:3, pl:{c:3}, al:{c:2}, k:1},
-  t3:{n:'Tambours de guerre', f:'T', $:5, pl:{c:2, od:1}, al:{d:1}, k:2},
-  t4:{n:'Chamane', f:'T', $:5, ch:4, ex:{h:2, p:2}, k:1},
-  t5:{n:"Esprit de l'île", f:'T', $:6, pl:{d:1, c:1}, al:{c:3}, k:1},
-  t6:{n:'Requin apprivoisé', f:'T', $:7, ch:6, ex:{c:4}, k:1},
-  t7:{n:'Chef de tribu', f:'T', $:8, ch:6, ex:{c:4}, k:1},
+  c3:{n:'Rituel de sang', f:'C', $:5, pl:{c:4}, al:{c:2}, k:1},
+  c4:{n:'Idole des profondeurs', f:'C', $:6, pl:{c:2}, sac:{c:8}, k:2},
+  c5:{n:'Grand prêtre', f:'C', $:9, ch:5, ex:{c:3}, k:1},
+  c6:{n:'Appel du Kraken', f:'C', $:10, pl:{c:7}, al:{c:3}, k:1},
+  c7:{n:'Liche des mers', f:'C', $:13, ch:7, ex:{c:5}, k:1},
+  t1:{n:'Guetteur', f:'T', $:4, pl:{c:1, d:1}, al:{c:1}, k:3},
+  t2:{n:'Lance tribale', f:'T', $:4, pl:{c:3}, al:{c:2}, k:1},
+  t3:{n:'Tambours de guerre', f:'T', $:7, pl:{c:2, od:1}, al:{d:1}, k:2},
+  t4:{n:'Chamane', f:'T', $:7, ch:4, ex:{h:2, p:2}, k:1},
+  t5:{n:"Esprit de l'île", f:'T', $:7, pl:{d:1, c:1}, al:{c:3}, k:1},
+  t6:{n:'Requin apprivoisé', f:'T', $:11, ch:6, ex:{c:4}, k:1},
+  t7:{n:'Chef de tribu', f:'T', $:13, ch:6, ex:{c:4}, k:1},
   // --- extension: more variety in the market ---
-  f9:{n:'Chasse au trésor', f:'F', $:3, pl:{g:2}, sac:{g:6}, k:2},
-  f10:{n:'Rat de cale', f:'F', $:3, pl:{g:1, d:1}, al:{g:1}, k:2},
-  f11:{n:'Canon volé', f:'F', $:5, pl:{c:4}, al:{aoe:3}, k:1},
-  f12:{n:'Capitaine corsaire', f:'F', $:7, ch:5, ex:{g:2, c:2}, k:1},
+  f9:{n:'Chasse au trésor', f:'F', $:4, pl:{g:2}, sac:{g:6}, k:2},
+  f10:{n:'Rat de cale', f:'F', $:4, pl:{g:1, d:1}, al:{g:1}, k:2},
+  f11:{n:'Canon volé', f:'F', $:7, pl:{c:4}, al:{aoe:3}, k:1},
+  f12:{n:'Capitaine corsaire', f:'F', $:11, ch:5, ex:{g:3, c:2}, k:1},
   m8:{n:'Clairon', f:'M', $:2, pl:{p:2}, al:{oc:1}, k:2},
-  m9:{n:'Boulets chaînés', f:'M', $:4, pl:{aoe:3}, al:{p:3}, k:2},
-  m10:{n:'Infirmerie', f:'M', $:5, pl:{h:6}, al:{h:3}, k:1},
-  m11:{n:'Garde du pont', f:'M', $:4, ch:4, ex:{p:3}, k:2},
-  c8:{n:'Tentacule', f:'C', $:2, pl:{c:3}, sac:{c:4}, k:1},
-  c9:{n:'Marée noire', f:'C', $:5, pl:{aoe:4}, al:{aoe:2}, k:1},
-  c10:{n:'Pacte abyssal', f:'C', $:4, pl:{c:2, d:1}, sac:{c:6}, k:2},
-  c11:{n:'Murène', f:'C', $:4, ch:3, ex:{c:2}, k:2},
+  m9:{n:'Boulets chaînés', f:'M', $:6, pl:{aoe:3}, al:{p:3}, k:2},
+  m10:{n:'Infirmerie', f:'M', $:7, pl:{h:6}, al:{h:3}, k:1},
+  m11:{n:'Garde du pont', f:'M', $:6, ch:4, ex:{p:3}, k:2},
+  c8:{n:'Tentacule', f:'C', $:3, pl:{c:3}, sac:{c:4}, k:1},
+  c9:{n:'Marée noire', f:'C', $:8, pl:{aoe:4}, al:{aoe:2}, k:1},
+  c10:{n:'Pacte abyssal', f:'C', $:6, pl:{c:2, d:1}, sac:{c:6}, k:2},
+  c11:{n:'Murène', f:'C', $:6, ch:3, ex:{c:2}, k:2},
   t8:{n:'Cueillette', f:'T', $:2, pl:{h:2, d:1}, k:2},
   t9:{n:'Sarbacane', f:'T', $:2, pl:{c:2}, al:{d:1}, k:1},
-  t10:{n:'Danse du feu', f:'T', $:5, pl:{c:3, od:1}, al:{c:3}, k:1},
-  t11:{n:'Tortue géante', f:'T', $:6, ch:8, ex:{p:3}, k:1},
+  t10:{n:'Danse du feu', f:'T', $:8, pl:{c:3, od:1}, al:{c:3}, k:1},
+  t11:{n:'Tortue géante', f:'T', $:9, ch:8, ex:{p:3}, k:1},
   // --- lean-deck tools: reward precise decks rather than huge ones ---
   x1:{n:'Cale sèche', f:'F', $:2, pl:{g:1, tr:1}, k:2},
-  x2:{n:'Canon à mitraille', f:'M', $:4, pl:{cpe:3}, k:2},
-  x3:{n:'Mercenaire', f:'F', $:5, ch:5, ex:{c:5}, up:1, k:1},
-  x4:{n:'Coffre piégé', f:'F', $:3, pl:{g:5, wd:1}, k:2},
-  x5:{n:'Vigie', f:'M', $:3, pl:{vig:1}, k:1},
-  x6:{n:'Pavillon noir', f:'C', $:4, pl:{pav:1}, k:2},
-  x7:{n:'Vieux loup de mer', f:'T', $:4, pl:{wolf:1}, k:2},
+  x2:{n:'Canon à mitraille', f:'M', $:7, pl:{cpe:3}, k:2},
+  x3:{n:'Mercenaire', f:'F', $:8, ch:5, ex:{c:5}, up:1, k:1},
+  x4:{n:'Coffre piégé', f:'F', $:4, pl:{g:5, wd:1}, k:2},
+  x5:{n:'Vigie', f:'M', $:8, pl:{vig:1}, k:1},
+  x6:{n:'Pavillon noir', f:'C', $:6, pl:{pav:1}, k:2},
+  x7:{n:'Vieux loup de mer', f:'T', $:11, pl:{wolf:1}, k:2},
   x8:{n:'Ascète des îles', f:'T', $:2, pl:{c:2, asc:3}, k:2},
   // --- faction identities: Flibuste = gold & market, Marine = defence, Culte = sacrifice & wounds, Tribu = draw & alliances ---
   f13:{n:'Pot-de-vin', f:'F', $:2, pl:{g:1, rb:2}, k:2},
-  f15:{n:'Marché noir', f:'F', $:3, pl:{g:2, mf:2}, k:2},
-  f14:{n:"Galion d'or", f:'F', $:7, pl:{g:3, fac:{f:'F', c:2}}, al:{og:2}, k:1},
-  m12:{n:"Filet d'abordage", f:'M', $:3, pl:{p:4, net:3}, k:2},
-  m13:{n:'Vaisseau amiral', f:'M', $:8, pl:{p:6, h:3, fac:{f:'M', p:2}}, al:{oc:2}, k:1},
-  c12:{n:'Marque maudite', f:'C', $:3, pl:{wnd:2}, k:2},
-  c13:{n:'Dévot', f:'C', $:3, pl:{c:1, dev:2}, sac:{c:3}, k:2},
-  c14:{n:'Rituel interdit', f:'C', $:7, pl:{c:4, fac:{f:'C', c:2}}, sac:{aoe:8}, k:1},
-  t12:{n:'Chant des ancêtres', f:'T', $:4, pl:{c:2}, al:{d:1, c:2}, k:2},
+  f15:{n:'Marché noir', f:'F', $:4, pl:{g:2, mf:2}, k:2},
+  f14:{n:"Galion d'or", f:'F', $:12, pl:{g:3, fac:{f:'F', c:2}}, al:{og:2}, k:1},
+  m12:{n:"Filet d'abordage", f:'M', $:4, pl:{p:4, net:3}, k:2},
+  m13:{n:'Vaisseau amiral', f:'M', $:13, pl:{p:6, h:3, fac:{f:'M', p:2}}, al:{oc:2}, k:1},
+  c12:{n:'Marque maudite', f:'C', $:4, pl:{wnd:2}, k:2},
+  c13:{n:'Dévot', f:'C', $:4, pl:{c:1, dev:2}, sac:{c:3}, k:2},
+  c14:{n:'Rituel interdit', f:'C', $:12, pl:{c:4, fac:{f:'C', c:2}}, sac:{aoe:8}, k:1},
+  t12:{n:'Chant des ancêtres', f:'T', $:6, pl:{c:2}, al:{d:1, c:2}, k:2},
   t13:{n:'Moussaillon', f:'T', $:1, pl:{c:1, g:1}, al:{c:1}, k:2},
-  m14:{n:'Riposte', f:'M', $:5, pl:{rip:1}, k:2},
-  c15:{n:'Frénésie', f:'C', $:5, pl:{frz:1}, k:2},
-  f16:{n:'Trésor de guerre', f:'F', $:5, pl:{g:2, gw:1}, k:2},
-  t14:{n:'Exode', f:'T', $:7, pl:{c:2, d:1, fac:{f:'T', c:2}}, al:{od:1}, k:1},
+  m14:{n:'Riposte', f:'M', $:7, pl:{rip:1}, k:2},
+  c15:{n:'Frénésie', f:'C', $:13, pl:{frz:1}, k:2},
+  f16:{n:'Trésor de guerre', f:'F', $:9, pl:{g:2, gw:1}, k:2},
+  t14:{n:'Exode', f:'T', $:12, pl:{c:2, d:1, fac:{f:'T', c:2}}, al:{od:1}, k:1},
   // --- legendary: only offered as epic rewards, never sold ---
   L1:{n:'Colère de Poséidon', leg:1, pl:{c:5, aoe:3}},
   L2:{n:'Coffre de Davy Jones', leg:1, pl:{g:6}},
@@ -818,6 +822,10 @@ const ART = {m14:'⚜️', c15:'🪓', f16:'💸', dou:'🪙', ec:'🪣', x1:'�
   L1:'⚡', L2:'🏺', L3:'🧿', L4:'👸', L5:'🐲', L6:'🥂', L7:'🌬️', L8:'🎆',
   t1:'👁️', t2:'🔱', t3:'🥁', t4:'🌿', t5:'🌋', t6:'🦈', t7:'🪶'};
 const MK_N = 4;   // cards on display at the market
+const MK_CAP = [7, 9, 12, 15];   // highest price on sale at the market during each epic: bigger cards appear as the voyage goes on
+const mkCap = G => G.tut ? 99 : (globalThis.MKCAP || MK_CAP)[Math.min(3, (G.ep || 1) - 1)];
+const mkPool = G => { const cap = mkCap(G); return MARKET_POOL.filter(c => CARDS[c].$ <= cap); };
+function freshMarket(G){ G.mdeck = shuffle(mkPool(G)); G.mk = []; while(G.mk.length < MK_N) G.mk.push(G.mdeck.pop()); }
 const MARKET_POOL = Object.entries(CARDS).filter(([, C]) => C.k).flatMap(([c, C]) => Array(C.k).fill(c));
 
 // it: repeating intent pattern. hit v, multi v×n, shield v, grow v, board v, heal v (every menace), curse n (a wound for each sailor),
@@ -879,16 +887,16 @@ const TRAIT_P = [.12, .3, .45, .65];
 const armorOf = e => (FOES[e.t].arm || 0) + (e.af === 'cui' ? 2 : 0);
 // a crossing is 3 epics played with the same deck; each epic: 2 encounters, 1 elite, 1 boss
 const EPICS = [
-  {n:'Première épopée', z:'Mer des Brumes', tr:'Des eaux traîtresses mais prévisibles', hp:1, bm:1.15, dm:1.1, cdm:{2:1.151, 3:1.143, 4:1.151}, bdm:1.15, ehp:.75, bhp:.3,
+  {n:'Première épopée', z:'Mer des Brumes', tr:'Des eaux traîtresses mais prévisibles', hp:1, bm:1.15, dm:1.1, cdm:{2:1.141, 3:1.221, 4:1.229}, bdm:1.15, ehp:.75, bhp:.3,
    pool:[['req'], ['pir', 'pir'], ['crab'], ['jelly', 'jelly'], ['gull', 'gull'], ['gull', 'jelly'], ['jelly', 'pir']],
    elites:[['nav'], ['sir', 'req'], ['crab', 'crab']]},
-  {n:'Deuxième épopée', z:'Les Récifs', tr:"Ruse : sbires, vols d'or et brouillard", hp:1.25, bm:1.45, dm:1.33, cdm:{2:1.128, 3:1.126, 4:1.137}, bdm:1.15, ehp:.9, bhp:.58,
+  {n:'Deuxième épopée', z:'Les Récifs', tr:"Ruse : sbires, vols d'or et brouillard", hp:1.25, bm:1.45, dm:1.33, cdm:{2:1.063, 3:1.131, 4:1.232}, bdm:1.15, ehp:.9, bhp:.58,
    pool:[['sir', 'req'], ['nav'], ['eel', 'smug'], ['witch', 'pir'], ['skel', 'mist'], ['smug', 'smug'], ['mist', 'eel'], ['witch', 'skel'], ['mutn', 'pir']],
    elites:[['ser'], ['orca'], ['gal']]},
-  {n:'Troisième épopée', z:'Les Abysses', tr:"Rage : les menaces s'enragent à mi-vie et les malédictions collent au deck", rage:1, hex:1, hp:1.45, bm:2.4, dm:1.3, ehp:.8, bhp:1.15, bdm:1.3, cdm:{2:.986, 3:1.064, 4:1.055},
+  {n:'Troisième épopée', z:'Les Abysses', tr:"Rage : les menaces s'enragent à mi-vie et les malédictions collent au deck", rage:1, hex:1, hp:1.45, bm:2.4, dm:1.3, ehp:.8, bhp:1.15, bdm:1.3, cdm:{2:1.009, 3:1.205, 4:1.282},
    pool:[['ser'], ['orca'], ['gal'], ['angl', 'jelly'], ['witch', 'angl'], ['nav', 'smug'], ['sir', 'mist'], ['eel', 'eel', 'jelly'], ['vort', 'skel'], ['bsir', 'mist'], ['rat', 'skel'], ['mutn', 'smug'], ['seer', 'angl']],
    elites:[['gal', 'skel'], ['orca', 'eel'], ['ser', 'witch'], ['titan'], ['titan', 'eel']]},
-  {n:'Quatrième épopée', z:"L'Œil du cyclone", tr:'Cyclone : rage, malédictions tenaces, et chaque menace frappe plus fort dès le départ', rage:1, hex:1, str0:1, hp:1.5, bm:2.73, dm:1, cdm:{2:.817, 3:.882, 4:.927}, ehp:.8, bhp:1, bdm:.8,
+  {n:'Quatrième épopée', z:"L'Œil du cyclone", tr:'Cyclone : rage, malédictions tenaces, et chaque menace frappe plus fort dès le départ', rage:1, hex:1, str0:1, hp:1.5, bm:2.73, dm:1, cdm:{2:0.9, 3:1.376, 4:1.829}, ehp:.8, bhp:1, bdm:.8,
    pool:[['ser', 'smug'], ['orca', 'mist'], ['gal', 'eel'], ['angl', 'wrai'], ['wrai', 'jelly', 'jelly'], ['nav', 'angl'], ['wrai', 'skel'], ['vort', 'crab'], ['vort', 'req', 'req'], ['bsir', 'seer'], ['rat', 'mutn', 'jelly'], ['titan', 'smug']],
    elites:[['gal', 'wrai'], ['ser', 'orca'], ['angl', 'angl', 'mist'], ['titan', 'bsir'], ['rat', 'rat', 'seer']]},
 ];
@@ -980,20 +988,20 @@ function applyFx(G, s, fx){
   if(fx.skip) G.en.forEach(e => e.sk = 1);
   if(fx.tr) S.ft = (S.ft || 0) + fx.tr;                                                        // free throw-away
   if(fx.cpe) S.c += fx.cpe * G.en.filter(e => e.hp > 0).length;                                 // per menace
-  if(fx.vig) addProt(G, Math.min(8, G.seats.reduce((t, o) => t + o.champ.length, 0)));          // per servant aboard
+  if(fx.vig) addProt(G, G.seats.reduce((t, o) => t + o.champ.length, 0));          // per servant aboard
   if(fx.pav) S.c += fx.pav * factionCount(G, 'C');                                             // per Cult card in play in the crew
-  if(fx.wolf) S.c += Math.min(6, S.draw.length);                                                // rewards NOT drawing everything
+  if(fx.wolf) S.c += S.draw.length;                                                // rewards NOT drawing everything
   if(fx.asc && S.play.length <= 4) S.c += fx.asc;                                               // rewards short turns
   if(fx.wd) S.disc.push('bl');
   if(fx.rb) S.rb = (S.rb || 0) + fx.rb;                                                        // next purchase cheaper
   if(fx.mf) S.mf = (S.mf || 0) + fx.mf;                                                        // free market refreshes
   if(fx.net) G.net = (G.net || 0) + fx.net;                                                    // servants hold better against the next boarding
-  if(fx.wnd) S.c += Math.min(8, fx.wnd * [...S.draw, ...S.disc].filter(c => c === 'bl').length);   // wounds become strength
+  if(fx.wnd) S.c += fx.wnd * [...S.draw, ...S.disc].filter(c => c === 'bl').length;   // wounds become strength
   if(fx.dev) S.dev = (S.dev || 0) + fx.dev;
-  if(fx.rip) S.c += Math.min(12, G.prot * fx.rip);                           // défense : la protection devient des dégâts
-  if(fx.frz) S.c += Math.min(12, S.c * fx.frz);                               // attaque : le combat du tour augmente de moitié
-  if(fx.gw) S.c += Math.min(12, S.g * fx.gw);                                                  // économie : l'or en main devient des dégâts
-  if(fx.fac){ const n = Math.min(4, Math.max(0, S.play.filter(p => CARDS[p.c].f === fx.fac.f).length - 1)); const o = {}; for(const k in fx.fac) if(k !== 'f') o[k] = fx.fac[k] * n; applyFx(G, s, o); }   // rewards a one-faction turn                                                    // every sacrifice this turn gives more
+  if(fx.rip) S.c += Math.floor(G.prot / 2) * fx.rip;                           // défense : la protection devient des dégâts
+  if(fx.frz) S.c += S.c * fx.frz;                               // attaque : le combat du tour augmente de moitié
+  if(fx.gw) S.c += S.g * fx.gw;                                                  // économie : l'or en main devient des dégâts
+  if(fx.fac){ const n = Math.max(0, S.play.filter(p => CARDS[p.c].f === fx.fac.f).length - 1); const o = {}; for(const k in fx.fac) if(k !== 'f') o[k] = fx.fac[k] * n; applyFx(G, s, o); }   // rewards a one-faction turn                                                    // every sacrifice this turn gives more
   if(fx.half) G.half = 1;
 }
 function factionCount(G, f){
@@ -1016,7 +1024,7 @@ function startVoyage(G){
   G.maxHull = G.tut ? 30 : HULL(n); G.hull = G.maxHull; G.node = -1;
   G.ep = 1; G.bosses = [...shuffle(['levi', 'dutch']), 'kra', 'mael'];
   G.route = G.tut ? TUT_ROUTE : makeRoute(G);
-  G.mdeck = shuffle([...MARKET_POOL]); G.mk = [];
+  G.mdeck = shuffle(G.tut ? [...MARKET_POOL] : mkPool(G)); G.mk = []; G.newCards = [];
   if(G.tut){ G.mk = ['f1','t1','m3','c1']; G.mdeck = G.mdeck.filter(c => !G.mk.includes(c)); }
   while(G.mk.length < MK_N) G.mk.push(G.mdeck.pop());
   logf(G, "L'équipage lève l'ancre !");
@@ -1034,7 +1042,7 @@ function advance(G){
   if(!G.tut && E.str0) G.en.forEach(e => e.str += E.str0);
   G.en.forEach(e => { const F = FOES[e.t]; if(F.cap) e.cap = Math.round(F.cap * k); });
   if(!G.tut) G.en.forEach(e => { if(Math.random() < TRAIT_P[G.ep - 1] * (FOES[e.t].boss ? .8 : 1)){ e.af = pickOne(Object.keys(TRAITS)); if(e.af === 'gia'){ e.hp = e.mx = Math.round(e.mx * 1.4); } } });
-  if(!G.tut){ G.mdeck = shuffle([...MARKET_POOL]); G.mk = []; while(G.mk.length < MK_N) G.mk.push(G.mdeck.pop()); }   // a fresh market at every step
+  if(!G.tut && (G.node === 0 || N.boss)) freshMarket(G);   // the market is renewed at the start of each epic and before the boss
   G.seats.forEach(S => { S.mr = 0; S.draw = shuffle([...S.deck, ...Array(S.nw || 0).fill('bl')]); S.nw = 0; S.dt = 0; S.fog = 0; S.disc = []; S.hand = []; S.play = []; S.champ = []; S.eu = 0; });
   logf(G, `En vue : ${N.f.map(t => FOES[t].n).join(', ')}`);
   evt(G, {t:'fight', z:N.z, boss:N.boss ? 1 : 0, el:N.el ? 1 : 0, f:N.f[0], ep:G.tut ? 0 : G.ep, first:G.node === 0 ? 1 : 0, myst:N.myst ? 1 : 0});
@@ -1122,7 +1130,7 @@ function buy(G, s, m){
   const code = m === -1 ? 'rhu' : G.mk[m]; if(!code) return;
   const cost = Math.max(0, CARDS[code].$ - (S.rb || 0)); if(S.g < cost) return;
   S.g -= cost; S.rb = 0; S.deck.push(code); S.disc.push(code);
-  if(m !== -1){ if(!G.mdeck.length) G.mdeck = shuffle([...MARKET_POOL]); G.mk[m] = G.mdeck.pop(); }
+  if(m !== -1){ if(!G.mdeck.length) G.mdeck = shuffle(mkPool(G)); G.mk[m] = G.mdeck.pop(); }
   logf(G, `${S.n} achète ${CARDS[code].n}`);
   evt(G, {t:'buy', s, c:code, m});
 }
@@ -1170,7 +1178,7 @@ function startStop(G, N){
   G.port = {k:N.rest ? 'rest' : 'evt', e:N.e || null, of:{}, pick:{}, rm:{}};
   G.seats.forEach((S, i) => {
     S.rd = S.ab; S.hand = []; S.play = []; S.champ = []; S.g = 0; S.c = 0;
-    const rares = shuffle(unique(C => C.$ >= 5)), mid = unique(C => C.$ >= 3 && C.$ <= 5), cheap = unique(C => C.$ >= 2 && C.$ <= 4);
+    const cap = mkCap(G), rares = shuffle(unique(C => C.$ >= cap - 3 && C.$ <= cap + 2)), mid = unique(C => C.$ >= 4 && C.$ <= 7), cheap = unique(C => C.$ >= 2 && C.$ <= 4);   // rewards follow the market's price range for this epic
     let of;
     if(N.rest) of = ['H:' + share(REST_HEAL), 'X', 'C:' + rares[0], 'C:' + rares[1]];
     else if(N.e === 'wreck') of = ['C:' + pickOne(cheap), 'CW:' + rares[0], 'N'];
@@ -1227,7 +1235,7 @@ function leavePort(G){
   });
   G.port = null; G.ep++; G.node = -1;
   G.route = makeRoute(G);
-  G.mdeck = shuffle([...MARKET_POOL]); G.mk = []; while(G.mk.length < MK_N) G.mk.push(G.mdeck.pop());
+  { const was = (EPICS[G.ep - 2] && (globalThis.MKCAP || MK_CAP)[G.ep - 2]) || 0, cap = mkCap(G); G.newCards = Object.keys(CARDS).filter(c => CARDS[c].k && CARDS[c].$ > was && CARDS[c].$ <= cap); }   // announced on the map: the cards that join the market
   logf(G, `${EPICS[G.ep - 1].n} : cap sur ${EPICS[G.ep - 1].z}`);
   advance(G);
 }
@@ -1392,7 +1400,7 @@ function dispatch(G, a, from){
 function view(G){
   return {ep:G.ep, port:G.port, rt:G.tut || !G.route ? null : G.route.map(routeCode), phase:G.phase, node:G.node, tut:G.tut ? 1 : 0, hull:G.hull, maxHull:G.maxHull, prot:G.prot, br:G.breach || 0, half:G.half ? 1 : 0, net:G.net || 0, bm:G.bm || 1, dm:G.dm, hk:G.hk || 1, round:G.round, stg:G.stg || 0, mut:G.mut ? 1 : 0, host:G.host,
     en:G.en.map(e => { const o = {t:e.t, hp:e.hp, mx:e.mx}; if(e.hp <= 0) return o; o.i = e.i; if(e.blk) o.blk = e.blk; if(e.str) o.str = e.str; if(e.sk) o.sk = 1; if(e.rg) o.rg = 1; if(e.cap){ o.cap = e.cap; o.tk = e.tk || 0; } if(e.af) o.af = e.af; if(e.rf) o.rf = 1; if(e.inv){ o.inv = 1; o.nx = e.nx ? e.nx[1] : 0; } return o; }),   // compact: zero fields are restored by setView
-    mk:G.mk, md:G.mdeck.length,
+    mk:G.mk, md:G.mdeck.length, mc:mkCap(G), nc:(G.newCards || []).length, ncl:G.node <= 0 ? (G.newCards || []) : [],
     seats:G.seats.map(S => ({r:S.r, n:S.n, p:S.p, g:S.g, c:S.c, hand:S.hand, play:S.play, champ:S.champ.map(p => { const o = {c:p.c, u:p.u ? 1 : 0}; if(p.lk) o.lk = 1; if(p.bd) o.bd = 1; return o; }), dr:S.draw.length, di:S.disc.length, dk:S.deck.length, deck:packDeck(S.deck), bl:[...S.draw, ...S.disc, ...S.hand].filter(c => c === 'bl').length, rd:S.rd ? 1 : 0, eu:S.eu >= eclMax(S) ? 1 : 0, eul:eclMax(S) - S.eu, rel:S.rel || [], pg:S.pg || 0, bot:S.bot ? 1 : 0, rb:S.rb || 0, mf:S.mf || 0, nw:S.nw || 0, dt:S.dt || 0, ft:S.ft || 0, mr:S.mr || 0, ed:S.ed || 0, ef:S.ef || 0, ab:S.ab ? 1 : 0})),
     log:G.log.slice(-3), ack:G.ack, ev:G.ev.slice(-8)};
 }
@@ -1427,7 +1435,7 @@ function aiTurn(G, i){
   while(G.phase === 'fight' && S.hand.includes('bl')) sacHand(G, i, S.hand.indexOf('bl'));
   playAll(G, i); if(G.phase !== 'fight' || G.stg !== st) return;
   if(S.eu < eclMax(S)){ const live = G.en.filter(e => e.hp > 0), inc = aiIncoming(G);
-    const go = S.r === 'can' ? live.length >= 2 || live.some(e => e.hp <= 12) : S.r === 'cha' ? G.hull <= .55 * G.maxHull || inc >= .35 * G.hull : S.r === 'car' ? inc >= .3 * G.hull || inc >= 14 : true;
+    const go = S.r === 'can' ? G.hull <= .55 * G.maxHull || inc >= .35 * G.hull : S.r === 'cha' ? G.hull <= .55 * G.maxHull || inc >= .35 * G.hull : S.r === 'car' ? inc >= .3 * G.hull || inc >= 14 : true;
     if(go){ eclat(G, i); playAll(G, i); } if(G.phase !== 'fight' || G.stg !== st) return; }
   // sacrifice what pays off before shopping (the gold is spent right away): cheap cards always, the others in boss fights
   const boss = G.en.some(e => e.hp > 0 && FOES[e.t].boss);
@@ -1436,7 +1444,7 @@ function aiTurn(G, i){
   for(let n = 0; n < 8 && G.phase === 'fight' && G.stg === st; n++){
     let best = -1, bs = -1; G.mk.forEach((c, m) => { if(c && CARDS[c].$ <= S.g){ const v = aiScore(S, c); if(v > bs){ bs = v; best = m; } } });
     if(best >= 0 && bs >= 5){ buy(G, i, best); continue; }
-    if(S.g >= mkCost(S) + 2){ let w = -1, ws = 99; G.mk.forEach((c, m) => { const v = aiScore(S, c) / Math.max(1, CARDS[c].$); if(v < ws){ ws = v; w = m; } }); if(w >= 0){ mkRemove(G, i, w); continue; } }
+    if(S.g >= mkCost(S) + 2){ let w = -1, ws = 99; G.mk.forEach((c, m) => { const v = aiScore(S, c); if(v < ws){ ws = v; w = m; } }); if(w >= 0){ mkRemove(G, i, w); continue; } }
     if(best >= 0 && bs >= 3){ buy(G, i, best); continue; }
     break;
   }
@@ -1660,12 +1668,13 @@ async function playTransition(prev, v){
         ${!inPort ? '' : `<i class="next port" style="left:100%">⚓</i>`}
         <span class="vship" style="--x0:${(Math.max(from, -.5) + .5) / R.length * 100}%;--x1:${Math.min(to + .5, R.length) / R.length * 100}%">⛵</span></div>
       <div class="vdest"><span class="vic">${L.ic}</span><b>${esc(L.t)}</b><small>${esc(L.sub || '')}</small></div>
+      ${newEp && (v.ep || 1) > 1 && v.nc ? `<div class="vmk">🛒 Le marché s'agrandit : <b>${v.nc} nouvelles cartes</b>, jusqu'à ${v.mc} 🪙<span class="vmk-ic">${(v.ncl || []).map(c => `<i title="${esc(CARDS[c].n)}">${ART[c] || '🃏'}</i>`).join('')}</span></div>` : ''}
       <div class="vhull">Coque ${v.hull}/${v.maxHull}</div>
       <div class="vskip">Touche pour continuer</div></div>`;
   o.addEventListener('click', () => skip());
   document.body.appendChild(o);
   requestAnimationFrame(() => o.classList.add('on'));
-  await wait(newEp ? 3800 : 3000);
+  await wait(newEp ? ((v.ep || 1) > 1 && v.nc ? 5200 : 3800) : 3000);
   o.classList.remove('on'); o.classList.add('off'); await sleep(300);
 }
 function clearPresence(){ if(room) room.presence({k:null, h:null, q:null, g:null}).catch(() => {}); }
@@ -1681,11 +1690,13 @@ function runBots(){
   ui.botT = null;
   if(mode !== 'local' || !G) return;
   if(ui.playing){ scheduleBots(); return; }
+  // a teammate's power (the Captain's « Hissez les voiles »…) can hand cards or gold to a robot that already ended its turn: wake it up to use them
+  if(G.phase === 'fight') G.seats.forEach(S => { if(S.bot && S.rd && !S.ab && (S.hand.some(c => !CARDS[c].junk) || S.g > (S.rdg || 0))) S.rd = false; });
   const i = G.seats.findIndex(S => S.bot && !S.rd && !S.ab);
   if(i < 0 || (G.phase !== 'fight' && G.phase !== 'port')) return;
   const st = G.stg;
   if(G.phase === 'fight') aiTurn(G, i); else aiStop(G, i);
-  if(G.stg === st && (G.phase === 'fight' || G.phase === 'port')){ const S = G.seats[i]; if(!S.rd) setReady(G, i, true); }   // not if its blow just ended the step
+  if(G.stg === st && (G.phase === 'fight' || G.phase === 'port')){ const S = G.seats[i]; S.rdg = S.g; if(!S.rd) setReady(G, i, true); }   // not if its blow just ended the step
   publish();
 }
 function startLocal(){
@@ -1737,19 +1748,19 @@ function fxText(fx){
   if(fx.aoe) t.push(`${fx.aoe} dégâts à chaque menace`);
   if(fx.tr) t.push(`jette gratuitement une carte de ta main pour de bon`);
   if(fx.cpe) t.push(`+${fx.cpe} combat par menace en vie`);
-  if(fx.vig) t.push(`+1 protection par serviteur à bord (max 8)`);
+  if(fx.vig) t.push(`+1 protection par serviteur à bord`);
   if(fx.pav) t.push(`+${fx.pav} combat par carte Culte des abysses en jeu dans l'équipage`);
-  if(fx.wolf) t.push(`+1 combat par carte restant dans ta pioche (max 6)`);
+  if(fx.wolf) t.push(`+1 combat par carte restant dans ta pioche`);
   if(fx.asc) t.push(`+${fx.asc} combat de plus si tu as joué 4 cartes ou moins ce tour`);
   if(fx.wd) t.push(`une blessure dans ta défausse`);
   if(fx.rb) t.push(`ton prochain achat ce tour coûte ${fx.rb} or de moins`);
   if(fx.mf) t.push(`${fx.mf} retraits du marché gratuits ce tour`);
   if(fx.net) t.push(`+${fx.net} de défense à tous les serviteurs contre les abordages de ce tour`);
-  if(fx.wnd) t.push(`+${fx.wnd} combat par blessure dans ta pioche et ta défausse (max 8)`);
-  if(fx.rip) t.push(`+1 combat par point de protection de l'équipage (max 12) : joue-la en dernier`);
-  if(fx.frz) t.push(`double ton combat de ce tour (max +12) : joue-la en dernier`);
-  if(fx.gw) t.push(`+1 combat par or que tu possèdes, sans le dépenser (max 12) : joue-la en dernier`);
-  if(fx.fac) t.push(`${facLine(fx.fac)} par autre carte ${FACTIONS[fx.fac.f].n} que tu as déjà jouée ce tour (max 4) : joue-la en dernier`);
+  if(fx.wnd) t.push(`+${fx.wnd} combat par blessure dans ta pioche et ta défausse`);
+  if(fx.rip) t.push(`+1 combat pour 2 points de protection de l'équipage : joue-la en dernier`);
+  if(fx.frz) t.push(`double ton combat de ce tour : joue-la en dernier`);
+  if(fx.gw) t.push(`+1 combat par or que tu possèdes, sans le dépenser : joue-la en dernier`);
+  if(fx.fac) t.push(`${facLine(fx.fac)} par autre carte ${FACTIONS[fx.fac.f].n} que tu as déjà jouée ce tour : joue-la en dernier`);
   if(fx.dev) t.push(`chaque sacrifice ce tour donne +${fx.dev} combat de plus`);
   if(fx.d) t.push(`pioche ${fx.d}`); if(fx.og) t.push(`chaque coéquipier +${fx.og} or`); if(fx.oc) t.push(`chaque coéquipier +${fx.oc} combat`); if(fx.od) t.push(`chaque coéquipier pioche ${fx.od}`);
   return t.join(', ');
@@ -1772,18 +1783,18 @@ function facLine(o, short){ return Object.keys(o).filter(k => k !== 'f').map(k =
 function specialText(fx){
   const t = [];
   if(fx.cpe) t.push(`${fx.cpe}⚔ par menace en vie`);
-  if(fx.vig) t.push('1🛡 par serviteur à bord (max 8)');
+  if(fx.vig) t.push('1🛡 par serviteur à bord');
   if(fx.pav) t.push(`${fx.pav}⚔ par carte Culte en jeu`);
-  if(fx.wolf) t.push('1⚔ par carte dans ta pioche (max 6)');
+  if(fx.wolf) t.push('1⚔ par carte dans ta pioche');
   if(fx.asc) t.push(`+${fx.asc}⚔ si tu as joué 4 cartes ou moins`);
   if(fx.tr) t.push('Jette 1 carte de ta main, gratuitement');
   if(fx.wd) t.push('+1 blessure dans ta défausse');
   if(fx.rb) t.push(`Prochain achat : −${fx.rb}🪙`);
   if(fx.mf) t.push(`${fx.mf} retraits du marché gratuits`);
   if(fx.net) t.push(`+${fx.net} déf. aux serviteurs ce tour`);
-  if(fx.wnd) t.push(`${fx.wnd}⚔ par blessure dans ton deck (max 8)`);
+  if(fx.wnd) t.push(`${fx.wnd}⚔ par blessure dans ton deck`);
   if(fx.dev) t.push(`Sacrifices : +${fx.dev}⚔ chacun`);
-  if(fx.rip) t.push('+1⚔ par 🛡 de l\'équipage');
+  if(fx.rip) t.push('+1⚔ pour 2🛡 de l\'équipage');
   if(fx.frz) t.push('Double ton ⚔ du tour');
   if(fx.gw) t.push('+1⚔ par 🪙 que tu as');
   if(fx.fac) t.push(`${facLine(fx.fac, 1)} par carte ${FACTIONS[fx.fac.f].ic} jouée avant`);
@@ -2242,7 +2253,7 @@ function renderFight(app){
         <div class="st">${x.ab ? 'Absent·e' : `<span>🪙 ${x.g}</span><span>⚔ ${x.c}</span><span>🃏 ${x.hand.length}</span>${x.champ.length ? `<span>🛡 ${x.champ.length}</span>` : ''}`}</div></button>`;
     }).join('')}</div>
     ${playedHTML(s)}
-    <section class="sect" id="market"><header><h2>Marché</h2><span class="note">${pv.md} cartes en réserve</span></header>
+    <section class="sect" id="market"><header><h2>Marché</h2><span class="note">${pv.md} cartes en réserve${pv.tut ? '' : ` · jusqu'à ${pv.mc || 15} 🪙`}</span></header>
       <div class="cards">${pv.mk.map((c, i) => c ? `<div class="mkslot">${cardHTML(c, `data-act="buy" data-m="${i}"`, `${S && S.g + (S.rb || 0) >= CARDS[c].$ && !S.rd ? 'afford' : 'off'} ${ui.flip && ui.flip.has(i) ? 'flipin' : ''}`, {cost:1})}<button class="mkrm" data-act="mkrm" data-m="${i}" title="Retirer cette carte du marché : elle est remplacée par une nouvelle (${S ? mkCost(S) : 1} or ; le prix monte de 1 à chaque retrait et revient à 1 à chaque nouvelle étape)" ${S && (S.mf || S.g >= mkCost(S)) && !S.rd ? '' : 'disabled'}>✕ Retirer ${S && S.mf ? 'gratuit' : '🪙' + (S ? mkCost(S) : 1)}</button></div>` : '').join('')}
         ${cardHTML('rhu', 'data-act="buy" data-m="-1"', S && S.g >= 2 && !S.rd ? 'afford' : 'off', {cost:1})}</div>
       <div class="legend">${Object.values(FACTIONS).map(f => `<span>${f.ic} ${f.n}</span>`).join('')}<span>💥 toutes les menaces</span><span>👥 chaque coéquipier</span><span>🃏 pioche</span><span>❤ coque</span><span>☠ sacrifier</span></div></section>
@@ -2561,7 +2572,7 @@ async function playEnemyTurn(turn, prev){
         if(ship){ ship.classList.remove('hit'); void ship.offsetWidth; ship.classList.add('hit'); }
         splash(); floatAt('#prot', `💥 Brèche −${ev.br}`, '#ff8a70'); await sleep(500);
         const from = rectOf('#ship');
-        (ev.w || []).forEach((si, k) => setTimeout(() => { flyGhost(cardHTML('bl', '', ''), from, `.seat[data-s="${si}"]`); const S = pv.seats[si]; if(S) floatAt(`.seat[data-s="${si}"]`, `🩹 Blessure pour ${S.n}`, '#e8c8ff'); }, k * 280));
+        (ev.w || []).forEach((si, k) => setTimeout(() => { if(!pv) return; flyGhost(cardHTML('bl', '', ''), from, `.seat[data-s="${si}"]`); const S = pv.seats[si]; if(S) floatAt(`.seat[data-s="${si}"]`, `🩹 Blessure pour ${S.n}`, '#e8c8ff'); }, k * 280));
         await sleep(650);
       }
       await sleep(450);
