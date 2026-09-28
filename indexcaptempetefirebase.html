@@ -208,6 +208,20 @@ body.docked #app{ padding-bottom:var(--dockh, 280px); }
 .foe .atk:hover, .foe .atk:focus-visible{ background:#ff6a45; outline:none; }
 @keyframes firepulse{ 50%{ scale:1.1; box-shadow:0 3px 0 rgba(0,0,0,.35), 0 0 24px rgba(255,140,90,.9); } }
 @media (prefers-reduced-motion:reduce){ .foe .atk{ animation:none; } }
+.hups{ margin-left:6px; letter-spacing:1px; }
+.hups i{ font-style:normal; font-size:11px; }
+.sacts{ position:absolute; left:10px; top:52px; z-index:12; display:flex; gap:6px; }
+.sact{ width:34px; height:34px; border-radius:50%; display:grid; place-items:center; font-size:17px; border:2px solid #8a6a3c; background:radial-gradient(circle at 40% 30%, #3d5a6b, #122330 75%); box-shadow:0 2px 5px rgba(0,0,0,.5); cursor:pointer; padding:0; }
+.sact.ready{ border-color:#ffd98a; animation:sactglow 1.6s ease-in-out infinite; }
+.sact.used{ filter:grayscale(1) brightness(.6); }
+.sact:disabled{ cursor:default; }
+@keyframes sactglow{ 50%{ box-shadow:0 0 14px rgba(255,210,120,.85), 0 2px 5px rgba(0,0,0,.5); } }
+.upchoice{ display:grid; gap:8px; margin:0 0 14px; padding:12px; border-radius:14px; background:linear-gradient(rgba(217,164,65,.16), rgba(10,20,26,.4)); border:1px solid rgba(217,164,65,.6); text-align:left; }
+.upchoice > b{ font-size:15px; color:var(--parch); } .upchoice small{ color:var(--muted); font-size:12.5px; }
+.upchoice .opts{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+.myship{ display:flex; flex-wrap:wrap; gap:6px 12px; align-items:center; margin:0 0 14px; padding:8px 12px; border-radius:12px; background:rgba(10,20,26,.4); border:1px solid var(--line); font-size:13px; }
+.myship b{ color:var(--parch); }
+.cups{ font-size:12.5px; color:var(--muted); margin-top:4px; }
 .helmpick{ display:grid; gap:6px; padding:10px 12px; border-radius:12px; background:rgba(10,20,26,.45); border:1px solid rgba(217,164,65,.45); text-align:left; }
 .helmpick > b{ font-size:14.5px; color:var(--parch); }
 .helmpick small{ font-size:12.5px; color:var(--muted); line-height:1.35; }
@@ -215,6 +229,9 @@ body.docked #app{ padding-bottom:var(--dockh, 280px); }
 .helmpick .seg button{ border:1px solid var(--line); border-radius:18px; padding:6px 11px; font-size:12.5px; background:var(--sea-2); }
 .helmpick .seg button.on{ background:linear-gradient(#f3cf7a, #d9a441); border-color:#ffe3a0; color:#2b1a0a; box-shadow:0 0 12px rgba(217,164,65,.5); }
 .helmb{ margin-left:4px; font-size:.9em; filter:drop-shadow(0 0 4px rgba(255,210,120,.6)); }
+.shipdec{ border-color:rgba(217,164,65,.55); background:linear-gradient(rgba(217,164,65,.12), transparent 60%), linear-gradient(var(--deck), var(--sea-2)); }
+.shipdec .relic.dim{ opacity:.6; }
+.waitcap{ padding:10px 12px; border-radius:10px; background:rgba(10,20,26,.4); }
 .foe .atk.spect{ background:rgba(20,34,44,.85); color:#ffd9cc; border:2px dashed #e0876c; box-shadow:0 3px 0 rgba(0,0,0,.35); animation:none; pointer-events:none; font-size:17px; padding:6px 11px; }
 .atkstrip{ display:flex; align-items:center; gap:8px; margin:-4px 0 0; padding:8px 12px; border-radius:0 0 14px 14px; font-size:13.5px; line-height:1.3; color:#fff3dc; background:linear-gradient(90deg, rgba(120,40,20,.85), rgba(60,24,14,.85)); border:1px solid #b8432f; border-top:none; box-shadow:0 6px 14px rgba(0,0,0,.35); }
 .atkstrip.me{ background:linear-gradient(90deg, #b8432f, #7a2a18); animation:atkstrip 1.4s ease-in-out infinite; }
@@ -1230,11 +1247,22 @@ const ART = {sig3:'🪝', n31:'🧒', n32:'🔭', n33:'🔪', n34:'🏰', sig4:'
   L1:'⚡', L2:'🏺', L3:'🧿', L4:'👸', L5:'🐲', L6:'🥂', L7:'🌬️', L8:'🎆',
   t1:'👁️', t2:'🔱', t3:'🥁', t4:'🌿', t5:'🌋', t6:'🦈', t7:'🪶'};
 const MK_N = 4;   // cards on display at the market
+// ship upgrades: after each sector (its 4th epic won), the crew installs one of two upgrades, kept for the rest of the adventure
+const SHIP_UPS = {   // from the fifth sector on, when the sea gets rough: a reward after each hard sector
+  4:[['prow', '💥', 'Canon de proue', "Une fois par combat, le capitaine tire sur la menace la plus entamée : 3 dégâts par matelot à bord."], ['bell', '🔔', 'Cloche du bord', "Une fois par combat, le capitaine sonne le rappel : chaque matelot pioche 1 carte."]],
+  5:[['lamp', '🏮', 'Lanterne de cale', "La cale montre 5 cartes au lieu de 4."], ['safe', '💰', 'Coffre-fort', "Chaque matelot garde 1 bougie d'un tour à l'autre."]],
+  6:[['copper', '🛡️', 'Coque doublée de cuivre', "La coque gagne 10 points maximum."], ['chest', '🧰', 'Coffre du charpentier', "La coque regagne 3 points de plus après chaque combat gagné."]],
+  7:[['ram', '🔩', 'Éperon', "Les carapaces et cuirasses des menaces perdent 1."], ['grey', '🌫️', 'Voiles grises', "Une menace de moins dans les combats ordinaires à plusieurs menaces."]],
+  8:[['figure', '🔱', 'Figure de proue dorée', "À chaque attaque, +1 ⚔ par faction différente jouée par l'équipage ce tour."], ['anchor', '⚓', 'Ancre lestée', "Le premier coup reçu à chaque combat est réduit de moitié."]],
+};
+const UP = Object.fromEntries(Object.entries(SHIP_UPS).flatMap(([k, l]) => l.map(u => [u[0], {k:+k, ic:u[1], n:u[2], d:u[3]}])));
+const hasUp = (G, k) => !!(G && G.ups && G.ups.includes(k));
+const mkN = G => MK_N + (hasUp(G, 'lamp') ? 1 : 0);
 const MK_CAP = [7, 9, 12, 15];   // highest price on sale at the market during each epic: bigger cards appear as the voyage goes on
 const mkCap = G => G.tut ? 99 : G.camp ? Math.max(0, ...campPool(G).map(c => CARDS[c].$)) : (globalThis.MKCAP || MK_CAP)[Math.min(3, (G.ep || 1) - 1)];
 const mkPool = G => { if(G.camp) return campPool(G); const cap = mkCap(G); return MARKET_POOL.filter(c => CARDS[c].$ <= cap); };
 function campPool(G){ const C = CAMP[G.camp], S = CAMP_SECTORS.find(x => x.id === C.sector); return S.market.filter(m => m[1] <= C.idx).flatMap(m => Array(m[2]).fill(m[0])); }
-function freshMarket(G){ G.mdeck = shuffle(mkPool(G)); G.mk = []; while(G.mk.length < MK_N && G.mdeck.length) G.mk.push(G.mdeck.pop()); }
+function freshMarket(G){ G.mdeck = shuffle(mkPool(G)); G.mk = []; while(G.mk.length < mkN(G) && G.mdeck.length) G.mk.push(G.mdeck.pop()); }
 const MARKET_POOL = Object.entries(CARDS).filter(([, C]) => C.k).flatMap(([c, C]) => Array(C.k).fill(c));
 
 // it: repeating intent pattern. hit v, multi v×n, shield v, grow v, board v, heal v (every menace), curse n (a wound for each sailor),
@@ -1495,42 +1523,48 @@ const CAMP_DIFF = {
   '2.2':{dm:0.85, hp:0.65, bhp:0.6, ehp:0.8, cdm:{2:1.4, 3:1.44, 4:1.09}},
   '2.3':{dm:0.9, hp:0.65, bhp:0.6, ehp:0.85, cdm:{2:1.78, 3:1.83, 4:1.5}},
   '2.4':{dm:0.95, hp:0.68, bhp:0.6, ehp:0.85, cdm:{2:1.03, 3:0.9, 4:0.6}},
-  '3.1':{dm:1, hp:0.74, bhp:0.71, ehp:0.87, traits:.15, cdm:{2:2.084, 3:2.024, 4:1.509}},
-  '3.2':{dm:1, hp:0.65, bhp:0.77, ehp:1.23, traits:.15, cdm:{2:1.697, 3:1.697, 4:1.6}},
-  '3.3':{dm:1, hp:0.56, bhp:0.89, ehp:0.87, traits:.15, cdm:{2:1.322, 3:1.303, 4:1.342}},
-  '3.4':{dm:1, hp:0.46, bhp:0.86, ehp:0.89, traits:.15, cdm:{2:1.265, 3:1.228, 4:1.303}},
-  '4.1':{dm:1.05, hp:0.5, bhp:0.45, ehp:1.07, traits:.2, cdm:{2:0.557, 3:0.453, 4:0.314}},
-  '4.2':{dm:1.05, hp:0.71, bhp:0.62, ehp:0.93, traits:.2, cdm:{2:1.228, 3:1.093, 4:0.916}},
-  '4.3':{dm:1.05, hp:0.63, bhp:0.8, ehp:1.11, traits:.2, cdm:{2:1.748, 3:1.672, 4:1.554}},
-  '4.4':{dm:1.05, hp:0.57, bhp:0.84, ehp:1.12, traits:.2, cdm:{2:0.78, 3:0.645, 4:0.509}},
-  '5.1':{dm:1.1, hp:0.6, bhp:0.5, ehp:0.66, traits:.25, bm:0.6, cdm:{2:0.805, 3:1.003, 4:0.474}},
-  '5.2':{dm:1.1, hp:0.68, bhp:0.65, ehp:1.32, traits:.25, hex:1, bm:0.7, cdm:{2:1.246, 3:1.124, 4:0.887}},
-  '5.3':{dm:1.1, hp:0.58, bhp:0.62, ehp:1.27, traits:.65, bm:0.7, cdm:{2:0.917, 3:0.891, 4:0.945}},
-  '5.4':{dm:1.1, hp:0.57, bhp:0.88, ehp:0.77, traits:.3, rage:1, bm:0.8, cdm:{2:0.683, 3:0.683, 4:0.645}},
-  '6.1':{dm:1.15, hp:0.64, bhp:0.67, ehp:0.84, traits:.3, cdm:{2:0.746, 3:0.653, 4:0.634}},
-  '6.2':{dm:1.15, hp:0.54, bhp:0.65, ehp:0.87, traits:.3, arm:2, cdm:{2:0.746, 3:0.802, 4:0.791}},
-  '6.3':{dm:1.15, hp:0.45, bhp:0.72, ehp:0.91, traits:.3, cdm:{2:0.386, 3:0.353, 4:0.353}},
-  '6.4':{dm:1.15, hp:0.3, bhp:0.75, ehp:0.91, giant:1, cdm:{2:0.533, 3:0.46, 4:0.398}},
-  '7.1':{dm:1.2, hp:0.72, bhp:0.72, ehp:1.1, traits:.35, bdm:1.35, cdm:{2:0.509, 3:0.509, 4:0.532}},
-  '7.2':{dm:1.2, hp:0.77, bhp:0.65, ehp:1.2, traits:.35, shuffle:1, bdm:1.7, cdm:{2:0.607, 3:0.598, 4:0.616}},
-  '7.3':{dm:1.2, hp:0.56, bhp:0.7, ehp:0.9, traits:.35, cdm:{2:0.588, 3:0.683, 4:0.756}},
-  '7.4':{dm:1.2, hp:0.55, bhp:0.79, ehp:1.31, traits:.35, hide:1, rage:1, bdm:1.35, cdm:{2:0.509, 3:0.556, 4:0.58}},
-  '8.1':{dm:1.25, hp:0.55, bhp:1.12, ehp:1.06, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.5, cdm:{2:1.124, 3:1.531, 4:1.799}},
-  '8.2':{dm:1.25, hp:0.43, bhp:1.2, ehp:0.99, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.6, cdm:{2:0.928, 3:0.916, 4:1}},
-  '8.3':{dm:1.25, hp:0.47, bhp:1.14, ehp:0.98, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.6, cdm:{2:0.624, 3:0.839, 4:0.943}},
-  '8.4':{dm:1.25, hp:0.45, bhp:1.19, ehp:0.99, traits:.5, rage:1, hex:1, str0:1, bdm:1.35, cdm:{2:0.421, 3:0.415, 4:0.446}},
-  '9.1':{dm:1.3, hp:0.45, bhp:1.2, ehp:0.97, traits:.5, rage:1, hex:1, str0:1, bdm:1.35, cdm:{2:0.237, 3:0.231, 4:0.238}},
-  '9.2':{dm:1.3, hp:0.44, bhp:1.2, ehp:1.06, traits:.5, rage:1, hex:1, str0:1, bdm:1.7, cdm:{2:0.44, 3:0.44, 4:0.453}},
-  '9.3':{dm:1.3, hp:0.26, bhp:1.2, ehp:1.15, traits:.5, rage:1, hex:1, str0:1, esc0:1, bdm:1.8, cdm:{2:0.23, 3:0.556, 4:0.89}},
-  '9.4':{dm:1.3, hp:0.26, bhp:1.2, ehp:1.13, traits:.5, rage:1, hex:1, str0:1, esc0:1, bdm:1.7, cdm:{2:0.502, 3:0.501, 4:0.48}},
+  '3.1':{dm:1, hp:0.74, bhp:0.71, ehp:0.87, traits:.15, cdm:{2:2.023, 3:1.936, 4:1.509}},
+  '3.2':{dm:1, hp:0.65, bhp:0.77, ehp:1.23, traits:.15, cdm:{2:1.6, 3:1.554, 4:1.487}},
+  '3.3':{dm:1, hp:0.56, bhp:0.89, ehp:0.87, traits:.15, cdm:{2:1.321, 3:1.192, 4:1.209}},
+  '3.4':{dm:1, hp:0.46, bhp:0.86, ehp:0.89, traits:.15, cdm:{2:1.125, 3:1.192, 4:1.061}},
+  '4.1':{dm:1.05, hp:0.5, bhp:0.45, ehp:1.07, traits:.2, cdm:{2:0.565, 3:0.453, 4:0.287}},
+  '4.2':{dm:1.05, hp:0.71, bhp:0.62, ehp:0.93, traits:.2, cdm:{2:1.192, 3:1.046, 4:0.802}},
+  '4.3':{dm:1.05, hp:0.63, bhp:0.8, ehp:1.11, traits:.2, cdm:{2:1.648, 3:1.532, 4:1.444}},
+  '4.4':{dm:1.05, hp:0.57, bhp:0.84, ehp:1.12, traits:.2, cdm:{2:0.714, 3:0.626, 4:0.48}},
+  '5.1':{dm:1.1, hp:0.6, bhp:0.5, ehp:0.66, traits:.25, bm:0.6, cdm:{2:1.25, 3:1.269, 4:0.525}},
+  '5.2':{dm:1.1, hp:0.68, bhp:0.65, ehp:1.32, traits:.25, hex:1, bm:0.7, cdm:{2:1.283, 3:1.076, 4:0.914}},
+  '5.3':{dm:1.1, hp:0.58, bhp:0.62, ehp:1.27, traits:.65, bm:0.7, cdm:{2:0.89, 3:0.865, 4:0.864}},
+  '5.4':{dm:1.1, hp:0.57, bhp:0.88, ehp:0.77, traits:.3, rage:1, bm:0.8, cdm:{2:0.645, 3:0.645, 4:0.609}},
+  '6.1':{dm:1.15, hp:0.64, bhp:0.67, ehp:0.84, traits:.3, cdm:{2:0.851, 3:0.757, 4:0.682}},
+  '6.2':{dm:1.15, hp:0.54, bhp:0.65, ehp:0.87, traits:.3, arm:2, cdm:{2:0.827, 3:0.851, 4:0.815}},
+  '6.3':{dm:1.15, hp:0.45, bhp:0.72, ehp:0.91, traits:.3, cdm:{2:0.447, 3:0.403, 4:0.358}},
+  '6.4':{dm:1.15, hp:0.3, bhp:0.75, ehp:0.91, giant:1, cdm:{2:0.574, 3:0.509, 4:0.448}},
+  '7.1':{dm:1.2, hp:0.72, bhp:0.72, ehp:1.1, traits:.35, bdm:1.35, cdm:{2:0.683, 3:0.693, 4:0.735}},
+  '7.2':{dm:1.2, hp:0.77, bhp:0.65, ehp:1.2, traits:.35, shuffle:1, bdm:1.7, cdm:{2:0.683, 3:0.662, 4:0.653}},
+  '7.3':{dm:1.2, hp:0.56, bhp:0.7, ehp:0.9, traits:.35, cdm:{2:0.755, 3:0.815, 4:0.863}},
+  '7.4':{dm:1.2, hp:0.55, bhp:0.79, ehp:1.31, traits:.35, hide:1, rage:1, bdm:1.35, cdm:{2:0.625, 3:0.643, 4:0.615}},
+  '8.1':{dm:1.25, hp:0.55, bhp:1.12, ehp:1.06, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.5, cdm:{2:1.342, 3:1.623, 4:1.553}},
+  '8.2':{dm:1.25, hp:0.43, bhp:1.2, ehp:0.99, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.6, cdm:{2:1.123, 3:1.123, 4:1.158}},
+  '8.3':{dm:1.25, hp:0.47, bhp:1.14, ehp:0.98, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.6, cdm:{2:0.887, 3:0.957, 4:1.03}},
+  '8.4':{dm:1.25, hp:0.45, bhp:1.19, ehp:0.99, traits:.5, rage:1, hex:1, str0:1, bdm:1.35, cdm:{2:0.51, 3:0.525, 4:0.548}},
+  '9.1':{dm:1.3, hp:0.45, bhp:1.2, ehp:0.97, traits:.5, rage:1, hex:1, str0:1, bdm:1.35, cdm:{2:0.323, 3:0.314, 4:0.31}},
+  '9.2':{dm:1.3, hp:0.44, bhp:1.2, ehp:1.06, traits:.5, rage:1, hex:1, str0:1, bdm:1.7, cdm:{2:0.645, 3:0.608, 4:0.598}},
+  '9.3':{dm:1.3, hp:0.26, bhp:1.2, ehp:1.15, traits:.5, rage:1, hex:1, str0:1, esc0:1, bdm:1.8, cdm:{2:0.532, 3:0.791, 4:1.031}},
+  '9.4':{dm:1.3, hp:0.26, bhp:1.2, ehp:1.13, traits:.5, rage:1, hex:1, str0:1, esc0:1, bdm:1.7, cdm:{2:0.693, 3:0.653, 4:0.703}},
 };
 const CAMP_TARGET = {'1.1':.99, '1.2':.98, '1.3':.97, '1.4':.95, '2.1':.92, '2.2':.88, '2.3':.84, '2.4':.8, '3.1':.78, '3.2':.75, '3.3':.72, '3.4':.7, '4.1':.68, '4.2':.65, '4.3':.62, '4.4':.6,
   '5.1':.58, '5.2':.55, '5.3':.52, '5.4':.5, '6.1':.48, '6.2':.45, '6.3':.42, '6.4':.4, '7.1':.38, '7.2':.35, '7.3':.32, '7.4':.3, '8.1':.28, '8.2':.25, '8.3':.22, '8.4':.2, '9.1':.18, '9.2':.15, '9.3':.12, '9.4':.1};
 const CAMP_CLASSES0 = ['cap', 'can'];
 const CAMP_SOON = [];
 const SECT_COL = {1:'#3f8791', 2:'#6fb3c2', 3:'#e8905a', 4:'#2fb5bb', 5:'#7fae9c', 6:'#e0772c', 7:'#8a5ac0', 8:'#2a7ab0', 9:'#ff9f7a'};
-let CAMP_PROG = {st:{}, cls:[...CAMP_CLASSES0]};
-try{ const x = JSON.parse(localStorage.getItem('cap-camp') || 'null'); if(x && x.st) CAMP_PROG = {st:x.st, cls:x.cls || [...CAMP_CLASSES0]}; }catch(e){}
+let CAMP_PROG = {st:{}, cls:[...CAMP_CLASSES0], up:{}};
+try{ const x = JSON.parse(localStorage.getItem('cap-camp') || 'null'); if(x && x.st) CAMP_PROG = {st:x.st, cls:x.cls || [...CAMP_CLASSES0], up:x.up || {}}; }catch(e){}
+// the upgrades aboard for an epic: those chosen after each sector before it (simulations draw them at random)
+function shipUpsFor(id){
+  const C = CAMP[id]; if(!C) return []; const out = [];
+  for(let k = 1; k < C.sector; k++){ if(!SHIP_UPS[k]) continue; const c = (CAMP_PROG.up || {})[k]; if(c && UP[c] && UP[c].k === k) out.push(c); else if(globalThis.SIM_UP) out.push(SHIP_UPS[k][Math.random() < .5 ? 0 : 1][0]); }
+  return out;
+}
 function campSave(){ try{ localStorage.setItem('cap-camp', JSON.stringify(CAMP_PROG)); }catch(e){} }
 const campStarsOf = id => CAMP_PROG.st[id] || 0;
 const campOpen = id => { const i = CAMP_ORDER.indexOf(id); return i === 0 || (i > 0 && campStarsOf(CAMP_ORDER[i - 1]) > 0); };
@@ -1549,8 +1583,12 @@ function campRecord(v){
 function makeRoute(G){
   if(G.camp){   // campaign epic: its own steps, enemies and boss
     const C = CAMP[G.camp], pk = a => a[Math.floor(Math.random() * a.length)], pool = shuffle([...C.pool]); let k = 0;
-    return (C.steps || CAMP_STEPS).map(t => t === 'boss' ? {f:Array.isArray(C.boss) ? [...C.boss] : [C.boss], z:C.z, boss:1} : t === 'rest' ? {f:[], z:C.z, rest:1} : t === 'el' ? {f:pk(C.elites || C.pool), z:C.z, el:1}
+    const R = (C.steps || CAMP_STEPS).map(t => t === 'boss' ? {f:Array.isArray(C.boss) ? [...C.boss] : [C.boss], z:C.z, boss:1} : t === 'rest' ? {f:[], z:C.z, rest:1} : t === 'el' ? {f:pk(C.elites || C.pool), z:C.z, el:1}
       : t === 'my' ? (Math.random() < MYST_FIGHT ? {f:pool[(k++) % pool.length], z:C.z, myst:1} : {f:[], e:pk(SECT_EVENTS[C.sector] || ['wreck', 'merchant', 'storm', 'siren']), z:C.z, myst:1}) : {f:pool[(k++) % pool.length], z:C.z});
+    // a fork on the way (from the second sector on): the usual fight, or an elite guarding a treasure; the captain chooses
+    const fi = C.sector >= 2 ? (R.findIndex((n, x) => x > 0 && !n.el && !n.boss && !n.rest && !n.myst && !n.e) >= 0 ? R.findIndex((n, x) => x > 0 && !n.el && !n.boss && !n.rest && !n.myst && !n.e) : R.findIndex(n => !n.el && !n.boss && !n.rest && !n.myst && !n.e)) : -1;
+    if(fi >= 0) R[fi] = {fork:[R[fi], {f:pk(C.elites || C.pool), z:C.z, el:1, loot:1}], f:[], z:C.z};
+    return R;
   }
   const E = EPICS[G.ep - 1], pick = a => a[Math.floor(Math.random() * a.length)];
   const pool = shuffle([...E.pool]);
@@ -1561,28 +1599,29 @@ function makeRoute(G){
   r.push({f:[G.bosses[G.ep - 1]], z:E.z, boss:1});
   return r;
 }
-const routeCode = N => N.rest ? '~' : N.e ? '!' + N.e : (N.myst ? '?' : '') + (N.el ? '*' : '') + N.f.join('+');
+const routeCode = N => N.fork ? 'Y' + N.fork.map(routeCode).join('|') : N.rest ? '~' : N.e ? '!' + N.e : (N.loot ? '$' : '') + (N.myst ? '?' : '') + (N.el ? '*' : '') + N.f.join('+');
 function routeFromView(v){ // rebuilds the route from its compact form: elite and boss come from the position
   if(!v || !v.rt) return TUT_ROUTE;
   const E = epOfV(v), last = v.rt.length - 1;
-  return v.rt.map((f, i) => f === '~' ? {f:[], z:E.z, rest:1} : f[0] === '!' ? {f:[], e:f.slice(1), z:E.z, myst:1}
-    : {f:f.replace('?', '').replace('*', '').split('+'), z:E.z, myst:f[0] === '?' ? 1 : 0, el:f.includes('*') || (!v.cp && i === 2) ? 1 : 0, boss:i === last ? 1 : 0});
+  const dec = (f, i) => f === '~' ? {f:[], z:E.z, rest:1} : f[0] === 'Y' ? {f:[], z:E.z, myst:1, fork:f.slice(1).split('|').map(x => dec(x, -1))} : f[0] === '!' ? {f:[], e:f.slice(1), z:E.z, myst:1}
+    : {f:f.replace('$', '').replace('?', '').replace('*', '').split('+'), z:E.z, loot:f[0] === '$' ? 1 : 0, myst:f.replace('$', '')[0] === '?' ? 1 : 0, el:f.includes('*') || (!v.cp && i === 2) ? 1 : 0, boss:i === last ? 1 : 0};
+  return v.rt.map(dec);
 }
 let MYST_FIGHT = .5;   // chance that the mystery step is an ambush rather than an event
 // events: every sailor picks one option for himself; the offers are rolled in advance so nothing is hidden
 const EVENTS = {
   wreck:{n:'Épave à la dérive', ic:'🛶', t:"Une épave dérive, la cale éventrée. Fouiller le pont ne risque rien ; descendre dans la cale rapporte plus… si l'on en revient."},
-  merchant:{n:'Marchand ambulant', ic:'🧳', t:"Un marchand accoste à la rame et déballe sa camelote. Il accepte le troc, ou quelques planches de votre coque."},
-  storm:{n:'Tempête soudaine', ic:'⛈️', t:"Le ciel se déchire. Chaque matelot choisit : tenir la barre (la coque encaisse) ou jeter une carte par-dessus bord pour alléger le navire."},
+  merchant:{n:'Marchand ambulant', ic:'🧳', t:"Un marchand accoste à la rame et déballe sa camelote. Il accepte le troc ; pour ses pièces rares, il réclame des planches de la coque, et c'est au capitaine d'accepter ou non."},
+  storm:{n:'Tempête soudaine', ic:'⛈️', t:"Le ciel se déchire. Le capitaine décide : tenir la barre (la coque encaisse) ou alléger le navire (chaque matelot jette une carte par-dessus bord)."},
   siren:{n:'Chant des sirènes', ic:'🧜‍♀️', t:"Une mélodie irrésistible monte des flots. Elle promet un trésor légendaire… et quelques blessures pour qui l'écoute."},
   // events met in a single sector of the Aventure
-  fort:{n:'Les canons du fort', ic:'🏰', t:"Le fort de la pointe ouvre le feu sur tout ce qui passe. Filer sous les boulets coûte de la coque ; se délester d'une carte fait gagner de la vitesse."},
-  bazar:{n:'Bazar flottant', ic:'🎪', t:"Une jonque couverte de soieries et de lanternes accoste. Le marchand troque volontiers, ou vend ses merveilles contre quelques planches."},
+  fort:{n:'Les canons du fort', ic:'🏰', t:"Le fort de la pointe ouvre le feu sur tout ce qui passe. Le capitaine décide : filer sous les boulets (la coque encaisse) ou se délester (chaque matelot jette une carte) pour gagner de la vitesse."},
+  bazar:{n:'Bazar flottant', ic:'🎪', t:"Une jonque couverte de soieries et de lanternes accoste. Le marchand troque volontiers ; ses merveilles se paient en planches de la coque, si le capitaine l'accepte."},
   tomb:{n:'La tombe des marins', ic:'🪦', t:"Un cercueil flotte dans la brume, cerclé de chaînes. Un trésor légendaire dort dedans… avec la malédiction de son propriétaire."},
-  geyser:{n:'La source brûlante', ic:'♨️', t:"Au pied du volcan jaillit une eau bouillante. On peut y colmater la coque, ou y tremper une arme de géant."},
+  geyser:{n:'La source brûlante', ic:'♨️', t:"Au pied du volcan jaillit une eau bouillante. Le capitaine choisit : y colmater la coque, ou y tremper des armes de géant (une carte rare pour chacun)."},
   mirage:{n:'Le mirage', ic:'🏝️', t:"Une île apparaît là où aucune carte n'en montre. Ses ruines regorgent d'objets… mais rien ne dit qu'on en revient indemne."},
   whale:{n:'Le cimetière des baleines', ic:'🐋', t:"D'immenses squelettes reposent sur le fond. Entre leurs côtes brillent des épaves et des trésors engloutis."},
-  shore:{n:'Le premier rivage', ic:'🏖️', t:"Une plage dorée, de l'eau douce, des fruits : l'équipage souffle un instant avant la dernière tempête."},
+  shore:{n:'Le premier rivage', ic:'🏖️', t:"Une plage dorée, de l'eau douce, des fruits : l'équipage souffle un instant avant la dernière tempête. Le capitaine choisit : réparer la coque, ou explorer le rivage (une carte rare pour chacun)."},
 };
 const SECT_EVENTS = {3:['fort', 'fort', 'wreck', 'merchant', 'storm'], 4:['bazar', 'bazar', 'merchant', 'wreck'], 5:['tomb', 'tomb', 'siren', 'wreck'], 6:['geyser', 'geyser', 'storm', 'wreck'], 7:['mirage', 'mirage', 'siren', 'storm'], 8:['whale', 'whale', 'siren', 'wreck'], 9:['shore', 'shore', 'siren']};
 let REST_HEAL = .4, STORM_LOSS = .25, MERCHANT_COST = .3, EVT_WOUNDS = 2;   // shares of the max hull, split between present sailors
@@ -1626,11 +1665,11 @@ function strike(e, v){
   const ab = Math.min(e.blk, v); e.blk -= ab;
   let loss = v - ab; if(e.cap){ loss = Math.min(loss, Math.max(0, e.cap - (e.tk || 0))); e.tk = (e.tk || 0) + loss; }   // the coral titan only yields so much per turn
   e.hp = Math.max(0, e.hp - loss);
-  const RF = FOES[e.t].reform; if(e.hp <= 0 && RF && (e.rf || 0) < RF){ e.rf = (e.rf || 0) + 1; e.hp = Math.ceil(e.mx / (2 * e.rf)); e.blk = 0; return; }   // skeletons pull themselves together (once, or more for their captain)
+  const RF = FOES[e.t].reform; if(e.hp <= 0 && RF && (e.rf || 0) < RF){ e.rf = (e.rf || 0) + 1; e.hp = Math.ceil(e.mx / ((e.sil ? 4 : 2) * e.rf)); e.blk = 0; return; }   // skeletons pull themselves together (once, or more for their captain)
   if(e.hp > 0 && e.hp <= e.mx / 2){
     if(e.rv && !e.rg){ e.rg = 1; e.str += e.rv; }            // enraged below half health
     const F = FOES[e.t];
-    if(F.dive && !e.dv){ e.dv = 1; e.inv = 1; e.nx = ['hit', F.dive]; e.blk = 0; }   // dives out of reach
+    if(F.dive && !e.dv && !e.nodv){ e.dv = 1; e.inv = 1; e.nx = ['hit', F.dive]; e.blk = 0; }   // dives out of reach
   }
 }
 const guarded = (G, e) => !FOES[e.t].guard && G.en.some(o => o.hp > 0 && FOES[o.t].guard);
@@ -1688,13 +1727,14 @@ function checkWin(G){ furyCheck(G); if(G.phase === 'fight' && G.en.every(e => e.
 function startVoyage(G){
   if(G.phase !== 'lobby' || !G.seats.length) return;
   const n = G.seats.length;
-  G.maxHull = G.tut ? 30 : HULL(n); G.hull = G.maxHull; G.node = -1;
+  G.ups = G.camp && !G.tut ? shipUpsFor(G.camp) : [];
+  G.maxHull = G.tut ? 30 : HULL(n) + (hasUp(G, 'copper') ? 10 : 0); G.hull = G.maxHull; G.node = -1;
   G.ep = 1; G.bosses = [...shuffle(['levi', 'dutch']), 'kra', 'mael']; if(G.camp) G.cs = {buys:0, allies:0, ecl:{}};
   if(G.camp && CAMP[G.camp].gift) G.seats.forEach(S => S.deck.push(...CAMP[G.camp].gift));   // the epic's own gift to every sailor
   G.route = G.tut ? TUT_ROUTE : makeRoute(G);
   G.mdeck = shuffle(G.tut ? [...MARKET_POOL] : mkPool(G)); G.mk = []; G.newCards = [];
   if(G.tut){ G.mk = ['f1','t1','m3','c1']; G.mdeck = G.mdeck.filter(c => !G.mk.includes(c)); }
-  while(G.mk.length < MK_N && G.mdeck.length) G.mk.push(G.mdeck.pop());
+  while(G.mk.length < mkN(G) && G.mdeck.length) G.mk.push(G.mdeck.pop());
   logf(G, "L'équipage lève l'ancre !");
   advance(G);
 }
@@ -1703,26 +1743,33 @@ function advance(G){
   const R = routeOf(G);
   if(G.node >= R.length){ G.phase = G.tut ? 'tutend' : 'win'; return; }
   const N = R[G.node], n = G.seats.length, E = epOf(G), k = G.tut ? 1 : HPK(n) * E.hp;
+  if(N.fork){ startFork(G, N); return; }
   if(N.rest || N.e){ startStop(G, N); return; }
   G.phase = 'fight'; G.dm = G.tut ? 1 : DMG(n) * E.dm * ((E.cdm && E.cdm[n]) || 1) * (N.boss ? E.bdm || 1 : E.rdm || 1); G.bm = G.tut ? 1 : BOARD(n) * E.bm; G.prot = 0; G.breach = 0; G.vul = 0; G.net = 0; G.sub = null; G.atk = 0; G.round = 0; G.cur = 0;
   G.hk = k;
-  G.en = N.f.map((t, i) => { const F = FOES[t], hp = Math.round(F.hp * k * (G.tut ? 1 : F.boss ? E.bhp : N.el ? E.ehp : 1)); return {t, hp, mx:hp, blk:0, str:0, i:G.tut || F.boss ? 0 : Math.floor(Math.random() * F.it.length), sk:0, rv:!G.tut && E.rage ? RAGE : 0}; });
+  const foes = hasUp(G, 'grey') && !N.boss && !N.el && N.f.length >= 2 ? N.f.slice(0, -1) : N.f;   // grey sails: one threat loses the ship in the haze
+  G.anc = hasUp(G, 'anchor') ? 1 : 0; G.used = {};
+  G.en = foes.map((t, i) => { const F = FOES[t], hp = Math.round(F.hp * k * (G.tut ? 1 : F.boss ? E.bhp : N.el ? E.ehp : 1)); return {t, hp, mx:hp, blk:0, str:0, i:G.tut || F.boss ? 0 : Math.floor(Math.random() * F.it.length), sk:0, rv:!G.tut && E.rage ? RAGE : 0}; });
   if(!G.tut && E.str0) G.en.forEach(e => e.str += E.str0);
   G.en.forEach(e => { const F = FOES[e.t]; if(F.cap) e.cap = Math.round(F.cap * k); if(E.arm) e.ar = E.arm; if(E.giant && e.af !== 'gia'){ e.af = 'gia'; e.hp = e.mx = Math.round(e.mx * 1.4); } });
   if(!G.tut) G.en.forEach(e => { if(!e.af && Math.random() < (G.camp ? E.traits : TRAIT_P[G.ep - 1]) * (FOES[e.t].boss ? .8 : 1)){ e.af = pickOne(Object.keys(TRAITS)); if(e.af === 'gia'){ e.hp = e.mx = Math.round(e.mx * 1.4); } } });
+  if(hasUp(G, 'silver')) G.en.forEach(e => { if(FOES[e.t].reform) e.sil = 1; });
+  if(hasUp(G, 'diving')) G.en.forEach(e => { if(FOES[e.t].dive) e.nodv = 1; });
+  if(hasUp(G, 'flag')) G.en.forEach(e => { if(FOES[e.t].min) e.sk = 1; });   // the black flag: minions dare not move on the first turn
+  if(hasUp(G, 'ram')) G.en.forEach(e => { if(armorOf(e) > 0 || e.ar || FOES[e.t].arm) e.ca = (e.ca || 0) + 1; });
   if(!G.tut && (G.node === 0 || N.boss)) freshMarket(G);   // the market is renewed at the start of each epic and before the boss
   G.mr = 0; G.seats.forEach(S => { S.draw = shuffle([...S.deck, ...Array(S.nw || 0).fill('bl')]); S.nw = 0; S.dt = 0; S.fog = 0; S.disc = []; S.hand = []; S.play = []; S.champ = []; S.eu = 0; });
-  logf(G, `En vue : ${N.f.map(t => FOES[t].n).join(', ')}`);
+  logf(G, `En vue : ${foes.map(t => FOES[t].n).join(', ')}`);
   evt(G, {t:'fight', z:N.z, boss:N.boss ? 1 : 0, el:N.el ? 1 : 0, f:N.f[0], ep:G.tut ? 0 : G.ep, cp:G.camp || 0, first:G.node === 0 ? 1 : 0, myst:N.myst ? 1 : 0});
   newRound(G);
 }
 function newRound(G){
-  G.round++; G.prot = 0; G.half = 0; G.sub = null; G.atk = 0; G.rev = 0; G.sacN = 0; G.en.forEach(e => e.tk = 0);
-  if(G.camp && G.round > 1 && epOf(G).shuffle && G.mk.length){ G.mdeck.unshift(...G.mk.filter(Boolean)); G.mk = []; while(G.mk.length < MK_N && G.mdeck.length) G.mk.push(G.mdeck.pop()); evt(G, {t:'shuf'}); }   // the mad compass: the hold turns over every turn
+  G.round++; G.prot = 0; G.half = 0; G.sub = null; G.atk = 0; G.rev = G.round === 1 && hasUp(G, 'compass') ? 1 : 0; G.sacN = 0; G.en.forEach(e => e.tk = 0);
+  if(G.camp && G.round > 1 && epOf(G).shuffle && G.mk.length){ G.mdeck.unshift(...G.mk.filter(Boolean)); G.mk = []; while(G.mk.length < mkN(G) && G.mdeck.length) G.mk.push(G.mdeck.pop()); evt(G, {t:'shuf'}); }   // the mad compass: the hold turns over every turn
   G.seats.forEach((S, i) => {
     S.disc.push(...S.hand, ...S.play.map(p => p.c)); S.hand = []; S.play = [];
     S.champ.forEach(p => { p.u = p.bd ? 1 : 0; p.lk = p.bd ? 1 : 0; p.bd = 0; });   // a bound servant sits this turn out
-    S.g = 0; S.c = 0; S.rd = S.ab; S.ed = 0; S.ef = 0; S.ft = 0; S.rb = 0; S.mf = 0; S.dev = 0;
+    S.g = hasUp(G, 'safe') && G.round > 1 ? Math.min(1, S.g || 0) : 0; S.c = 0; S.rd = S.ab; S.ed = 0; S.ef = 0; S.ft = 0; S.rb = 0; S.mf = 0; S.dev = 0;
     const rel = S.rel || [];
     drawN(G, i, 5 + (rel.includes('lv') ? 1 : 0) - (S.fog || 0), true); S.fog = 0;
     if(!S.ab){ if(rel.includes('bo')) addGold(S, 1); if(rel.includes('pa')) S.c += 1; if(rel.includes('fp')) addProt(G, 3); }
@@ -1735,10 +1782,11 @@ function newRound(G){
   }
 }
 function fightWon(G){
-  const bonus = 5 + G.seats.filter(S => !S.ab && (S.rel || []).includes('tr')).length * 4;
+  const bonus = 5 + (hasUp(G, 'chest') ? 3 : 0) + G.seats.filter(S => !S.ab && (S.rel || []).includes('tr')).length * 4;
   G.hull = Math.min(G.maxHull, G.hull + bonus);
   logf(G, `Victoire ! La coque est réparée de ${bonus}`);
   evt(G, {t:'win'});
+  if(!G.tut && G.camp && routeOf(G)[G.node].loot) G.seats.forEach((S, i) => { if(S.ab) return; const c = lootCard(G); S.deck.push(c); evt(G, {t:'loot', s:i, c}); logf(G, `Butin : ${CARDS[c].n} pour ${S.n}`); });
   if(!G.tut && routeOf(G)[G.node].boss){
     if(G.camp){ G.cstars = campStars(G); G.phase = 'win'; return; }
     if(G.ep >= EPICS.length){ G.phase = 'win'; return; }
@@ -1834,6 +1882,8 @@ function eclat(G, s){
 function setReady(G, s, v){
   if(G.phase !== 'fight' && G.phase !== 'port') return;
   if(G.phase === 'fight' && G.sub === 'atk') return;   // attack phase: only the captain acts
+  if(G.phase === 'port' && G.port && G.port.k === 'fork'){ if(s === capSeat(G) && v && G.port.sp >= 0) takeFork(G); return; }
+  if(G.phase === 'port' && G.port && G.port.ship && G.port.sp < 0 && v) return;   // the captain decides first
   G.seats[s].rd = v;
   if(present(G).every(x => x.rd)){ if(G.phase === 'fight') startAttack(G); else leavePort(G); }
 }
@@ -1848,9 +1898,27 @@ const canHit = (G, e) => e.hp > 0 && !e.inv && !guarded(G, e) && !(e.cap && (e.t
 // everyone is done with cards and market: the combat of the whole crew is pooled on the ship
 function startAttack(G){
   G.atk = G.seats.reduce((t, S) => t + Math.max(0, S.c || 0), 0); G.seats.forEach(S => S.c = 0);
+  if(hasUp(G, 'figure')){ const fs = new Set(); G.seats.forEach(S => S.play.forEach(p => { if(CARDS[p.c].f) fs.add(CARDS[p.c].f); })); if(fs.size){ G.atk += fs.size; logf(G, `Figure de proue dorée : +${fs.size} ⚔`); } }
   if(G.cur){ G.atk = Math.floor(G.atk * .75); G.cur = 0; }   // the double of the Cartographer turned our own current against us
   if(G.atk > 0 && G.en.some(e => canHit(G, e))){ G.sub = 'atk'; evt(G, {t:'atkph', s:capSeat(G), v:G.atk}); logf(G, `Phase d'attaque : ${G.atk} ⚔ à répartir`); }
   else endAttack(G);
+}
+// the ship's own manoeuvres (active upgrades), fired by the captain at the helm, once per fight
+function shipAct(G, s, k){
+  if(G.phase !== 'fight' || s !== capSeat(G) || !hasUp(G, k) || (G.used || {})[k]) return;
+  if(k === 'bell'){ if(G.sub) return; G.used = {...G.used, bell:1}; G.seats.forEach((S, i) => { if(!S.ab) drawN(G, i, 1); }); logf(G, 'Cloche du bord : chaque matelot pioche une carte'); evt(G, {t:'sact', k}); }
+  else if(k === 'prow'){
+    const live = G.en.map((e, i) => [e, i]).filter(([e]) => canHit(G, e)); if(!live.length) return;
+    const [E, i] = live.sort((a, b) => a[0].hp - b[0].hp)[0], v = 3 * present(G).length, h0 = E.hp, b0 = E.blk, r0 = E.rf;
+    G.used = {...G.used, prow:1}; strike(E, v); logf(G, `Canon de proue : ${v} sur ${FOES[E.t].n}`);
+    const rf = E.rf && !r0 ? 1 : 0; evt(G, {t:'shot', e:i, v, d:rf ? h0 : h0 - E.hp, b:b0 - E.blk, h:E.hp, bl:E.blk, k:E.hp <= 0 ? 1 : 0, rf, a:G.atk}); evt(G, {t:'sact', k});
+    checkWin(G);
+  }
+}
+function aiShipAct(G){
+  if(G.phase !== 'fight') return; const c = capSeat(G);
+  if(hasUp(G, 'bell') && !G.used.bell && !G.sub) shipAct(G, c, 'bell');
+  if(hasUp(G, 'prow') && !G.used.prow){ const v = 3 * present(G).length; if(G.round >= 3 || G.en.some(e => canHit(G, e) && e.hp + (e.blk || 0) + armorOf(e) <= v)) shipAct(G, c, 'prow'); }
 }
 function endAttack(G){ if(G.phase !== 'fight') return; G.sub = null; G.atk = 0; endRound(G); }
 // ---- port between two epics: full repair, one reward and up to 2 removals per sailor ----
@@ -1872,26 +1940,68 @@ function startPort(G){
 // ---- cove and event steps: same screen as the port, one option per sailor ----
 const unique = f => [...new Set(MARKET_POOL)].filter(c => f(CARDS[c]));
 const pickOne = a => a[Math.floor(Math.random() * a.length)];
+// at a stop, the decisions that engage the whole ship belong to the captain at the helm; each sailor keeps his own reward
+const SHIP_DEC = {rest:['SR', 'SE'], geyser:['SR', 'SE'], shore:['SR', 'SE'], storm:['SD', 'SJ'], fort:['SD', 'SJ'], merchant:['SM', 'SN'], bazar:['SM', 'SN']};
 function startStop(G, N){
   G.stg = (G.stg || 0) + 1;
   G.phase = 'port'; G.prot = 0; G.breach = 0; G.vul = 0; G.en = [];
-  const n = present(G).length || 1, share = v => Math.max(2, Math.round(G.maxHull * v / n));
-  G.port = {k:N.rest ? 'rest' : 'evt', e:N.e || null, of:{}, pick:{}, rm:{}};
+  const n = present(G).length || 1, share = v => Math.max(2, Math.round(G.maxHull * v / n)), whole = v => Math.max(2, Math.round(G.maxHull * v));
+  const kind = N.rest ? 'rest' : N.e;
+  G.port = {k:N.rest ? 'rest' : 'evt', e:N.e || null, of:{}, pick:{}, rm:{}, base:{}, sp:-1, ship:null};
+  if(SHIP_DEC[kind]) G.port.ship = SHIP_DEC[kind].map(k => k === 'SR' ? 'SR:' + whole(kind === 'rest' ? REST_HEAL : kind === 'shore' ? .35 : .22) : k === 'SD' ? 'SD:' + whole(STORM_LOSS) : k);
   G.seats.forEach((S, i) => {
     S.rd = S.ab; S.hand = []; S.play = []; S.champ = []; S.g = 0; S.c = 0;
     const cap = mkCap(G), U = f => G.camp ? [...new Set(campPool(G))].filter(c => f(CARDS[c])) : unique(f), all = U(C => C.$ >= 1).sort((x, y) => CARDS[x].$ - CARDS[y].$), or = (l, alt) => l.length ? l : alt, rares = shuffle(or(U(C => C.$ >= cap - 3 && C.$ <= cap + 2), all.slice(-4))), mid = or(U(C => C.$ >= 3 && C.$ <= 7), all.slice(0, 6)), cheap = or(U(C => C.$ >= 1 && C.$ <= 4), all.slice(0, 4));   // rewards follow the market's price range for this epic (the richest holds have no cheap crates)
-    let of;
-    if(N.rest) of = ['H:' + share(REST_HEAL), 'X', 'C:' + rares[0], 'C:' + rares[1]];
-    else if(N.e === 'wreck') of = ['C:' + pickOne(cheap), 'CW:' + rares[0], 'N'];
-    else if(N.e === 'merchant' || N.e === 'bazar') of = [S.deck.includes('dou') ? 'T:' + pickOne(mid) : null, `HC:${share(MERCHANT_COST)}:${rares[0]}`, N.e === 'bazar' ? 'C:' + pickOne(cheap) : null, 'N'].filter(Boolean);
-    else if(N.e === 'storm' || N.e === 'fort') of = ['D:' + share(STORM_LOSS), 'J:' + pickOne(S.deck.filter(c => !CARDS[c].role))];
+    const jc = shuffle([...new Set(S.deck.filter(c => !CARDS[c].role))]).slice(0, 3);
+    G.port.base[i] = {r0:rares[0], r1:rares[1] || rares[0], cheap:pickOne(cheap), mid:pickOne(mid), jc, trade:S.deck.includes('dou'), cost:share(MERCHANT_COST)};
+    let of = [];
+    if(N.e === 'wreck') of = ['C:' + pickOne(cheap), 'CW:' + rares[0], 'N'];
     else if(N.e === 'mirage' || N.e === 'whale') of = ['C:' + pickOne(mid), 'CW:' + rares[0], 'N'];
-    else if(N.e === 'geyser' || N.e === 'shore') of = ['H:' + share(N.e === 'shore' ? .35 : .22), 'C:' + rares[0], 'C:' + rares[1]];
-    else of = ['LW:' + pickOne(LEGENDS.filter(c => featOn(G.camp, 'srv') || !CARDS[c].ch)), 'N'];
+    else if(!G.port.ship) of = ['LW:' + pickOne(LEGENDS.filter(c => featOn(G.camp, 'srv') || !CARDS[c].ch)), 'N'];
     G.port.of[i] = of; G.port.pick[i] = -1; G.port.rm[i] = [];
   });
   if(N.rest){ logf(G, 'Escale dans une crique abritée'); evt(G, {t:'rest'}); }
   else { logf(G, EVENTS[N.e].n + ' !'); evt(G, {t:'evt', e:N.e}); }
+}
+// the sailors' own options, once the captain has decided for the ship
+function stopOffers(G){
+  const P = G.port; if(!P || !P.ship) return;
+  const k = P.sp >= 0 ? P.ship[P.sp].split(':')[0] : null, kind = P.k === 'rest' ? 'rest' : P.e;
+  G.seats.forEach((S, i) => {
+    const b = P.base[i]; let of = [];
+    if(k && b){
+      if(kind === 'rest') of = k === 'SR' ? ['N'] : ['X', 'C:' + b.r0, 'C:' + b.r1];
+      else if(kind === 'geyser' || kind === 'shore') of = k === 'SR' ? ['N'] : ['C:' + b.r0, 'C:' + b.r1];
+      else if(kind === 'storm' || kind === 'fort') of = k === 'SD' ? ['N'] : (b.jc.length ? b.jc.map(c => 'J:' + c) : ['N']);
+      else of = [b.trade ? 'T:' + b.mid : null, k === 'SM' ? `HC:${b.cost}:${b.r0}` : null, kind === 'bazar' ? 'C:' + b.cheap : null, 'N'].filter(Boolean);
+    }
+    P.of[i] = of; P.pick[i] = -1; P.rm[i] = [];
+  });
+}
+// the captain decides: at a stop for the ship, or at a fork for the route
+function shipPick(G, s, o){
+  const P = G.port; if(G.phase !== 'port' || !P || !P.ship || !P.ship[o] || s !== capSeat(G)) return;
+  if(P.k !== 'fork' && G.seats.some((S, i) => i !== s && S.rd && !S.ab)) return;   // the crew has already chosen on this basis
+  if(P.sp === o) return;
+  P.sp = o; G.seats[s].rd = G.seats[s].ab; if(P.k !== 'fork') stopOffers(G);
+  evt(G, {t:'ship', o});
+}
+// a fork on the route: two ways on, the captain chooses
+function startFork(G, N){
+  G.stg = (G.stg || 0) + 1;
+  G.phase = 'port'; G.prot = 0; G.breach = 0; G.vul = 0; G.en = [];
+  const c = capSeat(G);
+  G.port = {k:'fork', e:null, of:{}, pick:{}, rm:{}, ship:['A', 'B'], sp:-1, fk:N.fork};
+  G.seats.forEach((S, i) => { S.hand = []; S.play = []; S.champ = []; S.g = 0; S.c = 0; S.rd = S.ab || i !== c; G.port.of[i] = []; G.port.pick[i] = -1; G.port.rm[i] = []; });
+  logf(G, 'La route se divise'); evt(G, {t:'fork'});
+}
+// the treasure guarded by an elite: a rare card of this epic's hold
+function lootCard(G){ const cap = mkCap(G), pool = [...new Set(campPool(G))], l = pool.filter(c => CARDS[c].$ >= cap - 3 && CARDS[c].$ <= cap + 2); return pickOne(l.length ? l : pool); }
+function takeFork(G){
+  const P = G.port; if(!P || P.k !== 'fork' || P.sp < 0) return;
+  const N = P.fk[P.sp]; G.route[G.node] = {...N};
+  logf(G, N.e ? `Cap sur : ${EVENTS[N.e].n}` : `Cap sur l'ennemi : ${N.f.map(t => FOES[t].n).join(', ')}`);
+  G.port = null; G.seats.forEach(S => { S.rd = false; }); G.node--; advance(G);
 }
 function applyOpt(G, S, opt){
   const [k, a, b] = opt.split(':');
@@ -1904,6 +2014,8 @@ function applyOpt(G, S, opt){
   else if(k === 'J'){ const d = S.deck.indexOf(a); if(d >= 0 && S.deck.length > 5) S.deck.splice(d, 1); }
 }
 function leaveStop(G){
+  const P = G.port;
+  if(P.ship){ const d = P.ship[P.sp >= 0 ? P.sp : 0], [k, a] = d.split(':'); if(k === 'SR') G.hull += +a; else if(k === 'SD') G.hull -= +a; if(P.sp < 0){ P.sp = 0; stopOffers(G); } }
   G.seats.forEach((S, i) => {
     let o = G.port.pick[i];
     if(o < 0 && (G.port.e === 'storm' || G.port.e === 'fort') && !S.ab) o = 0;   // nobody escapes the storm: holding the helm by default
@@ -1957,7 +2069,7 @@ function purge(G, s, h, code){
 function addProt(G, v){ const c = Math.min(G.breach || 0, v); G.breach = (G.breach || 0) - c; G.prot += v - c; }
 // a ship left with an open breach is Vulnerable during the enemy phase: hull damage ×1.5
 const HALF_K = .75;   // Contre-courant: share of the damage that still hits
-function hullDmg(G, v){ if(G.half) v = Math.ceil(v * HALF_K); const ab = Math.min(G.prot, v); G.prot -= ab; const d = G.vul ? Math.round((v - ab) * 1.5) : v - ab; G.hull = Math.max(0, G.hull - d); return d; }
+function hullDmg(G, v){ if(G.anc && v > 0){ v = Math.ceil(v / 2); G.anc = 0; } if(G.half) v = Math.ceil(v * HALF_K); const ab = Math.min(G.prot, v); G.prot -= ab; const d = G.vul ? Math.round((v - ab) * 1.5) : v - ab; G.hull = Math.max(0, G.hull - d); return d; }
 function endRound(G){
   // every enemy action is recorded as a 'foe' event so each screen can replay it step by step
   G.vul = G.breach > 0 ? 1 : 0; G.breach = 0; G.mut = 0;
@@ -2024,14 +2136,14 @@ function endRound(G){
       else if(it[0] === 'heal'){ ev.v = Math.round(it[1] * (G.hk || 1)); G.en.forEach(o => { if(o.hp > 0) o.hp = Math.min(o.mx, o.hp + ev.v); }); logf(G, `${F.n} soigne les menaces de ${ev.v}`); }
       else if(it[0] === 'curse'){
         const hex = !G.tut && epOf(G).hex; ev.v = it[1]; if(hex) ev.hex = 1;
-        G.seats.forEach(S => { if(!S.ab) for(let k = 0; k < it[1]; k++){ S.disc.push('bl'); if(hex) S.deck.push('bl'); } });
+        G.seats.forEach(S => { if(!S.ab) for(let k = 0; k < it[1] - (hasUp(G, 'candles') ? 1 : 0); k++){ S.disc.push('bl'); if(hex) S.deck.push('bl'); } });
         logf(G, hex ? `${F.n} maudit l'équipage jusqu'au prochain port` : `${F.n} maudit l'équipage : une blessure pour chacun`);
       }
       else if(it[0] === 'summon'){
         const code = it[1], M = FOES[code], alive = G.en.filter(o => o.hp > 0 && FOES[o.t].min).length, n = Math.min(it[2], MAX_MINIONS - alive);
         ev.c = code; ev.n = [];
         for(let k = 0; k < n; k++){
-          const hp = Math.round(M.hp * (G.hk || 1)), m = {t:code, hp, mx:hp, blk:0, str:0, i:Math.floor(Math.random() * M.it.length), sk:0, rv:0, ns:1};
+          const hp = Math.round(M.hp * (G.hk || 1)), m = {t:code, hp, mx:hp, blk:0, str:0, i:Math.floor(Math.random() * M.it.length), sk:0, rv:0, ns:1}; if(M.reform && hasUp(G, 'silver')) m.sil = 1;
           const slot = G.en.findIndex(o => o.hp <= 0 && FOES[o.t].min);
           if(slot >= 0){ G.en[slot] = m; ev.n.push(slot); } else { G.en.push(m); ev.n.push(G.en.length - 1); }
         }
@@ -2047,7 +2159,7 @@ function endRound(G){
           let best = null;
           G.seats.forEach(S => S.champ.forEach(p => { if(!best || CARDS[p.c].ch > CARDS[best.p.c].ch) best = {S, p}; }));
           if(!best) break;
-          const d = CARDS[best.p.c].ch + (G.net || 0);
+          const d = CARDS[best.p.c].ch + (G.net || 0) + (hasUp(G, 'nets') ? 1 : 0);
           if(v < d){ ev.rep = best.p.c; logf(G, `${CARDS[best.p.c].n} repousse l'abordage de ${F.n}`); v = 0; break; }
           best.S.champ.splice(best.S.champ.indexOf(best.p), 1); best.S.disc.push(best.p.c); ev.ko.push(best.p.c); v -= d;
           logf(G, `${F.n} jette ${CARDS[best.p.c].n} à l'eau`);
@@ -2120,12 +2232,14 @@ function dispatch(G, a, from){
     case 'ecl': if(own(a.s)) eclat(G, a.s); break;
     case 'purge': if(own(a.s)) purge(G, a.s, a.h | 0, String(a.c)); break;
     case 'pick': if(own(a.s)) portPick(G, a.s, a.o | 0); break;
+    case 'ship': if(own(a.s)) shipPick(G, a.s, a.o | 0); break;
+    case 'sact': if(own(a.s)) shipAct(G, a.s, String(a.k)); break;
     case 'mark': if(own(a.s)) portMark(G, a.s, String(a.c), !!a.v); break;
     case 'rdy': if(own(a.s)) setReady(G, a.s, !!a.v); break;
   }
 }
 function view(G){
-  return {sub:G.sub === 'atk' ? 1 : 0, atk:G.atk || 0, cps:G.phase === 'fight' ? capSeat(G) : -1, helm:G.helm || null, cp:G.camp || 0, cst:G.cstars || null, ep:G.ep, port:G.port, rt:G.tut || !G.route ? null : G.route.map(routeCode), phase:G.phase, node:G.node, tut:G.tut ? 1 : 0, hull:G.hull, maxHull:G.maxHull, prot:G.prot, br:G.breach || 0, half:G.half ? 1 : 0, net:G.net || 0, rev:G.rev ? 1 : 0, cur:G.cur ? 1 : 0, mr:G.mr || 0, bm:G.bm || 1, dm:G.dm, hk:G.hk || 1, round:G.round, stg:G.stg || 0, mut:G.mut ? 1 : 0, host:G.host,
+  return {sub:G.sub === 'atk' ? 1 : 0, atk:G.atk || 0, cps:G.phase === 'fight' || G.phase === 'port' ? capSeat(G) : -1, ups:G.ups || [], used:G.used || {}, helm:G.helm || null, cp:G.camp || 0, cst:G.cstars || null, ep:G.ep, port:G.port ? {...G.port, base:undefined} : null, rt:G.tut || !G.route ? null : G.route.map(routeCode), phase:G.phase, node:G.node, tut:G.tut ? 1 : 0, hull:G.hull, maxHull:G.maxHull, prot:G.prot, br:G.breach || 0, half:G.half ? 1 : 0, net:G.net || 0, rev:G.rev ? 1 : 0, cur:G.cur ? 1 : 0, mr:G.mr || 0, bm:G.bm || 1, dm:G.dm, hk:G.hk || 1, round:G.round, stg:G.stg || 0, mut:G.mut ? 1 : 0, host:G.host,
     en:G.en.map(e => { const o = {t:e.t, hp:e.hp, mx:e.mx}; if(e.hp <= 0) return o; o.i = e.i; if(e.blk) o.blk = e.blk; if(e.str) o.str = e.str; if(e.sk) o.sk = 1; if(e.rg) o.rg = 1; if(e.cap){ o.cap = e.cap; o.tk = e.tk || 0; } if(e.af) o.af = e.af; if(e.rf) o.rf = e.rf; if(e.ar) o.ar = e.ar; if(e.ca) o.ca = e.ca; if(e.inv){ o.inv = 1; o.nx = e.nx ? e.nx[1] : 0; if(e.vn) o.vn = 1; } return o; }),   // compact: zero fields are restored by setView
     mk:G.mk, md:G.mdeck.length, mc:mkCap(G), nc:(G.newCards || []).length, ncl:G.node <= 0 ? (G.newCards || []) : [],
     seats:G.seats.map(S => ({r:S.r, n:S.n, p:S.p, g:S.g, c:S.c, hand:S.hand, play:S.play, champ:S.champ.map(p => { const o = {c:p.c, u:p.u ? 1 : 0}; if(p.lk) o.lk = 1; if(p.bd) o.bd = 1; return o; }), dr:S.draw.length, di:S.disc.length, dk:S.deck.length, deck:packDeck(S.deck), dw:packDeck(S.draw), ds:packDeck(S.disc), bl:[...S.draw, ...S.disc, ...S.hand].filter(c => c === 'bl').length, rd:S.rd ? 1 : 0, eu:S.eu >= eclMax(S) ? 1 : 0, eul:eclMax(S) - S.eu, rel:S.rel || [], pg:S.pg || 0, bot:S.bot ? 1 : 0, rb:S.rb || 0, mf:S.mf || 0, nw:S.nw || 0, dt:S.dt || 0, ft:S.ft || 0, mr:S.mr || 0, ed:S.ed || 0, ef:S.ef || 0, ab:S.ab ? 1 : 0})),
@@ -2159,6 +2273,7 @@ function aiTarget(G, S){
 }
 function aiTurn(G, i){
   const S = G.seats[i], st = G.stg; if(G.phase !== 'fight' || S.rd) return;
+  if(i === capSeat(G) && G.used){ aiShipAct(G); if(G.phase !== 'fight' || G.stg !== st) return; }
   while(G.phase === 'fight' && S.hand.includes('bl')) sacHand(G, i, S.hand.indexOf('bl'));
   playAll(G, i); if(G.phase !== 'fight' || G.stg !== st) return;
   if(S.eu < eclMax(S)){ const live = G.en.filter(e => e.hp > 0), inc = aiIncoming(G);
@@ -2183,8 +2298,23 @@ function aiAttack(G){
   for(let n = 0; n < 16 && G.phase === 'fight' && G.stg === st && G.sub === 'atk' && G.atk > 0; n++){ const t = aiTarget(G, {c:G.atk}); if(t < 0) break; attack(G, c, t); }
   if(G.phase === 'fight' && G.stg === st && G.sub === 'atk') endAttack(G);
 }
+// the robot at the helm decides for the ship, or picks the way at a fork
+function aiShip(G){
+  const P = G.port; if(!P || !P.ship || P.sp >= 0) return; const c = capSeat(G), h = G.hull / G.maxHull;
+  let o = 0;
+  if(P.k === 'fork') o = globalThis.FORK_ELITE && h >= .75 ? 1 : 0;   // a robot captain plays it safe: the usual fight
+  else { const k = P.k === 'rest' ? 'rest' : P.e, weak = G.seats.every((S, i) => S.ab || (P.base[i] && P.base[i].jc.some(c => ['dou', 'dag', 'bou'].includes(c))));
+    o = ['rest', 'geyser', 'shore'].includes(k) ? (h < .6 ? 0 : 1) : ['storm', 'fort'].includes(k) ? (weak || h <= .5 ? 1 : 0) : (h > .5 ? 0 : 1); }
+  shipPick(G, c, o);
+}
 function aiStop(G, i){
+  const P0 = G.port; if(P0 && P0.ship && P0.sp < 0){ if(i === capSeat(G)) aiShip(G); else return; }
   const P = G.port, S = G.seats[i], of = P && P.of[i]; if(!of || S.rd || P.pick[i] >= 0) return;   // choose once
+  if(P.k === 'fork') return;
+  if(P.ship && of.length === 1){ portPick(G, i, 0); return; }
+  if(P.ship && P.k === 'rest'){ const x = S.deck.filter(c => c === 'dou').length >= 3; portPick(G, i, x ? 0 : Math.min(1, of.length - 1)); if(x){ portMark(G, i, 'dou', true); portMark(G, i, 'dou', true); } return; }
+  if(P.ship && ['storm', 'fort'].includes(P.e) && of[0] !== 'N'){ const w = of.findIndex(o => ['dou', 'dag', 'bou'].includes(o.split(':')[1])); portPick(G, i, Math.max(0, w)); return; }
+  if(P.ship && ['geyser', 'shore'].includes(P.e)){ portPick(G, i, 0); return; }
   if(P.k === 'port'){ const r = of.findIndex(o => o.startsWith('R:')); portPick(G, i, r >= 0 ? r : 0); portMark(G, i, 'dou', true); portMark(G, i, 'dou', true); return; }
   if(P.k === 'rest'){ const o = G.hull < .6 * G.maxHull ? 0 : S.deck.filter(c => c === 'dou').length >= 3 ? 1 : 2; portPick(G, i, o); if(o === 1){ portMark(G, i, 'dou', true); portMark(G, i, 'dou', true); } return; }
   const k = o => of.findIndex(x => x.split(':')[0] === o), healthy = G.hull > .5 * G.maxHull;
@@ -2392,6 +2522,7 @@ function stepLabel(v){
   if(v.phase === 'tutend') return {ic:'🗼', t:'Baie tranquille', sub:'Fin du tutoriel'};
   const R = routeFromView(v), N = R[v.node]; if(!N) return {ic:'⛵', t:'En mer', sub:''};
   if(N.rest) return {ic:'🏝️', t:'Crique abritée', sub:'Dernière escale avant le boss'};
+  if(N.fork) return {ic:'🔀', t:'La route se divise', sub:'Le capitaine choisit le chemin'};
   if(N.myst) return {ic:'❓', t:'Eaux inconnues', sub:'Embuscade ou rencontre étrange…'};
   if(N.boss){ const F = FOES[N.f[0]]; return {ic:'👑', t:F.the || F.n, sub:'Le boss de l\'épopée'}; }
   if(N.el) return {ic:'🔥', t:'Élite', sub:'Une menace redoutable'};
@@ -2415,7 +2546,7 @@ async function playTransition(prev, v){
   const R = routeFromView(v), L = stepLabel(v), E = epOfV(v);
   const inPort = v.phase === 'port' && v.port && v.port.k === 'port';
   const to = inPort || v.phase === 'win' ? R.length : Math.max(0, v.node), from = newEp ? -1 : inPort || v.phase === 'win' ? R.length - 1 : Math.max(-1, v.node - 1);
-  const icon = (n, i) => i < to ? '✓' : n.boss ? '👑' : n.el ? '🔥' : n.rest ? '🏝️' : n.myst ? '❓' : '⚔';
+  const icon = (n, i) => i < to ? '✓' : n.boss ? '👑' : n.el ? '🔥' : n.rest ? '🏝️' : n.fork ? '🔀' : n.myst ? '❓' : '⚔';
   const o = document.createElement('div'); o.id = 'voyfx'; o.className = 'voyfx';
   o.innerHTML = `<div class="vbox">
       ${newEp ? `<div class="vep">${esc(E.n)}<small>${esc(E.z)} · ${esc(E.tr || '')}</small></div>` : `<div class="vep sm">${esc(E.z)}</div>`}
@@ -2449,7 +2580,8 @@ function runBots(){
   // a teammate's power (the Captain's « Hissez les voiles »…) can hand cards or candles to a robot that already ended its turn: wake it up to use them
   if(G.phase === 'fight') G.seats.forEach(S => { if(S.bot && S.rd && !S.ab && (S.hand.some(c => !CARDS[c].junk) || S.g > (S.rdg || 0))) S.rd = false; });
   if(ui.coach >= 0 && G.phase === 'fight' && G.seats.some(S => !S.bot && !S.ab && !S.rd)) return;   // during the guided turn, robots play after the human
-  const i = G.seats.findIndex(S => S.bot && !S.rd && !S.ab);
+  let i = G.seats.findIndex(S => S.bot && !S.rd && !S.ab);
+  if(G.phase === 'port' && G.port && G.port.ship && G.port.sp < 0){ const c = capSeat(G); if(!G.seats[c].bot) return; i = c; }   // the captain decides first
   if(i < 0 || (G.phase !== 'fight' && G.phase !== 'port')) return;
   const st = G.stg;
   if(G.phase === 'fight') aiTurn(G, i); else aiStop(G, i);
@@ -2823,6 +2955,7 @@ const TIPS = {
   shift:['🔀 Menace changeante', "Chaque tir qu'elle encaisse lui fait changer de plan : regarde sa bulle après chaque tir avant de continuer."],
   fury:['🧿 L\'œil du chef', "Tant que cet œil vit, son chef est intouchable. Crève-le pour l'atteindre… mais le chef deviendra furieux : sois prêt·e à encaisser."],
   cur:['🌀 Contre-courant retourné', "Le double du Cartographe a retourné le courant : votre prochaine attaque perdra un quart de sa force. Prévois plus de combat."],
+  sact:['🎖️ Manœuvres du navire', "Sous la coque, les boutons du navire : ses améliorations à déclencher. Le capitaine à la barre les lance, une fois par combat."],
   shuf:['🧭 Cale instable', "La boussole s'affole : à chaque nouveau tour, toutes les cartes de la cale changent. Ce qui te plaît maintenant ne sera plus là au tour suivant."],
   arm:['🔰 Écailles des colosses', "Chaque tir contre ces menaces est réduit. Regroupe ton attaque en quelques gros tirs, ou fends leurs écailles avec la Hache brise-carapace."],
   rage:['😡 Rage', "Ici, chaque menace s'enrage sous la moitié de sa vie (+3 force) : achève-les vite une fois entamées. Et quand les malédictions ☠ sont tenaces, leurs blessures restent dans ton deck."],
@@ -2851,6 +2984,8 @@ function renderCamp(app){
       ${sel && CAMP[sel].sector === S.id ? campSetupHTML(sel) : ''}</section>`; };
   app.innerHTML = `<button class="back" data-act="menu">‹ Retour</button>
     <div class="camptop"><h2>🗺️ Aventure</h2></div>
+    ${upsPending().map(upChoiceHTML).join('')}
+    ${Object.entries(CAMP_PROG.up || {}).some(([k, c]) => UP[c] && UP[c].k === +k) ? `<div class="myship"><b>⛵ Ton navire</b>${Object.entries(CAMP_PROG.up).sort((a, b) => a[0] - b[0]).map(([k, c]) => UP[c] && UP[c].k === +k ? `<span title="${esc(UP[c].d)}">${UP[c].ic} ${esc(UP[c].n)}</span>` : '').join('')}</div>` : ''}
     ${all.map(secHTML).join('')}`;
 }
 // who takes the helm: that sailor fires the ship's attack every turn (the Capitaine by default)
@@ -2864,7 +2999,8 @@ function helmHTML(roles, cur, act, edit, who){
 function campSetupHTML(id){
   const C = CAMP[id], L = ui.cloc, have = campClasses(), lab = {me:'Moi', bot:'🤖 Robot', off:'Absent'};
   const first = !!(C.coach || C.lock), roles = Object.keys(ROLES), me = roles.filter(r => have.includes(r) && L[r] === 'me'), n = roles.filter(r => have.includes(r) && L[r] !== 'off').length;
-  return `<div class="csetup"><div class="cinfo"><h3>${esc(C.n)}</h3><p class="cnew">Nouveauté : ${esc(C.mech[0])}</p></div>
+  const ups = shipUpsFor(id);
+  return `<div class="csetup"><div class="cinfo"><h3>${esc(C.n)}</h3><p class="cnew">Nouveauté : ${esc(C.mech[0])}</p>${ups.length ? `<p class="cups">⛵ À bord : ${ups.map(k => `<span title="${esc(UP[k].d)}">${UP[k].ic} ${esc(UP[k].n)}</span>`).join(' · ')}</p>` : ''}</div>
     ${first ? `<p class="note">👑 Capitaine (toi) et 💣 Canonnier (robot).</p>` : `${id === '1.3' ? `<div class="crewhelp"><b>Compose ton équipage</b>
       <ul><li><b>Moi</b> : tu joues ce rôle. Tu peux en prendre plusieurs, tu passes de l'un à l'autre pendant la partie.</li>
       <li><b>🤖 Robot</b> : l'ordinateur le joue à tes côtés.</li>
@@ -2912,7 +3048,7 @@ function renderTip(){
   const live = pv.en.filter(e => e.hp > 0), itOf = e => { const F = FOES[e.t]; return F.it[e.i % F.it.length][0]; };
   const me = activeSeat();
   const Eh = !pv.tut && pv.cp ? epOfV(pv) : {};
-  const cond = {tax:live.some(e => itOf(e) === 'tax'), hide:live.some(e => FOES[e.t].hide) || !!Eh.hide, vanish:live.some(e => e.vn), shift:live.some(e => FOES[e.t].shift), fury:live.some(e => FOES[e.t].fury), cur:!!pv.cur || live.some(e => itOf(e) === 'courant'), shuf:!!Eh.shuffle, arm:live.some(e => e.ar), ally:Object.keys(FACTIONS).some(f => crewFactionCount(f, me) >= 2), guard:live.some(e => FOES[e.t].guard), sup:live.some(e => FOES[e.t].sup), steal:live.some(e => itOf(e) === 'steal') || pv.seats.some(S => S.dt),
+  const cond = {tax:live.some(e => itOf(e) === 'tax'), hide:live.some(e => FOES[e.t].hide) || !!Eh.hide, vanish:live.some(e => e.vn), shift:live.some(e => FOES[e.t].shift), fury:live.some(e => FOES[e.t].fury), cur:!!pv.cur || live.some(e => itOf(e) === 'courant'), shuf:!!Eh.shuffle, sact:(pv.ups || []).some(k => k === 'bell' || k === 'prow') && mySeats().includes(pv.cps), arm:live.some(e => e.ar), ally:Object.keys(FACTIONS).some(f => crewFactionCount(f, me) >= 2), guard:live.some(e => FOES[e.t].guard), sup:live.some(e => FOES[e.t].sup), steal:live.some(e => itOf(e) === 'steal') || pv.seats.some(S => S.dt),
     fog:live.some(e => itOf(e) === 'fog'), dive:live.some(e => e.inv && !e.vn), rage:pv.ep >= 3 || !!Eh.rage,
     storm:pv.round >= ESC_ROUND - 1 && live.some(e => FOES[e.t].boss),
     mkrot:(() => { const S = pv.seats[activeSeat()]; return !!S && featOn(pv.cp, 'mkrm') && !S.rd && S.g >= 1 && !S.hand.some(c => !CARDS[c].junk) && !pv.mk.some(c => c && CARDS[c].$ <= S.g); })(),
@@ -2969,6 +3105,7 @@ function renderCampEnd(app){
   app.innerHTML = `<div class="end ${fin ? 'finale' : ''}">${sceneHTML({lighthouse:win && !fin, sunk:!win, ratio:win ? 1 : .1, amb:ambOf(pv)})}<h2>${fin ? 'Terre en vue !' : win ? 'Épopée réussie !' : 'Naufrage'}</h2>
     <p>${esc(C.n)}</p>
     ${fin ? `<p class="epilogue">Le cyclone s'efface. Davy Jones sombre avec son équipage-miroir, et à l'aube une côte verte se découpe sur l'horizon. Après neuf secteurs de tempêtes, de cales sombres et de monstres, le navire jette l'ancre au Nouveau Monde. L'équipage a tenu bon, ensemble.</p>` : ''}
+    ${win && C.idx === 3 && SHIP_UPS[C.sector] && upsPending().includes(C.sector) ? upChoiceHTML(C.sector) : ''}
     ${win && nw.cls ? `<div class="cunlock">🎉 Nouveau matelot : <b>${ROLES[nw.cls].ic} ${ROLES[nw.cls].n}</b></div>` : ''}
     ${mode === 'host' || mode === 'guest' ? `${helmHTML(Object.keys(ROLES).filter(r => pv.seats.some(x => x.r === r && !x.ab)), pv.helm, 'lob-helm', mode === 'host', r => { const x = pv.seats.find(y => y.r === r); return x ? `${x.n} (${ROLES[r].n})` : ROLES[r].n; })}<div class="menu">${mode === 'host' ? `
       ${win && next && CAMP[next] ? `<button class="bigbtn primary" data-act="relaunch" data-id="${next}"><b>Épopée suivante</b><span>${esc(CAMP[next].n)}, avec le même équipage</span></button>` : ''}
@@ -3065,8 +3202,21 @@ function miniHTML(p, S, si, i, mine){
 // the ship's hull: a short notched bar with a big number, under which the crew reads « Coque »
 function hullHTML(h, mx){
   h = Math.max(0, h); mx = Math.max(1, mx); const step = mx <= 40 ? 5 : 10;
-  return `<div class="hullbox" id="hull" title="Coque du navire : ${h} sur ${mx}. Si elle tombe à zéro, c'est le naufrage."><span class="hbar ${hpLevel(h, mx)}" style="--tk:${(step / mx * 100).toFixed(3)}%"><i style="width:${h / mx * 100}%"></i><em>${h}<small>/${mx}</small></em></span><span class="hlabel">⚓ Coque</span></div>`;
+  return `<div class="hullbox" id="hull" title="Coque du navire : ${h} sur ${mx}. Si elle tombe à zéro, c'est le naufrage."><span class="hbar ${hpLevel(h, mx)}" style="--tk:${(step / mx * 100).toFixed(3)}%"><i style="width:${h / mx * 100}%"></i><em>${h}<small>/${mx}</small></em></span><span class="hlabel">⚓ Coque${pv && pv.ups && pv.ups.length ? `<span class="hups">${pv.ups.map(k => `<i title="${esc(UP[k].n + ' : ' + UP[k].d)}">${UP[k].ic}</i>`).join('')}</span>` : ''}</span></div>`;
 }
+// the manoeuvres of the ship (active upgrades): the captain at the helm fires them, once per fight
+function shipActsHTML(){
+  const acts = (pv.ups || []).filter(k => k === 'bell' || k === 'prow'); if(!acts.length) return '';
+  const me = mySeats().includes(pv.cps);
+  return `<div class="sacts">${acts.map(k => { const used = (pv.used || {})[k], ok = me && !used && !(k === 'bell' && pv.sub);
+    return `<button class="sact ${used ? 'used' : ok ? 'ready' : ''}" data-act="sact" data-k="${k}" ${ok ? '' : 'disabled'} title="${esc(UP[k].n + ' : ' + UP[k].d + (used ? ' (déjà utilisé ce combat)' : me ? '' : ' Le capitaine à la barre la déclenche.'))}" aria-label="${esc(UP[k].n)}">${UP[k].ic}</button>`; }).join('')}</div>`;
+}
+// choosing the ship's upgrade after a sector
+function upChoiceHTML(k){
+  return `<div class="upchoice"><b>⛵ Secteur ${k} franchi : améliore le navire</b><small>Choisis une amélioration. Elle reste à bord pour tout le reste de l'aventure, dans toutes les épopées suivantes.</small>
+    <div class="opts">${SHIP_UPS[k].map(u => `<div class="opt"><button class="relic act" data-act="up-pick" data-k="${k}" data-c="${u[0]}"><span class="face"><span class="ric">${u[1]}</span><b>${esc(u[2])}</b><span>${esc(u[3])}</span><small>Amélioration du navire</small></span></button></div>`).join('')}</div></div>`;
+}
+const upsPending = () => Object.keys(SHIP_UPS).map(Number).filter(k => campStarsOf(k + '.4') > 0 && !(UP[(CAMP_PROG.up || {})[k]] && UP[CAMP_PROG.up[k]].k === k));
 // what a new turn brings: the boss's storm, a hold that reshuffles…
 function roundEffects(v){
   const out = []; if(!v || v.tut || v.phase !== 'fight') return out;
@@ -3151,28 +3301,50 @@ function optHTML(opt, o, picked){
     : k === 'HC' ? `Contre <span class="bad">${a} points de coque</span>` : k === 'LW' ? `Écouter le chant : carte légendaire, mais ${W}` : 'Jeter cette carte par-dessus bord : elle quitte ton deck';
   return `<div class="opt">${cardHTML(code, at, `${pk} ${k === 'J' ? 'marked' : ''}`)}<small>${note}</small></div>`;
 }
+// what the captain can decide for the whole ship (a stop), or which way to go (a fork)
+const FORK_TXT = {2:"Deux passes s'ouvrent entre les bancs de sable.", 3:"La côte se divise : une anse gardée d'un côté, le large de l'autre.", 4:"Deux chenaux serpentent entre les îles de l'archipel.", 5:"Dans la brume, deux lueurs appellent le navire.", 6:"Deux sillages d'écume contournent l'île des géants.", 7:"La boussole hésite entre deux caps.", 8:"Deux courants plongent vers les profondeurs.", 9:"Deux routes mènent vers la terre promise."};
+function shipTile(P, opt, o, mine){
+  const tile = (ic, t, d, sub, risk) => `<div class="opt">${mine ? `<button class="relic act ${risk ? 'risk' : ''} ${P.sp === o ? 'picked' : ''}" data-act="ship" data-o="${o}">` : `<div class="relic ${risk ? 'risk' : ''} ${P.sp === o ? 'picked' : 'dim'}">`}<span class="face"><span class="ric">${ic}</span><b>${t}</b><span>${d}</span><small>${sub}</small></span>${mine ? '</button>' : '</div>'}</div>`;
+  if(P.k === 'fork'){ const N = P.fk[o];
+    if(N.e){ const E = EVENTS[N.e]; return tile(E.ic, esc(E.n), esc(E.t), 'Une rencontre'); }
+    const cnt = {}; N.f.forEach(t => cnt[t] = (cnt[t] || 0) + 1); const foes = Object.entries(cnt).map(([t, n]) => `${n > 1 ? n + ' × ' : ''}${esc(FOES[t].n)}`).join(', ');
+    return N.el ? tile('🔥', 'Braver l’élite', foes, '🎁 Butin : une carte rare pour chaque matelot', true) : tile(FOES[N.f[0]].ic, 'Passer au plus court', foes, 'Un combat ordinaire'); }
+  const [k, a] = opt.split(':'), kind = P.k === 'rest' ? 'rest' : P.e;
+  if(k === 'SR') return tile('🔧', 'Réparer la coque', `Tout l'équipage répare : la coque regagne ${a} points`, 'Personne ne prend de carte');
+  if(k === 'SE') return tile('🧭', kind === 'rest' ? 'Explorer la crique' : 'Explorer', 'Pas de réparation', kind === 'rest' ? 'Chacun allège son deck ou prend une carte rare' : 'Chacun choisit une carte rare');
+  if(k === 'SD') return tile('⛵', 'Tenir la barre', `La coque perd ${a} points`, 'Les decks ne bougent pas', true);
+  if(k === 'SJ') return tile('🌊', 'Alléger le navire', 'Chaque matelot jette une carte de son deck', 'Il choisit laquelle');
+  if(k === 'SM') return tile('⚖️', 'Commercer', 'Chacun peut aussi acheter une carte rare', 'Payée en planches de la coque', true);
+  return tile('🚫', 'Refuser le marché noir', 'Seulement le troc et les petites affaires', 'La coque ne risque rien');
+}
 function renderStop(app){
   const s = activeSeat(), S = pv.seats[s], P = pv.port, R = routeFromView(pv), bossF = FOES[R[R.length - 1].f[0]];
   const readyCount = pv.seats.filter(x => x.rd && !x.ab).length, total = pv.seats.filter(x => !x.ab).length;
   const offer = S ? (P.of[s] || []) : [], pick = S ? P.pick[s] : -1, rm = S ? (P.rm[s] || []) : [], lim = S ? markLimit(P, s) : 0;
-  const rest = P.k === 'rest', E = rest ? null : EVENTS[P.e];
-  const title = rest ? 'Crique abritée' : E.n, ic = rest ? '🏝️' : E.ic;
-  const text = rest ? `Dernière escale avant ${esc((bossF.the || bossF.n).replace(/^L/, 'l'))}. Chaque matelot choisit une option : réparer la coque (les réparations s'additionnent), alléger son deck ou prendre une carte rare.` : esc(E.t);
+  const rest = P.k === 'rest', fork = P.k === 'fork', E = rest || fork ? null : EVENTS[P.e];
+  const cps = pv.cps, capX = pv.seats[cps], iCapt = mySeats().includes(cps), wait = !!P.ship && P.sp < 0;
+  const capName = capX ? `${ROLES[capX.r].ic} ${esc(capX.n)}` : 'Le capitaine';
+  const title = fork ? 'La route se divise' : rest ? 'Crique abritée' : E.n, ic = fork ? '🔀' : rest ? '🏝️' : E.ic;
+  const sec = pv.cp && CAMP[pv.cp] ? CAMP[pv.cp].sector : 0;
+  const text = fork ? `${esc(FORK_TXT[sec] || 'Deux chemins s’offrent au navire.')} Le capitaine à la barre choisit la route.` : rest ? `Dernière escale avant ${esc((bossF.the || bossF.n).replace(/^L/, 'l'))}. Le capitaine décide si l'équipage répare la coque ou explore la crique, puis chacun fait son choix.` : esc(E.t);
+  const shipSec = P.ship ? `<section class="sect shipdec" id="shipdec"><header><h2>🎖️ ${fork ? 'Choix de la route' : 'Décision du capitaine'}</h2><span class="note">${iCapt ? (fork ? 'À toi de choisir le chemin' : 'À toi de décider pour tout le navire') : `${capName} décide${fork ? ' du chemin' : ' pour tout le navire'}`}</span></header>
+      <div class="opts">${P.ship.map((x, o) => shipTile(P, x, o, iCapt)).join('')}</div></section>` : '';
   app.innerHTML = `
-    <div class="topline">${quitBtn()}<div class="zone display">${esc(R[pv.node] ? R[pv.node].z : '')}<span class="epb">Épopée ${pv.ep}/${EPICS.length}</span></div>
-      <div class="route">${R.map((n, i) => `${i ? '<b></b>' : ''}<i class="${i < pv.node ? 'done' : i === pv.node ? 'now' : ''}">${i < pv.node ? '✓' : i === pv.node ? ic : n.boss ? '👑' : n.el ? '🔥' : n.rest ? '🏝️' : n.myst ? '❓' : '⚔'}</i>`).join('')}</div></div>
+    <div class="topline">${quitBtn()}<div class="zone display">${esc(R[pv.node] ? R[pv.node].z : '')}${pv.cp ? `<span class="epb">${pv.cp} · ${esc(CAMP[pv.cp].n)}</span>` : `<span class="epb">Épopée ${pv.ep}/${EPICS.length}</span>`}</div>
+      <div class="route">${R.map((n, i) => `${i ? '<b></b>' : ''}<i class="${i < pv.node ? 'done' : i === pv.node ? 'now' : ''}">${i < pv.node ? '✓' : i === pv.node ? ic : n.boss ? '👑' : n.el ? '🔥' : n.rest ? '🏝️' : n.fork ? '🔀' : n.myst ? '❓' : '⚔'}</i>`).join('')}</div></div>
     ${sceneHTML({lighthouse:rest, amb:ambOf(pv), ratio:pv.hull / pv.maxHull, hull:`${hullHTML(pv.hull, pv.maxHull)}<div class="scchips"></div>`})}
     <div class="panel porthead evhead"><span class="evic">${ic}</span><h2>${esc(title)}</h2><p>${text}</p>
       ${S && S.nw ? `<p class="pendw">🩹 ${S.nw} blessures t'attendent au prochain combat.</p>` : ''}</div>
+    ${shipSec}
     <div class="crew" id="crew">${pv.seats.map((x, i) => {
       const o = P.pick[i], ch = o >= 0 && P.of[i] ? P.of[i][o] : null;
       return `<button class="seat ${x.p === myId() ? 'mine' : ''} ${i === s ? 'active' : ''} ${x.ab ? 'away' : ''}" style="--rc:${ROLES[x.r].col}" data-act="seat" data-s="${i}">
-        <div class="tl"><span class="who">${ROLES[x.r].ic} ${esc(x.n)}</span>${x.rd && !x.ab ? '<span class="ok">✓ prêt</span>' : ''}</div>
-        <div class="st"><span>${esc(optLabel(ch))}${ch === 'X' ? ` ${(P.rm[i] || []).length}/${PORT_REMOVALS}` : ''}</span></div></button>`;
+        <div class="tl"><span class="who">${ROLES[x.r].ic} ${esc(x.n)}${i === cps && total > 1 ? '<span class="helmb" title="À la barre">🎖️</span>' : ''}</span>${x.rd && !x.ab && !fork ? '<span class="ok">✓ prêt</span>' : ''}</div>
+        <div class="st"><span>${fork ? (i === cps ? '🎖️ Choisit la route' : 'Attend le capitaine') : wait ? (i === cps ? '🎖️ Décide pour le navire' : 'Attend le capitaine') : `${esc(optLabel(ch))}${ch === 'X' ? ` ${(P.rm[i] || []).length}/${PORT_REMOVALS}` : ''}`}</span></div></button>`;
     }).join('')}</div>
-    ${S ? `<section class="sect" id="reward"><header><h2>${rest ? 'Ton choix' : 'Que fais-tu ?'}</h2><span class="note">${ROLES[S.r].ic} ${esc(S.n)}, une option</span></header>
-      <div class="opts">${offer.map((c, o) => optHTML(c, o, o === pick)).join('')}</div></section>
-    ${lim ? `<section class="sect" id="lighten"><header><h2>Alléger le deck</h2><span class="note">${rm.length}/${lim} carte${rm.length > 1 ? 's' : ''} à jeter</span></header>
+    ${S && !fork ? `<section class="sect" id="reward"><header><h2>${rest ? 'Ton choix' : 'Que fais-tu ?'}</h2><span class="note">${ROLES[S.r].ic} ${esc(S.n)}${offer.length > 1 ? ', une option' : ''}</span></header>
+      ${wait ? `<p class="note waitcap">⏳ ${iCapt ? 'Décide d’abord pour le navire, juste au-dessus.' : `En attente de la décision du capitaine (${capName}).`}</p>` : `<div class="opts">${offer.map((c, o) => optHTML(c, o, o === pick)).join('')}</div>`}</section>
+    ${lim && !wait ? `<section class="sect" id="lighten"><header><h2>Alléger le deck</h2><span class="note">${rm.length}/${lim} carte${rm.length > 1 ? 's' : ''} à jeter</span></header>
       <p class="note">Touche une carte pour la jeter. Toucher une carte jetée la rend à ton deck.</p>
       ${deckGroups(deckOf(S)).map(g => `<div class="group">${g.label}</div><div class="grid">${g.items.map(([c, n]) => { const m = rm.filter(x => x === c).length; return cardHTML(c, `data-act="mark" data-c="${c}" data-m="${m}"`, m ? 'marked' : '', {cnt:n, rm:m}); }).join('')}</div>`).join('')}
     </section>` : ''}` : ''}
@@ -3180,9 +3352,11 @@ function renderStop(app){
   if(!S) return;
   const dock = $('#dock'), dockIn = $('#dockIn'); dock.hidden = false; document.body.classList.add('docked');
   const mine = mySeats(), allMineReady = mine.every(i => pv.seats[i].rd);
-  dockIn.innerHTML = `<div class="bar"><span class="grow note">${pick >= 0 ? '✓ ' + esc(optLabel(offer[pick])) : 'Choisis une option'}</span>
+  dockIn.innerHTML = fork ? `<div class="bar"><span class="grow note">${P.sp >= 0 ? '✓ Route choisie' : iCapt ? 'Choisis un chemin' : 'Le capitaine choisit…'}</span>
+    ${iCapt ? `<button class="ready" id="readyBtn" data-act="ready" ${P.sp >= 0 ? '' : 'disabled'}>Prendre cette route</button>` : `<button class="ready wait" id="readyBtn" disabled>🎖️ Le capitaine choisit la route…</button>`}</div>`
+    : `<div class="bar"><span class="grow note">${wait ? (iCapt ? 'Décide pour le navire' : 'Le capitaine décide…') : pick >= 0 ? '✓ ' + esc(optLabel(offer[pick])) : 'Choisis une option'}</span>
     <button class="btn ghost small" data-act="deck" data-s="${s}">Deck</button>
-    <button class="ready ${allMineReady ? 'wait' : ''}" id="readyBtn" data-act="ready">${allMineReady ? `Annuler (${readyCount}/${total})` : `Lever l'ancre (${readyCount}/${total})`}</button></div>`;
+    <button class="ready ${allMineReady ? 'wait' : ''}" id="readyBtn" data-act="ready" ${wait ? 'disabled' : ''}>${allMineReady ? `Annuler (${readyCount}/${total})` : `Lever l'ancre (${readyCount}/${total})`}</button></div>`;
   requestAnimationFrame(() => document.body.style.setProperty('--dockh', (dock.offsetHeight + 16) + 'px'));
 }
 function renderPort(app){
@@ -3241,11 +3415,11 @@ function renderFight(app){
         ${(F.min || mins) && !e.str && !e.rg ? '' : `<span class="fnum">${F.min || mins ? '' : esc(F.n)}${e.str ? ` 💪+${e.str}` : ''}${e.rg ? ' 😡' : ''}</span>`}${traitChips(e, i)}</button>`;
     }).join('')}</div>`;
   ui.spawned = null;
-  const hull = `${roundHTML()}${hullHTML(pv.hull, pv.maxHull)}<div class="scchips">${bossEsc() ? `<span class="escchip" title="À partir du ${ESC_ROUND}e tour, le boss gagne +${ESC} de force à chaque tour : ne traîne pas !">🌪️ ${pv.round >= ESC_ROUND ? 'La tempête enfle' : `Tempête au tour ${ESC_ROUND}`}</span>` : ''}${pv.net ? `<span class="halfchip" title="Filet d'abordage : tes serviteurs ont +${pv.net} de défense contre les abordages de ce tour">🕸️ Défense +${pv.net}</span>` : ''}${pv.half ? '<span class="halfchip" title="Contre-courant : les dégâts sur la coque sont réduits d\'un quart ce tour">🌀 Dégâts −¼</span>' : ''}${pv.cur ? '<span class="brchip" title="Le double du Cartographe a retourné le courant : votre prochaine attaque perd un quart">🌀 Attaque −¼</span>' : ''}${pv.br ? `<span class="brchip" title="Colmate la brèche avec de la protection (Écoper, Garde…) avant la fin du tour">💥 Brèche ${pv.br} : dégâts ×1,5</span>` : ''}</div>`;
+  const hull = `${roundHTML()}${hullHTML(pv.hull, pv.maxHull)}${shipActsHTML()}<div class="scchips">${bossEsc() ? `<span class="escchip" title="À partir du ${ESC_ROUND}e tour, le boss gagne +${ESC} de force à chaque tour : ne traîne pas !">🌪️ ${pv.round >= ESC_ROUND ? 'La tempête enfle' : `Tempête au tour ${ESC_ROUND}`}</span>` : ''}${pv.net ? `<span class="halfchip" title="Filet d'abordage : tes serviteurs ont +${pv.net} de défense contre les abordages de ce tour">🕸️ Défense +${pv.net}</span>` : ''}${pv.half ? '<span class="halfchip" title="Contre-courant : les dégâts sur la coque sont réduits d\'un quart ce tour">🌀 Dégâts −¼</span>' : ''}${pv.cur ? '<span class="brchip" title="Le double du Cartographe a retourné le courant : votre prochaine attaque perd un quart">🌀 Attaque −¼</span>' : ''}${pv.br ? `<span class="brchip" title="Colmate la brèche avec de la protection (Écoper, Garde…) avant la fin du tour">💥 Brèche ${pv.br} : dégâts ×1,5</span>` : ''}</div>`;
 
   app.innerHTML = `
     <div class="topline">${quitBtn()}<div class="zone display">${esc(N.z)}${pv.tut ? '' : pv.cp ? `<span class="epb" title="${esc(CAMP[pv.cp].n)}">${pv.cp} · ${esc(CAMP[pv.cp].n)}</span>` : `<span class="epb" title="${esc(EPICS[(pv.ep || 1) - 1].n)}">Épopée ${pv.ep || 1}/${EPICS.length}</span>`}</div>
-      <div class="route">${R.map((n, i) => `${i ? '<b></b>' : ''}<i class="${i < pv.node ? 'done' : i === pv.node ? 'now' : ''}" title="${esc(n.z + (n.boss ? ', boss' : n.el ? ', élite' : n.rest ? ', crique abritée' : n.myst ? ', mystère' : ''))}">${i < pv.node ? '✓' : n.boss ? (i === pv.node ? FOES[n.f[0]].ic : '👑') : n.el ? '🔥' : n.rest ? '🏝️' : n.myst ? '❓' : '⚔'}</i>`).join('')}</div></div>
+      <div class="route">${R.map((n, i) => `${i ? '<b></b>' : ''}<i class="${i < pv.node ? 'done' : i === pv.node ? 'now' : ''}" title="${esc(n.z + (n.boss ? ', boss' : n.el ? ', élite' : n.rest ? ', crique abritée' : n.myst ? ', mystère' : ''))}">${i < pv.node ? '✓' : n.boss ? (i === pv.node ? FOES[n.f[0]].ic : '👑') : n.el ? '🔥' : n.rest ? '🏝️' : n.fork ? '🔀' : n.myst ? '❓' : '⚔'}</i>`).join('')}</div></div>
     ${sceneHTML({ratio:pv.hull / pv.maxHull, shield:pv.prot > 0, hull, foes, mates:matesHTML(), prot:pv.prot, br:pv.br || 0, atk:shipAtk, atkOn:!!pv.sub, amb:ambOf(pv)})}
     ${pv.sub && pv.atk > 0 && pv.seats.filter(x => !x.ab).length > 1 ? `<div class="atkstrip ${iCap ? 'me' : ''}">${iCap ? `🎖️ <span>À toi de tirer ! Touche une bulle ⚔ pour envoyer les <b>${pv.atk} ⚔</b> du navire.</span>` : `🎖️ <span>${(X => X ? `<b>${esc(X.n)}</b>, à la barre,` : '<b>Le capitaine</b>')(pv.seats[pv.cps])} répartit les <b>${pv.atk} ⚔</b> du navire. Regarde où il tire !</span>`}</div>` : ''}
     <div class="crew" id="crew">${pv.seats.map((x, i) => {
@@ -3482,6 +3656,8 @@ function postFx(fx){
     else if(e.t === 'merc') floatAt('#ship', `🫠 ${CARDS[e.c].n} a fondu, faute de bougies`, '#ffe39a');
     else if(e.t === 'thorn') floatAt('#ship', `🌵 Épines : −${e.d}`, '#ff8f7a');
     else if(e.t === 'sac') floatAt('#inplay', '☠ Sacrifice', '#ffb9a8');
+    else if(e.t === 'sact' && e.k === 'bell') banner('🔔 Cloche du bord', 'Chaque matelot pioche une carte', true);
+    else if(e.t === 'loot' && mySeats().includes(e.s) && CARDS[e.c]) toast(`🎁 Butin de l’élite : ${CARDS[e.c].n} rejoint ${mySeats().length > 1 ? 'le deck de ' + (pv.seats[e.s] ? pv.seats[e.s].n : '') : 'ton deck'}.`);
     else if(e.t === 'shuf'){ if(!fx.newRound) banner('🧭 La boussole s\'affole', 'Toutes les cartes de la cale ont changé', true); }
     else if(e.t === 'fury') banner('😡 Le boss devient furieux !', `+${e.v} de force`, true);
     else if(e.t === 'shift'){ const el = document.querySelector(`.foe[data-e="${e.e}"]`); if(el) floatAt(el.querySelector('.fi') || el, '🔀 Change de plan !', '#e6d2ff'); }
@@ -4221,6 +4397,7 @@ document.addEventListener('click', ev => {
       const roles = pv && pv.seats.length === 2 ? pv.seats.map(x => x.r) : ui.soloRoles; quitToMenu(); ui.soloRoles = roles; startSolo(); break; }
     case 'purge-mode': if(S && !busy()){ ui.purge = !ui.purge; if(ui.purge) toast(`Touche une carte de ta main : elle est jetée par-dessus bord et quitte ton deck pour de bon (${S.ft ? 'gratuit' : '🕯️' + PURGE_COST(S)}).`); render(); } break;
     case 'pick': if(S) act({a:'pick', s, o:+b.dataset.o}); break;
+    case 'ship': if(pv && mySeats().includes(pv.cps)) act({a:'ship', s:pv.cps, o:+b.dataset.o}); break;
     case 'mark': if(S){
       const c = b.dataset.c, m = +b.dataset.m, rm = pv.port.rm[s] || [], owned = deckOf(S).filter(x => x === c).length;
       const lim = markLimit(pv.port, s), add = rm.length < lim && m < owned && !(m > 0 && owned === 1);
@@ -4246,6 +4423,8 @@ document.addEventListener('click', ev => {
     case 'cale-info': openCaleInfo(); break;
     case 'hand-toggle': ui.handDown = !ui.handDown; render(); break;
     case 'zoom': openCardZoom(b.dataset.c); break;
+    case 'sact': if(pv && mySeats().includes(pv.cps)) act({a:'sact', s:pv.cps, k:b.dataset.k}); break;
+    case 'up-pick': { const k = +b.dataset.k; if(SHIP_UPS[k] && upsPending().includes(k)){ CAMP_PROG.up = {...(CAMP_PROG.up || {}), [k]:b.dataset.c}; campSave(); toast(`${UP[b.dataset.c].ic} ${UP[b.dataset.c].n} installé sur le navire.`); render(); } break; }
     case 'all': {
       if(!S || busy()) return;
       const cards = [...document.querySelectorAll('#hand .card[data-act="play"]')].map(el => ({r:el.getBoundingClientRect(), h:el.outerHTML, c:el.dataset.c}));
@@ -4288,10 +4467,11 @@ document.addEventListener('click', ev => {
     case 'ecl': if(S && !busy()) act({a:'ecl', s}); break;
     case 'ready': {
       const mine = mySeats(), all = mine.every(i => pv.seats[i].rd);
+      if(pv.phase === 'port' && pv.port && pv.port.k === 'fork'){ if(mine.includes(pv.cps) && pv.port.sp >= 0) act({a:'rdy', s:pv.cps, v:true}); break; }
       if(!all && pv.phase === 'port'){
-        const none = mine.filter(i => !pv.seats[i].ab && pv.port && pv.port.pick[i] < 0);
+        const none = mine.filter(i => !pv.seats[i].ab && pv.port && pv.port.pick[i] < 0 && (pv.port.of[i] || []).length > 1);
         const k = pv.port && pv.port.k, msg = k === 'port' ? "Pas de récompense choisie. Touche encore « Lever l'ancre » pour partir sans."
-          : pv.port.e === 'storm' ? "Pas de choix : tu tiendras la barre. Touche encore « Lever l'ancre » pour confirmer." : "Pas de choix : tu passes ton chemin. Touche encore « Lever l'ancre » pour confirmer.";
+          : ['storm', 'fort'].includes(pv.port.e) ? "Pas de choix : tu jetteras la première carte proposée. Touche encore « Lever l'ancre » pour confirmer." : "Pas de choix : tu passes ton chemin. Touche encore « Lever l'ancre » pour confirmer.";
         if(none.length && !ui.confirm){ ui.confirm = true; toast(msg); setTimeout(() => ui.confirm = false, 4000); return; }
       }
       else if(!all){
