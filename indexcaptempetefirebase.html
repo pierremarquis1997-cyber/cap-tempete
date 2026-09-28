@@ -208,6 +208,26 @@ body.docked #app{ padding-bottom:var(--dockh, 280px); }
 .foe .atk:hover, .foe .atk:focus-visible{ background:#ff6a45; outline:none; }
 @keyframes firepulse{ 50%{ scale:1.1; box-shadow:0 3px 0 rgba(0,0,0,.35), 0 0 24px rgba(255,140,90,.9); } }
 @media (prefers-reduced-motion:reduce){ .foe .atk{ animation:none; } }
+.flagpick{ display:grid; gap:6px; padding:10px 12px; border-radius:12px; background:rgba(10,20,26,.45); border:1px solid rgba(217,164,65,.45); text-align:left; }
+.flagpick > b{ font-size:14.5px; color:var(--parch); } .flagpick small{ font-size:12px; color:var(--muted); line-height:1.35; }
+.flrow{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.flwho{ font-size:13px; font-weight:700; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.flrow .seg button{ font-size:15px; padding:5px 9px; }
+.flrow .seg button.on{ background:color-mix(in srgb, var(--fc) 55%, var(--sea-2)); color:#fff; box-shadow:inset 0 0 0 2px var(--fc); }
+.flcur{ font-size:13px; color:var(--parch); }
+.flkit{ opacity:.85; }
+.combos{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:8px; padding:6px 8px; border-radius:12px; border:1px solid rgba(255,220,150,.35); background:rgba(28,15,6,.65); font:inherit; color:#e8d3ae; cursor:pointer; width:100%; }
+.combos .cl{ font-size:12px; font-weight:800; letter-spacing:.04em; margin-right:2px; }
+.cpip{ display:inline-flex; align-items:center; gap:3px; padding:2px 8px 2px 2px; border-radius:16px; background:rgba(0,0,0,.35); border:1px solid color-mix(in srgb, var(--fc) 45%, transparent); font-size:12px; }
+.cpip .ic{ width:20px; height:20px; border-radius:50%; display:grid; place-items:center; font-size:11px; background:color-mix(in srgb, var(--fc) 30%, #1a0e05); }
+.cpip b{ font-size:13px; color:#fff; } .cpip small{ opacity:.7; }
+.cpip.on{ background:color-mix(in srgb, var(--fc) 40%, #2a1608); border-color:var(--fc); box-shadow:0 0 10px -2px var(--fc); }
+.cpip.gr{ background:linear-gradient(color-mix(in srgb, var(--fc) 55%, #2a1608), #2a1608); border-color:#ffd98a; box-shadow:0 0 14px -2px #ffd98a; color:#ffe9b8; }
+.sact.gcb{ position:relative; border-color:var(--fc); background:radial-gradient(circle at 40% 30%, color-mix(in srgb, var(--fc) 60%, #fff), color-mix(in srgb, var(--fc) 70%, #000)); }
+.sact.gcb i{ position:absolute; right:-4px; top:-5px; font-style:normal; font-size:12px; color:#ffd98a; text-shadow:0 0 4px #000; }
+.cmbchip{ font-size:11px; font-weight:700; color:#fff; background:color-mix(in srgb, var(--fc, #d9a441) 55%, rgba(10,20,26,.85)); border:1px solid var(--fc, #d9a441); border-radius:20px; padding:2px 8px; white-space:nowrap; }
+.comboinfo h4{ margin:10px 0 6px; font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--brass); }
+.comboinfo .note{ margin-bottom:10px; font-size:13.5px; }
 .hups{ margin-left:6px; letter-spacing:1px; }
 .hups i{ font-style:normal; font-size:11px; }
 .sacts{ position:absolute; left:10px; top:52px; z-index:12; display:flex; gap:6px; }
@@ -1256,6 +1276,30 @@ const SHIP_UPS = {   // from the fifth sector on, when the sea gets rough: a rew
   8:[['figure', '🔱', 'Figure de proue dorée', "À chaque attaque, +1 ⚔ par faction différente jouée par l'équipage ce tour."], ['anchor', '⚓', 'Ancre lestée', "Le premier coup reçu à chaque combat est réduit de moitié."]],
 };
 const UP = Object.fromEntries(Object.entries(SHIP_UPS).flatMap(([k, l]) => l.map(u => [u[0], {k:+k, ic:u[1], n:u[2], d:u[3]}])));
+// ---- combos: alliances of one faction, counted over the whole fight, unlock the crew's great manoeuvres (from the fifth sector) ----
+const COMBO_T = {1:[10, 16], 2:[10, 16], 3:[15, 23], 4:[19, 28]};   // allied cards over the fight for [combo, grand combo], by number of sailors aboard
+const COMBO_FX = {
+  M:[['Ligne de bataille', "Jusqu'à la fin du combat, le navire gagne 2 🛡 par matelot à chaque tour."], ['Bordée royale', "Le capitaine la déclenche : l'attaque du navire ×1,5 ce tour."]],
+  T:[['Chant des îles', "Jusqu'à la fin du combat, chaque matelot pioche 1 carte de plus à chaque tour."], ['Esquive', "Le capitaine la déclenche : la menace qui s'apprête à frapper le plus fort ce tour rate son coup."]],
+  F:[['Butin', "Jusqu'à la fin du combat, chaque matelot gagne 1 bougie de plus à chaque tour."], ['Pillage', "Le capitaine le déclenche : ce tour, chaque matelot remonte une carte de la cale gratuitement."]],
+  C:[['Encre noire', "Toutes les menaces perdent 2 de force jusqu'à la fin du combat."], ['Marée noire', "Le capitaine la déclenche : 3 dégâts par matelot à toutes les menaces."]],
+};
+const CROSS = {   // two factions at the combo level in the same fight
+  FM:['Corsaires du roi', "Chaque matelot gagne 2 ⚔ tout de suite."], MT:['Traité des îles', "La coque regagne 2 points par matelot."],
+  CM:['Boulets bénis', "Les carapaces et cuirasses des menaces perdent 3 jusqu'à la fin du combat."], FT:['Contrebande', "Chaque matelot pioche 1 carte et gagne 1 bougie."],
+  CF:['Pacte noir', "Chaque matelot se débarrasse d'une blessure et gagne 2 bougies."], CT:['Rituel des profondeurs', "Ce tour, les abordages et malédictions des menaces sont annulés."],
+};
+// from the fifth sector, each sailor sails under a flag: 3 cards of that faction replace 3 basic cards of his starting deck
+const FLAG_KIT = {M:['m1', 'm8', 'n32'], T:['t13', 't9', 't1'], F:['f1', 'n33', 'f2'], C:['c2', 'c2', 'c3']};
+const flagsOn = id => !!(id && CAMP[id] && featOn(id, 'combo'));
+function applyFlags(G){
+  if(!flagsOn(G.camp)) return; G.flags = G.flags || {};
+  const human = G.seats.filter(S => !S.bot && G.flags[S.r]).map(S => G.flags[S.r]), common = human.sort((a, b) => human.filter(x => x === b).length - human.filter(x => x === a).length)[0] || 'M';
+  G.seats.forEach(S => { const f = FLAG_KIT[G.flags[S.r]] ? G.flags[S.r] : common; G.flags[S.r] = f;
+    ['dou', 'dou', 'dag'].forEach(c => { const i = S.deck.indexOf(c); if(i >= 0) S.deck.splice(i, 1); }); S.deck.push(...FLAG_KIT[f]); });
+}
+const comboOn = G => !!(G && G.camp && !G.tut && featOn(G.camp, 'combo') && !globalThis.NOCOMBO);
+const comboT = (n, cp) => { const t = COMBO_T[Math.max(1, Math.min(4, n))], k = cp && CAMP[cp] && CAMP[cp].sector >= 8 ? .7 : 1; return t.map(v => Math.round(v * k)); };   // shorter fights in the abysses and the New World: the thresholds come down
 const hasUp = (G, k) => !!(G && G.ups && G.ups.includes(k));
 const mkN = G => MK_N + (hasUp(G, 'lamp') ? 1 : 0);
 const MK_CAP = [7, 9, 12, 15];   // highest price on sale at the market during each epic: bigger cards appear as the voyage goes on
@@ -1405,7 +1449,7 @@ const EPICS = [
 /* =========================================================== CAMPAIGN (Aventure) */
 // each epic of the Aventure is a complete game of 1 to 6 steps; 9 sectors of 4 epics, built sector by sector
 // ft: features switched on from a given epic (the novelty it teaches); market: [card, first epic index in the sector (0-3), copies]
-const CAMP_FEAT = {mk:'1.2', ecl:'1.4', purge:'2.2', esc:'2.4', srv:'3.1', mkrm:'1.2', sac:'5.1'};
+const CAMP_FEAT = {mk:'1.2', ecl:'1.4', purge:'2.2', esc:'2.4', srv:'3.1', mkrm:'1.2', sac:'5.1', combo:'5.1'};
 const CAMP_SECTORS = [
   {id:1, n:'Le Port à quai', ic:'⚓', z:'Le port', tr:"Le navire est encore à quai : quatre sorties courtes pour apprendre.",
    market:[['p1',1,3],['p2',1,3],['p3',1,3],['f13',1,1],['p4',2,2],['p5',2,2],['p6',3,2]],
@@ -1422,7 +1466,7 @@ const CAMP_SECTORS = [
            ['m4',3,2],['t5',3,1],['m7',3,1],['p4',3,2]],
    eps:[
     {n:'Les Hauts-Fonds', boss:'gws', pool:[['gulp', 'gulp'], ['crab'], ['req']], elites:[['crab', 'req']], mech:['Factions et alliances', "Chaque carte de faction a un bandeau en bas : son bonus s'active dès que tu as une autre carte de la même faction en jeu. Construis ton deck autour d'une ou deux factions !"], star:['ally5', 'Déclencher 5 alliances']},
-    {n:'Le Chenal des Anguilles', boss:'serb', pool:[['eel'], ['req'], ['gulp', 'crab']], elites:[['eel', 'req']], mech:['Pioche et défausse', "Certaines cartes font piocher. Pendant un tour, on ne pioche que ce qui reste dans ta pioche : la défausse n'est remélangée qu'au début du tour suivant. Tu peux aussi jeter une carte de ta main pour de bon (🗑)."], star:['deck14', 'Gagner avec 14 cartes ou moins chacun']},
+    {n:'Le Chenal des Anguilles', boss:'serb', pool:[['eel'], ['req'], ['gulp', 'crab']], elites:[['eel', 'req']], mech:['Pioche et défausse', "Certaines cartes font piocher. Pendant un tour, on ne pioche que ce qui reste dans ta pioche : la défausse n'est remélangée qu'au début du tour suivant (seules les compétences spéciales la remélangent tout de suite). Tu peux aussi jeter une carte de ta main pour de bon (🗑)."], star:['deck14', 'Gagner avec 14 cartes ou moins chacun']},
     {n:'La Nuit des Méduses', boss:'mqueen', pool:[['jelly'], ['crab', 'jelly'], ['eel']], elites:[['jelly', 'jelly', 'crab']], mech:['Blessures', "Les malédictions ☠ glissent des blessures 🩹 dans ton deck : des cartes qui ne font rien. Touche une blessure en main pour t'en débarrasser, ou soigne-toi."], star:['nowound', 'Finir sans blessure dans le deck']},
     {n:'La Passe du Serpent', boss:'orcb', pool:[['ser'], ['jelly', 'gulp'], ['eel', 'req']], elites:[['req', 'req', 'jelly']], mech:['La tempête enfle', "Seulement contre le boss : à partir du 5e tour de ce combat, il gagne +2 de force à chaque tour. Le compteur de tours, en haut de la scène, te dit où tu en es. Ne traîne pas !"], star:['boss5', 'Battre le boss en 5 tours'], unlock:'car'},
    ]},
@@ -1531,26 +1575,26 @@ const CAMP_DIFF = {
   '4.2':{dm:1.05, hp:0.71, bhp:0.62, ehp:0.93, traits:.2, cdm:{2:1.192, 3:1.046, 4:0.802}},
   '4.3':{dm:1.05, hp:0.63, bhp:0.8, ehp:1.11, traits:.2, cdm:{2:1.648, 3:1.532, 4:1.444}},
   '4.4':{dm:1.05, hp:0.57, bhp:0.84, ehp:1.12, traits:.2, cdm:{2:0.714, 3:0.626, 4:0.48}},
-  '5.1':{dm:1.1, hp:0.6, bhp:0.5, ehp:0.66, traits:.25, bm:0.6, cdm:{2:1.25, 3:1.269, 4:0.525}},
-  '5.2':{dm:1.1, hp:0.68, bhp:0.65, ehp:1.32, traits:.25, hex:1, bm:0.7, cdm:{2:1.283, 3:1.076, 4:0.914}},
-  '5.3':{dm:1.1, hp:0.58, bhp:0.62, ehp:1.27, traits:.65, bm:0.7, cdm:{2:0.89, 3:0.865, 4:0.864}},
-  '5.4':{dm:1.1, hp:0.57, bhp:0.88, ehp:0.77, traits:.3, rage:1, bm:0.8, cdm:{2:0.645, 3:0.645, 4:0.609}},
-  '6.1':{dm:1.15, hp:0.64, bhp:0.67, ehp:0.84, traits:.3, cdm:{2:0.851, 3:0.757, 4:0.682}},
-  '6.2':{dm:1.15, hp:0.54, bhp:0.65, ehp:0.87, traits:.3, arm:2, cdm:{2:0.827, 3:0.851, 4:0.815}},
-  '6.3':{dm:1.15, hp:0.45, bhp:0.72, ehp:0.91, traits:.3, cdm:{2:0.447, 3:0.403, 4:0.358}},
-  '6.4':{dm:1.15, hp:0.3, bhp:0.75, ehp:0.91, giant:1, cdm:{2:0.574, 3:0.509, 4:0.448}},
-  '7.1':{dm:1.2, hp:0.72, bhp:0.72, ehp:1.1, traits:.35, bdm:1.35, cdm:{2:0.683, 3:0.693, 4:0.735}},
-  '7.2':{dm:1.2, hp:0.77, bhp:0.65, ehp:1.2, traits:.35, shuffle:1, bdm:1.7, cdm:{2:0.683, 3:0.662, 4:0.653}},
-  '7.3':{dm:1.2, hp:0.56, bhp:0.7, ehp:0.9, traits:.35, cdm:{2:0.755, 3:0.815, 4:0.863}},
-  '7.4':{dm:1.2, hp:0.55, bhp:0.79, ehp:1.31, traits:.35, hide:1, rage:1, bdm:1.35, cdm:{2:0.625, 3:0.643, 4:0.615}},
-  '8.1':{dm:1.25, hp:0.55, bhp:1.12, ehp:1.06, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.5, cdm:{2:1.342, 3:1.623, 4:1.553}},
-  '8.2':{dm:1.25, hp:0.43, bhp:1.2, ehp:0.99, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.6, cdm:{2:1.123, 3:1.123, 4:1.158}},
-  '8.3':{dm:1.25, hp:0.47, bhp:1.14, ehp:0.98, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.6, cdm:{2:0.887, 3:0.957, 4:1.03}},
-  '8.4':{dm:1.25, hp:0.45, bhp:1.19, ehp:0.99, traits:.5, rage:1, hex:1, str0:1, bdm:1.35, cdm:{2:0.51, 3:0.525, 4:0.548}},
-  '9.1':{dm:1.3, hp:0.45, bhp:1.2, ehp:0.97, traits:.5, rage:1, hex:1, str0:1, bdm:1.35, cdm:{2:0.323, 3:0.314, 4:0.31}},
-  '9.2':{dm:1.3, hp:0.44, bhp:1.2, ehp:1.06, traits:.5, rage:1, hex:1, str0:1, bdm:1.7, cdm:{2:0.645, 3:0.608, 4:0.598}},
-  '9.3':{dm:1.3, hp:0.26, bhp:1.2, ehp:1.15, traits:.5, rage:1, hex:1, str0:1, esc0:1, bdm:1.8, cdm:{2:0.532, 3:0.791, 4:1.031}},
-  '9.4':{dm:1.3, hp:0.26, bhp:1.2, ehp:1.13, traits:.5, rage:1, hex:1, str0:1, esc0:1, bdm:1.7, cdm:{2:0.693, 3:0.653, 4:0.703}},
+  '5.1':{dm:1.1, hp:0.6, bhp:0.5, ehp:0.66, traits:.25, bm:0.6, cdm:{2:3.599, 3:3.154, 4:2.418}},
+  '5.2':{dm:1.1, hp:0.68, bhp:0.65, ehp:1.32, traits:.25, hex:1, bm:0.7, cdm:{2:2.053, 3:1.937, 4:1.644}},
+  '5.3':{dm:1.1, hp:0.58, bhp:0.62, ehp:1.27, traits:.65, bm:0.7, cdm:{2:1.601, 3:1.556, 4:1.465}},
+  '5.4':{dm:1.1, hp:0.57, bhp:0.88, ehp:0.77, traits:.3, rage:1, bm:0.8, cdm:{2:1.194, 3:1.16, 4:1.161}},
+  '6.1':{dm:1.15, hp:0.64, bhp:0.67, ehp:0.84, traits:.3, cdm:{2:1.322, 3:1.176, 4:1.091}},
+  '6.2':{dm:1.15, hp:0.54, bhp:0.65, ehp:0.87, traits:.3, arm:2, cdm:{2:1.193, 3:1.176, 4:1.176}},
+  '6.3':{dm:1.15, hp:0.45, bhp:0.72, ehp:0.91, traits:.3, cdm:{2:0.655, 3:0.574, 4:0.501}},
+  '6.4':{dm:1.15, hp:0.3, bhp:0.75, ehp:0.91, giant:1, cdm:{2:0.891, 3:0.814, 4:0.783}},
+  '7.1':{dm:1.2, hp:0.72, bhp:0.72, ehp:1.1, traits:.35, bdm:1.35, cdm:{2:1.51, 3:1.403, 4:1.403}},
+  '7.2':{dm:1.2, hp:0.77, bhp:0.65, ehp:1.2, traits:.35, shuffle:1, bdm:1.7, cdm:{2:1.383, 3:1.339, 4:1.283}},
+  '7.3':{dm:1.2, hp:0.56, bhp:0.7, ehp:0.9, traits:.35, cdm:{2:1.621, 3:1.555, 4:1.696}},
+  '7.4':{dm:1.2, hp:0.55, bhp:0.79, ehp:1.31, traits:.35, hide:1, rage:1, bdm:1.35, cdm:{2:1.061, 3:1.06, 4:1.282}},
+  '8.1':{dm:1.25, hp:0.55, bhp:1.12, ehp:1.06, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.5, cdm:{2:1.8, 3:1.825, 4:1.623}},
+  '8.2':{dm:1.25, hp:0.43, bhp:1.2, ehp:0.99, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.6, cdm:{2:1.906, 3:1.906, 4:2.084}},
+  '8.3':{dm:1.25, hp:0.47, bhp:1.14, ehp:0.98, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.6, cdm:{2:1.96, 3:1.826, 4:1.648}},
+  '8.4':{dm:1.25, hp:0.45, bhp:1.19, ehp:0.99, traits:.5, rage:1, hex:1, str0:1, bdm:1.35, cdm:{2:1.002, 3:0.917, 4:0.958}},
+  '9.1':{dm:1.3, hp:0.45, bhp:1.2, ehp:0.97, traits:.5, rage:1, hex:1, str0:1, bdm:1.35, cdm:{2:0.654, 3:0.635, 4:0.628}},
+  '9.2':{dm:1.3, hp:0.44, bhp:1.2, ehp:1.06, traits:.5, rage:1, hex:1, str0:1, bdm:1.7, cdm:{2:0.988, 3:0.945, 4:0.942}},
+  '9.3':{dm:1.3, hp:0.26, bhp:1.2, ehp:1.15, traits:.5, rage:1, hex:1, str0:1, esc0:1, bdm:1.8, cdm:{2:1.247, 3:1.466, 4:1.724}},
+  '9.4':{dm:1.3, hp:0.26, bhp:1.2, ehp:1.13, traits:.5, rage:1, hex:1, str0:1, esc0:1, bdm:1.7, cdm:{2:1.247, 3:1.076, 4:1.061}},
 };
 const CAMP_TARGET = {'1.1':.99, '1.2':.98, '1.3':.97, '1.4':.95, '2.1':.92, '2.2':.88, '2.3':.84, '2.4':.8, '3.1':.78, '3.2':.75, '3.3':.72, '3.4':.7, '4.1':.68, '4.2':.65, '4.3':.62, '4.4':.6,
   '5.1':.58, '5.2':.55, '5.3':.52, '5.4':.5, '6.1':.48, '6.2':.45, '6.3':.42, '6.4':.4, '7.1':.38, '7.2':.35, '7.3':.32, '7.4':.3, '8.1':.28, '8.2':.25, '8.3':.22, '8.4':.2, '9.1':.18, '9.2':.15, '9.3':.12, '9.4':.1};
@@ -1655,7 +1699,7 @@ function drawN(G, s, n, init){
   for(let k=0; k<n; k++){
     if(S.hand.length >= 12){ S.ed = (S.ed || 0) + n - k; S.ef = 1; return; }
     // the discard is only reshuffled for the start-of-turn hand: extra draws stop once the pile is empty (no endless drawing)
-    if(!S.draw.length){ if(!init || !S.disc.length){ S.ed = (S.ed || 0) + n - k; return; } S.draw = shuffle(S.disc); S.disc = []; }
+    if(!S.draw.length){ if(!(init || G.ecld) || !S.disc.length){ S.ed = (S.ed || 0) + n - k; return; } S.draw = shuffle(S.disc); S.disc = []; }
     S.hand.push(S.draw.pop());
   }
 }
@@ -1720,6 +1764,57 @@ function checkAllies(G){
     const C = CARDS[p.c];
     if(C.al && !p.a && factionCount(G, C.f, s) >= 2){ p.a = 1; if(G.cs) G.cs.allies++; applyFx(G, s, C.al); logf(G, `${C.n} (${S.n}) : bonus allié`); evt(G, {t:'ally', f:C.f, s}); }
   }));
+  // combos: every faction card that takes part in an alliance counts once for the fight
+  if(G.cmb){ let up = 0; G.seats.forEach((S, s) => S.play.forEach(p => { const C = CARDS[p.c]; if(C.f && !p.cm && factionCount(G, C.f, s) >= 2 && S.play.some(q => q !== p && CARDS[q.c].al && CARDS[q.c].f === C.f || (C.al && q === p))){ p.cm = 1; G.cmb[C.f] = (G.cmb[C.f] || 0) + 1; up = 1; } })); if(up) comboCheck(G); }
+}
+// a faction reaches a level over the fight: combo (lasting), grand combo (a manoeuvre for the captain), crossed combo (two factions)
+function comboCheck(G){
+  if(!comboOn(G) || !G.cmb || G.phase !== 'fight') return;
+  const n = present(G).length, [t1, t2] = comboT(n, G.camp);
+  for(const f of 'MTFC'){
+    const v = G.cmb[f] || 0, L = G.cmbL[f] || 0;
+    if(v >= t1 && L < 1){ G.cmbL[f] = 1; comboStart(G, f); evt(G, {t:'combo', f, lv:1}); logf(G, `Combo ${FACTIONS[f].n} : ${COMBO_FX[f][0][0]} !`); }
+    if(v >= t2 && (G.cmbL[f] || 0) < 2){ G.cmbL[f] = 2; G.gc[f] = 1; evt(G, {t:'combo', f, lv:2}); logf(G, `Grand combo ${FACTIONS[f].n} : ${COMBO_FX[f][1][0]} prêt pour le capitaine !`); }
+  }
+  const up = 'CFMT'.split('').filter(f => (G.cmbL[f] || 0) >= 1);
+  for(let a = 0; a < up.length; a++) for(let b = a + 1; b < up.length; b++){ const k = up[a] + up[b]; if(CROSS[k] && !G.cmbX[k]){ G.cmbX[k] = 1; crossStart(G, k); evt(G, {t:'cross', k}); logf(G, `Combo croisé : ${CROSS[k][0]} !`); } }
+}
+function comboStart(G, f){
+  const n = present(G).length, live = G.seats.map((S, i) => [S, i]).filter(([S]) => !S.ab);
+  if(f === 'M') addProt(G, 2 * n);
+  else if(f === 'T') live.forEach(([S, i]) => drawN(G, i, 1));
+  else if(f === 'F') live.forEach(([S]) => addGold(S, 1));
+  else if(f === 'C') G.en.forEach(e => { if(e.hp > 0) e.str -= 2; });
+}
+function comboRound(G){   // the lasting combos, at the start of each new turn
+  if(!G.cmbL) return; const n = present(G).length, live = G.seats.map((S, i) => [S, i]).filter(([S]) => !S.ab);
+  if(G.cmbL.M >= 1) addProt(G, 2 * n);
+  if(G.cmbL.T >= 1) live.forEach(([S, i]) => drawN(G, i, 1));
+  if(G.cmbL.F >= 1) live.forEach(([S]) => addGold(S, 1));
+}
+function crossStart(G, k){
+  const n = present(G).length, live = G.seats.map((S, i) => [S, i]).filter(([S]) => !S.ab);
+  if(k === 'FM') live.forEach(([S]) => S.c += 2);
+  else if(k === 'MT') G.hull = Math.min(G.maxHull, G.hull + 2 * n);
+  else if(k === 'CM') G.en.forEach(e => { if(e.hp > 0) e.ca = (e.ca || 0) + 3; });
+  else if(k === 'FT') live.forEach(([S, i]) => { drawN(G, i, 1); addGold(S, 1); });
+  else if(k === 'CF') live.forEach(([S]) => { let j = S.hand.indexOf('bl'); if(j >= 0) S.hand.splice(j, 1); else { j = S.disc.indexOf('bl'); if(j >= 0) S.disc.splice(j, 1); else { j = S.draw.indexOf('bl'); if(j >= 0) S.draw.splice(j, 1); } } addGold(S, 2); });
+  else if(k === 'CT') G.ritual = G.round;
+}
+// how hard an enemy is about to hit (to pick who dodges)
+function foeThreat(G, e){
+  if(e.hp <= 0 || e.sk || e.inv) return 0; const F = FOES[e.t], it = e.nx || F.it[e.i % F.it.length], d = v => Math.max(0, (v + e.str) * G.dm);
+  return it[0] === 'hit' || it[0] === 'pierce' || it[0] === 'ram' ? d(it[1]) : it[0] === 'multi' ? d(it[1]) * it[2] : it[0] === 'board' ? (it[1] + e.str) * (G.bm || 1) : it[0] === 'bordee' ? d(it[1]) : 0;
+}
+// the grand combos, fired by the captain at the helm
+function grandCombo(G, s, f){
+  if(G.phase !== 'fight' || G.sub || s !== capSeat(G) || !G.gc || G.gc[f] !== 1) return;
+  const n = present(G).length, live = G.seats.filter(S => !S.ab);
+  if(f === 'M') G.bordee = 1;
+  else if(f === 'T'){ const tg = G.en.filter(e => e.hp > 0).sort((a, b) => foeThreat(G, b) - foeThreat(G, a))[0]; if(!tg || !foeThreat(G, tg)) return; tg.sk = 1; }
+  else if(f === 'F') live.forEach(S => S.rb = Math.max(S.rb || 0, 99));
+  else if(f === 'C'){ const v = 3 * n; G.en.forEach((e, i) => { if(e.hp > 0 && !e.inv){ const h0 = e.hp; strike(e, v); evt(G, {t:'hitall', e:i, d:h0 - e.hp}); } }); }
+  G.gc[f] = 2; logf(G, `${COMBO_FX[f][1][0]} !`); evt(G, {t:'gcombo', f}); checkWin(G);
 }
 function furyCheck(G){ G.en.forEach(e => { const F = FOES[e.t]; if(e.hp <= 0 && F.fury && !e.fd){ e.fd = 1; G.en.forEach(b => { if(b.hp > 0 && FOES[b.t].boss) b.str += F.fury; }); evt(G, {t:'fury', v:F.fury}); logf(G, `${F.n} crevé : le boss devient furieux !`); } }); }
 function checkWin(G){ furyCheck(G); if(G.phase === 'fight' && G.en.every(e => e.hp <= 0 || FOES[e.t].min)){ G.en.forEach(e => e.hp = 0); fightWon(G); } }   // minions flee when their leaders fall
@@ -1731,6 +1826,7 @@ function startVoyage(G){
   G.maxHull = G.tut ? 30 : HULL(n) + (hasUp(G, 'copper') ? 10 : 0); G.hull = G.maxHull; G.node = -1;
   G.ep = 1; G.bosses = [...shuffle(['levi', 'dutch']), 'kra', 'mael']; if(G.camp) G.cs = {buys:0, allies:0, ecl:{}};
   if(G.camp && CAMP[G.camp].gift) G.seats.forEach(S => S.deck.push(...CAMP[G.camp].gift));   // the epic's own gift to every sailor
+  applyFlags(G);
   G.route = G.tut ? TUT_ROUTE : makeRoute(G);
   G.mdeck = shuffle(G.tut ? [...MARKET_POOL] : mkPool(G)); G.mk = []; G.newCards = [];
   if(G.tut){ G.mk = ['f1','t1','m3','c1']; G.mdeck = G.mdeck.filter(c => !G.mk.includes(c)); }
@@ -1748,7 +1844,7 @@ function advance(G){
   G.phase = 'fight'; G.dm = G.tut ? 1 : DMG(n) * E.dm * ((E.cdm && E.cdm[n]) || 1) * (N.boss ? E.bdm || 1 : E.rdm || 1); G.bm = G.tut ? 1 : BOARD(n) * E.bm; G.prot = 0; G.breach = 0; G.vul = 0; G.net = 0; G.sub = null; G.atk = 0; G.round = 0; G.cur = 0;
   G.hk = k;
   const foes = hasUp(G, 'grey') && !N.boss && !N.el && N.f.length >= 2 ? N.f.slice(0, -1) : N.f;   // grey sails: one threat loses the ship in the haze
-  G.anc = hasUp(G, 'anchor') ? 1 : 0; G.used = {};
+  G.anc = hasUp(G, 'anchor') ? 1 : 0; G.used = {}; G.cmb = comboOn(G) ? {} : null; G.cmbL = {}; G.cmbX = {}; G.gc = {}; G.bordee = 0; G.ritual = 0;
   G.en = foes.map((t, i) => { const F = FOES[t], hp = Math.round(F.hp * k * (G.tut ? 1 : F.boss ? E.bhp : N.el ? E.ehp : 1)); return {t, hp, mx:hp, blk:0, str:0, i:G.tut || F.boss ? 0 : Math.floor(Math.random() * F.it.length), sk:0, rv:!G.tut && E.rage ? RAGE : 0}; });
   if(!G.tut && E.str0) G.en.forEach(e => e.str += E.str0);
   G.en.forEach(e => { const F = FOES[e.t]; if(F.cap) e.cap = Math.round(F.cap * k); if(E.arm) e.ar = E.arm; if(E.giant && e.af !== 'gia'){ e.af = 'gia'; e.hp = e.mx = Math.round(e.mx * 1.4); } });
@@ -1774,6 +1870,7 @@ function newRound(G){
     drawN(G, i, 5 + (rel.includes('lv') ? 1 : 0) - (S.fog || 0), true); S.fog = 0;
     if(!S.ab){ if(rel.includes('bo')) addGold(S, 1); if(rel.includes('pa')) S.c += 1; if(rel.includes('fp')) addProt(G, 3); }
   });
+  if(G.round > 1 && G.cmbL) comboRound(G);
   if(G.tut){
     const force = (i, h) => { const S = G.seats[i]; S.draw.unshift(...S.hand); S.hand = h; };   // drawn cards (wounds included) go back to the pile
     if(G.round === 1){ force(0, ['dou','dou','bou','sab','m2']); force(1, ['dou','dou','m1','dag','rcha']); }
@@ -1877,7 +1974,7 @@ function mkRemove(G, s, m){
 }
 function eclat(G, s){
   const S = G.seats[s]; if(G.phase !== 'fight' || S.rd || S.eu >= eclMax(S) || !featOn(G.camp, 'ecl')) return;
-  S.eu++; if(G.cs) G.cs.ecl[S.r] = 1; applyFx(G, s, ROLES[S.r].ecl.fx); logf(G, `${S.n} : ${ROLES[S.r].ecl.n} !`); evt(G, {t:'ecl', r:S.r}); checkWin(G);
+  S.eu++; if(G.cs) G.cs.ecl[S.r] = 1; G.ecld = 1; applyFx(G, s, ROLES[S.r].ecl.fx); G.ecld = 0; logf(G, `${S.n} : ${ROLES[S.r].ecl.n} !`); evt(G, {t:'ecl', r:S.r}); checkWin(G);
 }
 function setReady(G, s, v){
   if(G.phase !== 'fight' && G.phase !== 'port') return;
@@ -1899,6 +1996,7 @@ const canHit = (G, e) => e.hp > 0 && !e.inv && !guarded(G, e) && !(e.cap && (e.t
 function startAttack(G){
   G.atk = G.seats.reduce((t, S) => t + Math.max(0, S.c || 0), 0); G.seats.forEach(S => S.c = 0);
   if(hasUp(G, 'figure')){ const fs = new Set(); G.seats.forEach(S => S.play.forEach(p => { if(CARDS[p.c].f) fs.add(CARDS[p.c].f); })); if(fs.size){ G.atk += fs.size; logf(G, `Figure de proue dorée : +${fs.size} ⚔`); } }
+  if(G.bordee){ G.atk = Math.round(G.atk * 1.5); G.bordee = 0; logf(G, 'Bordée royale : attaque ×1,5'); }
   if(G.cur){ G.atk = Math.floor(G.atk * .75); G.cur = 0; }   // the double of the Cartographer turned our own current against us
   if(G.atk > 0 && G.en.some(e => canHit(G, e))){ G.sub = 'atk'; evt(G, {t:'atkph', s:capSeat(G), v:G.atk}); logf(G, `Phase d'attaque : ${G.atk} ⚔ à répartir`); }
   else endAttack(G);
@@ -1917,6 +2015,12 @@ function shipAct(G, s, k){
 }
 function aiShipAct(G){
   if(G.phase !== 'fight') return; const c = capSeat(G);
+  if(G.gc && !G.sub){
+    if(G.gc.F === 1) grandCombo(G, c, 'F');
+    if(G.gc.C === 1 && G.phase === 'fight') grandCombo(G, c, 'C');
+    if(G.gc.T === 1 && G.phase === 'fight' && G.en.some(e => foeThreat(G, e) >= .2 * G.hull)) grandCombo(G, c, 'T');
+    if(G.gc.M === 1 && G.phase === 'fight' && (G.round >= 2 || G.en.some(e => FOES[e.t].boss))) grandCombo(G, c, 'M');
+  }
   if(hasUp(G, 'bell') && !G.used.bell && !G.sub) shipAct(G, c, 'bell');
   if(hasUp(G, 'prow') && !G.used.prow){ const v = 3 * present(G).length; if(G.round >= 3 || G.en.some(e => canHit(G, e) && e.hp + (e.blk || 0) + armorOf(e) <= v)) shipAct(G, c, 'prow'); }
 }
@@ -2085,9 +2189,10 @@ function endRound(G){
     const ev = {t:'foe', e:idx, k:it[0]};
     if(surge) ev.surge = surge;
     if(e.sk){ e.sk = 0; ev.k = 'skip'; logf(G, `${F.n} est déroutée et n'agit pas`); }
+    else if(G.ritual === G.round && (it[0] === 'board' || it[0] === 'curse')){ ev.k = 'skip'; logf(G, `Rituel des profondeurs : ${F.n} n'agit pas`); }
     else {
       if(!F.keep) e.blk = 0;
-      const dmg = v => Math.round((v + e.str) * G.dm);
+      const dmg = v => Math.max(0, Math.round((v + e.str) * G.dm));
       const strikeHull = v => { const before = G.prot; const d = hullDmg(G, v); if(e.af === 'vor' && d > 0) e.hp = Math.min(e.mx, e.hp + Math.ceil(d / 2)); return [d, before - G.prot]; };
       if(it[0] === 'hit'){ ev.hits = [strikeHull(dmg(it[1]))]; logf(G, `${F.n} frappe la coque : -${ev.hits[0][0]}`); }
       else if(it[0] === 'pierce'){ const keep = G.prot; G.prot = 0; ev.hits = [strikeHull(dmg(it[1]))]; ev.hits[0][1] = 0; G.prot = keep; logf(G, `${F.n} perce la coque : -${ev.hits[0][0]}`); }
@@ -2203,7 +2308,7 @@ function relaunch(G, id){
   if(!G.camp || (G.phase !== 'win' && G.phase !== 'lose') || !CAMP[id]) return;
   const seats = G.seats.filter(S => !S.ab).map(S => { const N = newSeat(S.r, S.n, S.p); if(S.bot) N.bot = 1; return N; });
   if(seats.length < 2) return;
-  const fresh = newGame(seats, G.host, false), keep = {evn:G.evn || 0, stg:G.stg || 0, ack:G.ack || {}, helm:G.helm || null};   // counters go on: stale actions stay stale
+  const fresh = newGame(seats, G.host, false), keep = {evn:G.evn || 0, stg:G.stg || 0, ack:G.ack || {}, helm:G.helm || null, flags:G.flags || {}};   // counters go on: stale actions stay stale
   for(const k of Object.keys(G)) delete G[k];
   Object.assign(G, fresh, keep); G.camp = id;
   startVoyage(G);
@@ -2212,13 +2317,14 @@ function cleanName(n){ return (String(n || '').replace(/[<>"&]/g, '').trim().sli
 function dispatch(G, a, from){
   if(!a || typeof a !== 'object') return;
   const own = s => Number.isInteger(s) && G.seats[s] && G.seats[s].p === from && !G.seats[s].ab;
-  if(a.g != null && a.g !== (G.stg || 0) && !['join', 'start', 'drop', 'camp', 'relaunch', 'helm'].includes(a.a)) return;   // clicked on a step that is already over
+  if(a.g != null && a.g !== (G.stg || 0) && !['join', 'start', 'drop', 'camp', 'relaunch', 'helm', 'flag'].includes(a.a)) return;   // clicked on a step that is already over
   switch(a.a){
     case 'join': join(G, from, cleanName(a.n), a.r); break;
     case 'drop': drop(G, from, a.r); break;
     case 'start': if(from === G.host) startVoyage(G); break;
     case 'camp': if(from === G.host) setCamp(G, a.id); break;
     case 'relaunch': if(from === G.host) relaunch(G, String(a.id)); break;
+    case 'flag': if(G.phase === 'lobby' || G.phase === 'win' || G.phase === 'lose'){ const S = G.seats.find(x => x.r === a.r && x.p === from); if(S && FLAG_KIT[a.f]) G.flags = {...(G.flags || {}), [a.r]:String(a.f)}; } break;
     case 'helm': if(from === G.host && ['lobby', 'win', 'lose'].includes(G.phase) && G.seats.some(S => S.r === a.r && !S.ab)) G.helm = String(a.r); break;
     case 'play': if(own(a.s)) playCard(G, a.s, a.h | 0, String(a.c)); break;
     case 'all': if(own(a.s)) playAll(G, a.s); break;
@@ -2234,12 +2340,13 @@ function dispatch(G, a, from){
     case 'pick': if(own(a.s)) portPick(G, a.s, a.o | 0); break;
     case 'ship': if(own(a.s)) shipPick(G, a.s, a.o | 0); break;
     case 'sact': if(own(a.s)) shipAct(G, a.s, String(a.k)); break;
+    case 'gcombo': if(own(a.s)) grandCombo(G, a.s, String(a.f)); break;
     case 'mark': if(own(a.s)) portMark(G, a.s, String(a.c), !!a.v); break;
     case 'rdy': if(own(a.s)) setReady(G, a.s, !!a.v); break;
   }
 }
 function view(G){
-  return {sub:G.sub === 'atk' ? 1 : 0, atk:G.atk || 0, cps:G.phase === 'fight' || G.phase === 'port' ? capSeat(G) : -1, ups:G.ups || [], used:G.used || {}, helm:G.helm || null, cp:G.camp || 0, cst:G.cstars || null, ep:G.ep, port:G.port ? {...G.port, base:undefined} : null, rt:G.tut || !G.route ? null : G.route.map(routeCode), phase:G.phase, node:G.node, tut:G.tut ? 1 : 0, hull:G.hull, maxHull:G.maxHull, prot:G.prot, br:G.breach || 0, half:G.half ? 1 : 0, net:G.net || 0, rev:G.rev ? 1 : 0, cur:G.cur ? 1 : 0, mr:G.mr || 0, bm:G.bm || 1, dm:G.dm, hk:G.hk || 1, round:G.round, stg:G.stg || 0, mut:G.mut ? 1 : 0, host:G.host,
+  return {sub:G.sub === 'atk' ? 1 : 0, atk:G.atk || 0, cps:G.phase === 'fight' || G.phase === 'port' ? capSeat(G) : -1, ups:G.ups || [], used:G.used || {}, cmb:G.cmb || null, cmbL:G.cmbL || {}, cmbX:G.cmbX || {}, gc:G.gc || {}, bordee:G.bordee || 0, helm:G.helm || null, flags:G.flags || {}, cp:G.camp || 0, cst:G.cstars || null, ep:G.ep, port:G.port ? {...G.port, base:undefined} : null, rt:G.tut || !G.route ? null : G.route.map(routeCode), phase:G.phase, node:G.node, tut:G.tut ? 1 : 0, hull:G.hull, maxHull:G.maxHull, prot:G.prot, br:G.breach || 0, half:G.half ? 1 : 0, net:G.net || 0, rev:G.rev ? 1 : 0, cur:G.cur ? 1 : 0, mr:G.mr || 0, bm:G.bm || 1, dm:G.dm, hk:G.hk || 1, round:G.round, stg:G.stg || 0, mut:G.mut ? 1 : 0, host:G.host,
     en:G.en.map(e => { const o = {t:e.t, hp:e.hp, mx:e.mx}; if(e.hp <= 0) return o; o.i = e.i; if(e.blk) o.blk = e.blk; if(e.str) o.str = e.str; if(e.sk) o.sk = 1; if(e.rg) o.rg = 1; if(e.cap){ o.cap = e.cap; o.tk = e.tk || 0; } if(e.af) o.af = e.af; if(e.rf) o.rf = e.rf; if(e.ar) o.ar = e.ar; if(e.ca) o.ca = e.ca; if(e.inv){ o.inv = 1; o.nx = e.nx ? e.nx[1] : 0; if(e.vn) o.vn = 1; } return o; }),   // compact: zero fields are restored by setView
     mk:G.mk, md:G.mdeck.length, mc:mkCap(G), nc:(G.newCards || []).length, ncl:G.node <= 0 ? (G.newCards || []) : [],
     seats:G.seats.map(S => ({r:S.r, n:S.n, p:S.p, g:S.g, c:S.c, hand:S.hand, play:S.play, champ:S.champ.map(p => { const o = {c:p.c, u:p.u ? 1 : 0}; if(p.lk) o.lk = 1; if(p.bd) o.bd = 1; return o; }), dr:S.draw.length, di:S.disc.length, dk:S.deck.length, deck:packDeck(S.deck), dw:packDeck(S.draw), ds:packDeck(S.disc), bl:[...S.draw, ...S.disc, ...S.hand].filter(c => c === 'bl').length, rd:S.rd ? 1 : 0, eu:S.eu >= eclMax(S) ? 1 : 0, eul:eclMax(S) - S.eu, rel:S.rel || [], pg:S.pg || 0, bot:S.bot ? 1 : 0, rb:S.rb || 0, mf:S.mf || 0, nw:S.nw || 0, dt:S.dt || 0, ft:S.ft || 0, mr:S.mr || 0, ed:S.ed || 0, ef:S.ef || 0, ab:S.ab ? 1 : 0})),
@@ -2724,7 +2831,9 @@ function tableModeHTML(camp, host, pre){
   if(!host) return camp && CAMP[camp] ? `<p class="tmode">🗺️ Aventure · <b>${camp} · ${esc(CAMP[camp].n)}</b></p>` : `<p class="tmode">🧭 <b>Grande traversée</b> : 4 épopées de 6 étapes, une escale au port entre chacune.</p>`;
   const open = CAMP_ORDER.filter(id => CAMP[id] && campOpen(id));
   return `<div class="seg tmodeseg"><button class="${camp ? '' : 'on'}" data-act="${pre}-mode" data-v="gt">🧭 Grande traversée</button><button class="${camp ? 'on' : ''}" data-act="${pre}-mode" data-v="camp">🗺️ Aventure</button></div>
-    ${camp ? `<div class="cpicks">${open.map(id => `<button class="cpk ${id === camp ? 'on' : ''} ${campStarsOf(id) ? 'won' : ''}" data-act="${pre}-camp" data-id="${id}"><span>${id}${campStarsOf(id) ? ' ✓' : ''}</span>${esc(CAMP[id].n)}</button>`).join('')}</div>
+    ${camp ? `<div class="tsecs">${CAMP_SECTORS.filter(S => open.some(id => CAMP[id].sector === S.id)).map(S => `<section class="csec" style="--sc:${SECT_COL[S.id] || 'var(--line)'}"><header><span class="cic">${S.ic}</span><h3>${esc(S.n)}</h3></header>
+      <div class="ceps">${S.eps.map((e, i) => { const id = S.id + '.' + (i + 1), op = open.includes(id), won = campStarsOf(id) > 0;
+        return op ? `<button class="cep ${id === camp ? 'on' : ''} ${won ? 'won' : ''}" data-act="${pre}-camp" data-id="${id}"><span class="ccode">${id}${won ? ' ✓' : ''}</span><b>${esc(e.n)}</b></button>` : `<span class="cep ghost"><span class="ccode">${id}</span></span>`; }).join('')}</div></section>`).join('')}</div>
       <p class="note">Les épopées que tu as ouvertes en solo. Chaque matelot à bord garde la victoire dans sa progression.</p>` : '<p class="note">4 épopées de 6 étapes, une escale au port entre chacune.</p>'}`;
 }
 function roleBtn(r, on, act){
@@ -2745,7 +2854,7 @@ function intentOf(e){
   if(it[0] === 'voiles') return {t:`⛵ Hisse les voiles +${it[1]}`, full:`Va donner +${it[1]} de force et de la protection à toutes les menaces, lui compris`};
   if(it[0] === 'summon'){ const M = FOES[it[1]]; return {t:`📯 Appelle ${it[2] > 1 ? it[2] + ' ' : ''}${M.ic}`, full:`Va appeler ${it[2]} ${M.n.toLowerCase()}${it[2] > 1 ? 's' : ''} (${M.guard ? 'gardien : protège les autres menaces' : 'soutien : ne protège pas, mais aide les autres'})`}; }
   if(it[0] === 'pierce') return {t:`🦷 Perce ${dmg(it[1])}`, full:`Va mordre la coque : ${dmg(it[1])} dégâts qui ignorent la protection`};
-  if(it[0] === 'ram') return {t:`🐋 Éperonne ${dmg(it[1])}`, full:`Va éperonner le navire : ${dmg(it[1])} dégâts, et renverser ton serviteur le plus faible (sa défense ne compte pas)`};
+  if(it[0] === 'ram') return {t:`🐋 Éperonne ${dmg(it[1])}`, full:`Va éperonner le navire : ${dmg(it[1])} dégâts${featOn(pv.cp, 'srv') || pv.seats.some(S => S.champ.length) ? ', et renverser ton serviteur le plus faible (sa défense ne compte pas)' : ''}`};
   if(it[0] === 'bind') return {t:`⛓ Enserre ${it[1]}`, full:`Va enserrer tes ${it[1]} serviteurs les plus solides : ils ne pourront pas agir au prochain tour`};
   if(it[0] === 'charm') return {t:`🖤 Ensorcelle ${it[1]}`, full:`Va ensorceler tes ${it[1]} serviteurs les plus solides : ils frappent ta coque (selon leur défense) puis restent inertes au prochain tour`};
   if(it[0] === 'wave') return {t:`🌊 Raz-de-marée ≤${it[1]}`, full:`Va jeter à l'eau d'un coup tous les serviteurs de défense ${it[1]} ou moins`};
@@ -2813,6 +2922,20 @@ function openCaleInfo(){
   d.innerHTML = `<div class="cm-box caleinfo"><button class="close" data-act="coll-close" aria-label="Fermer">✕</button>
     <h3>La cale sombre</h3>
     <ul class="fi-list">${rows.map(x => `<li><span>${x[0]}</span><div><b>${esc(x[1])}</b><br>${esc(x[2])}</div></li>`).join('')}</ul>
+    <button class="btn" data-act="coll-close">Compris</button></div>`;
+  d.addEventListener('click', ev => { if(ev.target === d) d.remove(); });
+  document.body.appendChild(d);
+}
+// the combos, explained on demand (touch the combo counters on the deck)
+function openComboInfo(){
+  const n = pv ? pv.seats.filter(x => !x.ab).length : 2, T = comboT(n, pv && pv.cp);
+  const d = document.createElement('div'); d.className = 'collmodal'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
+  d.innerHTML = `<div class="cm-box caleinfo comboinfo"><button class="close" data-act="coll-close" aria-label="Fermer">✕</button>
+    <h3>⚡ Les combos</h3>
+    <p class="note">Chaque carte de faction jouée en alliance compte pour tout le combat. À ${n} matelot${n > 1 ? 's' : ''} : <b>combo à ${T[0]}</b> cartes d'une même faction (effet jusqu'à la fin du combat), <b>grand combo à ${T[1]}</b> (une manœuvre que le capitaine déclenche). Deux factions au combo dans le même combat : <b>combo croisé</b>.</p>
+    <ul class="fi-list">${'MTFC'.split('').map(f => `<li><span>${FACTIONS[f].ic}</span><div><b>${esc(COMBO_FX[f][0][0])}</b> : ${esc(COMBO_FX[f][0][1])}<br><b>★ ${esc(COMBO_FX[f][1][0])}</b> : ${esc(COMBO_FX[f][1][1])}</div></li>`).join('')}</ul>
+    <h4>Combos croisés</h4>
+    <ul class="fi-list">${Object.entries(CROSS).map(([k, c]) => `<li><span>${k.split('').map(f => FACTIONS[f].ic).join('')}</span><div><b>${esc(c[0])}</b> : ${esc(c[1])}</div></li>`).join('')}</ul>
     <button class="btn" data-act="coll-close">Compris</button></div>`;
   d.addEventListener('click', ev => { if(ev.target === d) d.remove(); });
   document.body.appendChild(d);
@@ -2955,6 +3078,7 @@ const TIPS = {
   shift:['🔀 Menace changeante', "Chaque tir qu'elle encaisse lui fait changer de plan : regarde sa bulle après chaque tir avant de continuer."],
   fury:['🧿 L\'œil du chef', "Tant que cet œil vit, son chef est intouchable. Crève-le pour l'atteindre… mais le chef deviendra furieux : sois prêt·e à encaisser."],
   cur:['🌀 Contre-courant retourné', "Le double du Cartographe a retourné le courant : votre prochaine attaque perdra un quart de sa force. Prévois plus de combat."],
+  combo:['⚡ Les combos', "Chaque carte de faction jouée en alliance compte pour tout le combat (compteurs ⚡ sur le pont). Assez de cartes d'une même faction : un combo, qui dure jusqu'à la fin du combat. Encore plus : un grand combo, que le capitaine déclenche. Touche les compteurs pour tout voir."],
   sact:['🎖️ Manœuvres du navire', "Sous la coque, les boutons du navire : ses améliorations à déclencher. Le capitaine à la barre les lance, une fois par combat."],
   shuf:['🧭 Cale instable', "La boussole s'affole : à chaque nouveau tour, toutes les cartes de la cale changent. Ce qui te plaît maintenant ne sera plus là au tour suivant."],
   arm:['🔰 Écailles des colosses', "Chaque tir contre ces menaces est réduit. Regroupe ton attaque en quelques gros tirs, ou fends leurs écailles avec la Hache brise-carapace."],
@@ -2988,6 +3112,13 @@ function renderCamp(app){
     ${Object.entries(CAMP_PROG.up || {}).some(([k, c]) => UP[c] && UP[c].k === +k) ? `<div class="myship"><b>⛵ Ton navire</b>${Object.entries(CAMP_PROG.up).sort((a, b) => a[0] - b[0]).map(([k, c]) => UP[c] && UP[c].k === +k ? `<span title="${esc(UP[c].d)}">${UP[c].ic} ${esc(UP[c].n)}</span>` : '').join('')}</div>` : ''}
     ${all.map(secHTML).join('')}`;
 }
+// the flags of the crew (from the fifth sector): each sailor picks the faction he sails under
+function flagHTML(roles, cur, act, mine, who){
+  return `<div class="flagpick"><b>🏳️ Pavillons de l'équipage</b><small>Chaque matelot embarque avec 3 cartes de sa faction. Même pavillon : plus d'alliances d'une faction, donc des combos. Deux pavillons : des combos croisés.</small>
+    ${roles.map(r => { const f = (cur || {})[r] || 'M', ed = mine(r);
+      return `<div class="flrow"><span class="flwho">${ROLES[r].ic} ${esc(who ? who(r) : ROLES[r].n)}</span>${ed ? `<div class="seg">${'MTFC'.split('').map(x => `<button class="${x === f ? 'on' : ''}" style="--fc:${FACTIONS[x].col}" data-act="${act}" data-r="${r}" data-f="${x}" title="${esc(FACTIONS[x].n + ' : ' + FLAG_KIT[x].map(c => CARDS[c].n).join(', '))}">${FACTIONS[x].ic}</button>`).join('')}</div>` : `<span class="flcur">${FACTIONS[f].ic} ${esc(FACTIONS[f].n)}</span>`}</div>`; }).join('')}
+    <small class="flkit">${'MTFC'.split('').map(x => `${FACTIONS[x].ic} ${FLAG_KIT[x].map(c => CARDS[c].n).join(', ')}`).join(' · ')}</small></div>`;
+}
 // who takes the helm: that sailor fires the ship's attack every turn (the Capitaine by default)
 function helmHTML(roles, cur, act, edit, who){
   if(roles.length < 2) return '';
@@ -3008,6 +3139,7 @@ function campSetupHTML(id){
       <span>Il faut au moins 2 matelots à bord.</span></div>` : ''}<div class="locroles">${roles.map(r => { const R = ROLES[r], ok = have.includes(r);
       return `<div class="locrole ${ok ? L[r] : 'off lockedr'}" style="--rc:${R.col}"><div class="lh"><span class="ri">${R.ic}</span><b>${R.n}</b>${ok ? `<small>${esc(R.d)}</small>` : `<small class="teaser">🔒 Rejoindra l'équipage en route…</small>`}</div>
         ${ok ? `<div class="seg">${['me', 'bot', 'off'].map(v => `<button class="${L[r] === v ? 'on' : ''}" data-act="camp-set" data-r="${r}" data-v="${v}">${lab[v]}</button>`).join('')}</div>` : ''}</div>`; }).join('')}</div>
+      ${me.length && n >= 2 && flagsOn(id) ? flagHTML(roles.filter(r => have.includes(r) && L[r] !== 'off'), ui.cflag || (ui.cflag = {}), 'camp-flag', () => true, r => ROLES[r].n + (L[r] === 'me' ? ' (toi)' : ' 🤖')) : ''}
       ${!me.length ? '<p class="note">Prends au moins un rôle.</p>' : n < 2 ? '<p class="note">Il faut au moins 2 matelots.</p>' : helmHTML(roles.filter(r => have.includes(r) && L[r] !== 'off'), ui.chelm, 'camp-helm', true, r => ROLES[r].n + (L[r] === 'me' ? ' (toi)' : ' 🤖'))}`}
     <button class="btn" data-act="camp-go" data-id="${id}" ${first || (me.length && n >= 2) ? '' : 'disabled'}>Larguer les amarres</button></div>`;
 }
@@ -3021,6 +3153,7 @@ function startCamp(id){
   ui.as = Math.max(0, seats.findIndex(S => !S.bot));
   G = newGame(seats, 'local', false); G.camp = id; ui.last = {k:'camp', id};
   if(!fixed && ui.chelm && seats.some(S => S.r === ui.chelm)) G.helm = ui.chelm;   // the sailor chosen at the helm
+  if(flagsOn(id)) G.flags = Object.fromEntries(seats.map(S => [S.r, (ui.cflag || {})[S.r] || 'M']));
   startVoyage(G); ui.screen = 'game';
   if((C.lock || C.first) && ui.coach >= 0){   // the guided epic deals the card it teaches in the first hand (the role card, a servant, a card to sacrifice), before anything is shown
     const S = G.seats[ui.as], rc = S && (C.first || ROLES[S.r].card), k = S ? S.draw.indexOf(rc) : -1;
@@ -3036,6 +3169,7 @@ function openIntro(id){
   const d = document.createElement('div'); d.className = 'collmodal'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
   d.innerHTML = `<div class="cm-box intro"><span class="lbl">${S.ic} ${esc(S.n)} · épopée ${id}</span><h3>${esc(C.n)}</h3>
     <div class="inov"><b>Nouveauté : ${esc(C.mech[0])}</b><p>${esc(C.mech[1])}</p></div>
+    ${id === CAMP_FEAT.combo ? `<div class="inov"><b>Nouveauté : pavillons et combos</b><p>Chaque matelot embarque sous un pavillon (3 cartes de sa faction). Les cartes jouées en alliance s'additionnent sur tout le combat : assez d'une même faction et l'équipage déclenche un combo, puis un grand combo que le capitaine lance. Dans ce secteur, on apprend. À partir du suivant, sans combo, la mer devient très dure.</p></div>` : ''}
     ${C.gift ? `<div class="igift"><b>Chaque matelot embarque avec</b><div class="cards">${C.gift.map(c => cardHTML(c, 'tabindex="-1" aria-disabled="true"', '')).join('')}</div></div>` : ''}
     <button class="btn" data-act="coll-close">À l'abordage !</button></div>`;
   d.addEventListener('click', e => { if(e.target === d) d.remove(); });
@@ -3048,7 +3182,7 @@ function renderTip(){
   const live = pv.en.filter(e => e.hp > 0), itOf = e => { const F = FOES[e.t]; return F.it[e.i % F.it.length][0]; };
   const me = activeSeat();
   const Eh = !pv.tut && pv.cp ? epOfV(pv) : {};
-  const cond = {tax:live.some(e => itOf(e) === 'tax'), hide:live.some(e => FOES[e.t].hide) || !!Eh.hide, vanish:live.some(e => e.vn), shift:live.some(e => FOES[e.t].shift), fury:live.some(e => FOES[e.t].fury), cur:!!pv.cur || live.some(e => itOf(e) === 'courant'), shuf:!!Eh.shuffle, sact:(pv.ups || []).some(k => k === 'bell' || k === 'prow') && mySeats().includes(pv.cps), arm:live.some(e => e.ar), ally:Object.keys(FACTIONS).some(f => crewFactionCount(f, me) >= 2), guard:live.some(e => FOES[e.t].guard), sup:live.some(e => FOES[e.t].sup), steal:live.some(e => itOf(e) === 'steal') || pv.seats.some(S => S.dt),
+  const cond = {tax:live.some(e => itOf(e) === 'tax'), hide:live.some(e => FOES[e.t].hide) || !!Eh.hide, vanish:live.some(e => e.vn), shift:live.some(e => FOES[e.t].shift), fury:live.some(e => FOES[e.t].fury), cur:!!pv.cur || live.some(e => itOf(e) === 'courant'), shuf:!!Eh.shuffle, combo:!!pv.cmb, sact:(pv.ups || []).some(k => k === 'bell' || k === 'prow') && mySeats().includes(pv.cps), arm:live.some(e => e.ar), ally:Object.keys(FACTIONS).some(f => crewFactionCount(f, me) >= 2), guard:live.some(e => FOES[e.t].guard), sup:live.some(e => FOES[e.t].sup), steal:live.some(e => itOf(e) === 'steal') || pv.seats.some(S => S.dt),
     fog:live.some(e => itOf(e) === 'fog'), dive:live.some(e => e.inv && !e.vn), rage:pv.ep >= 3 || !!Eh.rage,
     storm:pv.round >= ESC_ROUND - 1 && live.some(e => FOES[e.t].boss),
     mkrot:(() => { const S = pv.seats[activeSeat()]; return !!S && featOn(pv.cp, 'mkrm') && !S.rd && S.g >= 1 && !S.hand.some(c => !CARDS[c].junk) && !pv.mk.some(c => c && CARDS[c].$ <= S.g); })(),
@@ -3081,6 +3215,7 @@ function renderLobby(app){
       return `<div class="lobrole ${S ? (mineR ? 'mine' : 'taken') : 'free'}" style="--rc:${R.col}"><span class="ri">${R.ic}</span><b>${R.n}</b>
         ${S ? (mineR ? `<span class="who">Toi</span>${lastMine ? '' : `<button class="btn ghost small" data-act="drop" data-r="${r}">Rendre</button>`}` : `<span class="who">${esc(S.n)}</span>`)
             : `<span class="who">Libre</span>${mySeats().length ? `<button class="btn small" data-act="take" data-r="${r}">Prendre aussi</button>` : ''}`}</div>`; }).join('')}</div>
+    ${pv.cp && flagsOn(pv.cp) && pv.seats.length ? flagHTML(Object.keys(ROLES).filter(r => pv.seats.some(x => x.r === r)), pv.flags, 'lob-flag', r => { const x = pv.seats.find(y => y.r === r); return x && x.p === myId(); }, r => { const x = pv.seats.find(y => y.r === r); return x ? `${x.n} (${ROLES[r].n})` : ROLES[r].n; }) : ''}
     ${helmHTML(Object.keys(ROLES).filter(r => pv.seats.some(x => x.r === r)), pv.helm, 'lob-helm', isHost, r => { const x = pv.seats.find(y => y.r === r); return x ? `${x.n} (${ROLES[r].n})` : ROLES[r].n; })}
     <p class="note">${pv.seats.length} / 4 rôles pris. Chaque joueur peut prendre plusieurs rôles : à deux, vous pouvez jouer à 2, 3 ou 4 rôles. Il faut au moins 2 rôles pour partir.</p>
     ${!isHost && !mySeats().length ? "<p class=\"note\">Embarquement en cours… Si ton nom n'apparaît pas, ton rôle a sans doute été pris : quitte et choisis-en un autre.</p>" : ''}
@@ -3107,6 +3242,7 @@ function renderCampEnd(app){
     ${fin ? `<p class="epilogue">Le cyclone s'efface. Davy Jones sombre avec son équipage-miroir, et à l'aube une côte verte se découpe sur l'horizon. Après neuf secteurs de tempêtes, de cales sombres et de monstres, le navire jette l'ancre au Nouveau Monde. L'équipage a tenu bon, ensemble.</p>` : ''}
     ${win && C.idx === 3 && SHIP_UPS[C.sector] && upsPending().includes(C.sector) ? upChoiceHTML(C.sector) : ''}
     ${win && nw.cls ? `<div class="cunlock">🎉 Nouveau matelot : <b>${ROLES[nw.cls].ic} ${ROLES[nw.cls].n}</b></div>` : ''}
+    ${(mode === 'host' || mode === 'guest') && (flagsOn(pv.cp) || (next && flagsOn(next))) ? flagHTML(Object.keys(ROLES).filter(r => pv.seats.some(x => x.r === r && !x.ab)), pv.flags, 'lob-flag', r => { const x = pv.seats.find(y => y.r === r); return x && x.p === myId(); }, r => { const x = pv.seats.find(y => y.r === r); return x ? `${x.n} (${ROLES[r].n})` : ROLES[r].n; }) : ''}
     ${mode === 'host' || mode === 'guest' ? `${helmHTML(Object.keys(ROLES).filter(r => pv.seats.some(x => x.r === r && !x.ab)), pv.helm, 'lob-helm', mode === 'host', r => { const x = pv.seats.find(y => y.r === r); return x ? `${x.n} (${ROLES[r].n})` : ROLES[r].n; })}<div class="menu">${mode === 'host' ? `
       ${win && next && CAMP[next] ? `<button class="bigbtn primary" data-act="relaunch" data-id="${next}"><b>Épopée suivante</b><span>${esc(CAMP[next].n)}, avec le même équipage</span></button>` : ''}
       <button class="bigbtn ${win ? '' : 'primary'}" data-act="relaunch" data-id="${pv.cp}"><b>${win ? 'Rejouer' : 'Réessayer'}</b><span>Avec le même équipage</span></button>`
@@ -3206,9 +3342,9 @@ function hullHTML(h, mx){
 }
 // the manoeuvres of the ship (active upgrades): the captain at the helm fires them, once per fight
 function shipActsHTML(){
-  const acts = (pv.ups || []).filter(k => k === 'bell' || k === 'prow'); if(!acts.length) return '';
+  const acts = (pv.ups || []).filter(k => k === 'bell' || k === 'prow'), gcs = 'MTFC'.split('').filter(f => (pv.gc || {})[f] === 1); if(!acts.length && !gcs.length) return '';
   const me = mySeats().includes(pv.cps);
-  return `<div class="sacts">${acts.map(k => { const used = (pv.used || {})[k], ok = me && !used && !(k === 'bell' && pv.sub);
+  return `<div class="sacts">${gcs.map(f => `<button class="sact gcb ready" data-act="gcombo" data-f="${f}" style="--fc:${FACTIONS[f].col}" ${me && !pv.sub ? '' : 'disabled'} title="${esc('Grand combo ' + FACTIONS[f].n + ' : ' + COMBO_FX[f][1][0] + '. ' + COMBO_FX[f][1][1] + (me ? '' : ' Le capitaine à la barre le déclenche.'))}" aria-label="${esc(COMBO_FX[f][1][0])}">${FACTIONS[f].ic}<i>★</i></button>`).join('')}${acts.map(k => { const used = (pv.used || {})[k], ok = me && !used && !(k === 'bell' && pv.sub);
     return `<button class="sact ${used ? 'used' : ok ? 'ready' : ''}" data-act="sact" data-k="${k}" ${ok ? '' : 'disabled'} title="${esc(UP[k].n + ' : ' + UP[k].d + (used ? ' (déjà utilisé ce combat)' : me ? '' : ' Le capitaine à la barre la déclenche.'))}" aria-label="${esc(UP[k].n)}">${UP[k].ic}</button>`; }).join('')}</div>`;
 }
 // choosing the ship's upgrade after a sector
@@ -3269,7 +3405,11 @@ function playedHTML(s){
     return `<span class="tpip ${n >= 2 ? 'on' : n === 1 ? 'one' : ''}" data-f="${f}" style="--fc:${F.col}" title="${esc(tip)}"><span class="ic">${F.ic}</span><b>${n}</b>${n >= 2 ? '<span class="st">alliance</span>' : n === 1 ? '<span class="st">encore 1</span>' : ''}</span>`;
   }).join('');
   const rows = pv.seats.map((S, si) => ({S, si})).filter(({S}) => S.play.length);
+  const cm = pv.cmb, n0 = pv.seats.filter(x => !x.ab).length, T = comboT(n0, pv.cp);
+  const combos = cm ? `<button class="combos" data-act="combo-info" aria-label="Combos du combat"><span class="cl">⚡ Combos</span>${'MTFC'.split('').map(f => { const v = cm[f] || 0, L = (pv.cmbL || {})[f] || 0;
+      return `<span class="cpip ${L >= 2 ? 'gr' : L ? 'on' : ''}" style="--fc:${FACTIONS[f].col}" title="${esc(FACTIONS[f].n)} : ${v} carte${v > 1 ? 's' : ''} en alliance pendant ce combat. Combo à ${T[0]}, grand combo à ${T[1]}."><span class="ic">${FACTIONS[f].ic}</span><b>${v}</b><small>/${L >= 1 ? T[1] : T[0]}</small>${L >= 2 ? '★' : ''}</span>`; }).join('')}</button>` : '';
   return `<section class="sect" id="inplay"><header><h2>Sur le pont</h2><span class="note">Cartes jouées ce tour</span></header>
+    ${combos}
     ${pv.mut ? '<p class="mutiny">🏴 Mutinerie : aucune alliance ne se déclenche ce tour.</p>' : ''}
     <div class="tally">${tally}</div>
     ${rows.length ? rows.map(({S, si}) => `<div class="prow ${si === s ? 'act' : ''}" data-seat="${si}" style="--rc:${ROLES[S.r].col}"><span class="pwho" title="${esc(S.n)}">${ROLES[S.r].ic}</span>
@@ -3415,7 +3555,8 @@ function renderFight(app){
         ${(F.min || mins) && !e.str && !e.rg ? '' : `<span class="fnum">${F.min || mins ? '' : esc(F.n)}${e.str ? ` 💪+${e.str}` : ''}${e.rg ? ' 😡' : ''}</span>`}${traitChips(e, i)}</button>`;
     }).join('')}</div>`;
   ui.spawned = null;
-  const hull = `${roundHTML()}${hullHTML(pv.hull, pv.maxHull)}${shipActsHTML()}<div class="scchips">${bossEsc() ? `<span class="escchip" title="À partir du ${ESC_ROUND}e tour, le boss gagne +${ESC} de force à chaque tour : ne traîne pas !">🌪️ ${pv.round >= ESC_ROUND ? 'La tempête enfle' : `Tempête au tour ${ESC_ROUND}`}</span>` : ''}${pv.net ? `<span class="halfchip" title="Filet d'abordage : tes serviteurs ont +${pv.net} de défense contre les abordages de ce tour">🕸️ Défense +${pv.net}</span>` : ''}${pv.half ? '<span class="halfchip" title="Contre-courant : les dégâts sur la coque sont réduits d\'un quart ce tour">🌀 Dégâts −¼</span>' : ''}${pv.cur ? '<span class="brchip" title="Le double du Cartographe a retourné le courant : votre prochaine attaque perd un quart">🌀 Attaque −¼</span>' : ''}${pv.br ? `<span class="brchip" title="Colmate la brèche avec de la protection (Écoper, Garde…) avant la fin du tour">💥 Brèche ${pv.br} : dégâts ×1,5</span>` : ''}</div>`;
+  const lasting = 'MTFC'.split('').filter(f => ((pv.cmbL || {})[f] || 0) >= 1).map(f => `<span class="cmbchip" style="--fc:${FACTIONS[f].col}" title="${esc(COMBO_FX[f][0][1])}">${FACTIONS[f].ic} ${esc(COMBO_FX[f][0][0])}</span>`).join('') + (pv.bordee ? '<span class="cmbchip" title="La prochaine attaque du navire ×1,5">⚓★ Bordée prête</span>' : '');
+  const hull = `${roundHTML()}${hullHTML(pv.hull, pv.maxHull)}${shipActsHTML()}<div class="scchips">${lasting}${bossEsc() ? `<span class="escchip" title="À partir du ${ESC_ROUND}e tour, le boss gagne +${ESC} de force à chaque tour : ne traîne pas !">🌪️ ${pv.round >= ESC_ROUND ? 'La tempête enfle' : `Tempête au tour ${ESC_ROUND}`}</span>` : ''}${pv.net ? `<span class="halfchip" title="Filet d'abordage : tes serviteurs ont +${pv.net} de défense contre les abordages de ce tour">🕸️ Défense +${pv.net}</span>` : ''}${pv.half ? '<span class="halfchip" title="Contre-courant : les dégâts sur la coque sont réduits d\'un quart ce tour">🌀 Dégâts −¼</span>' : ''}${pv.cur ? '<span class="brchip" title="Le double du Cartographe a retourné le courant : votre prochaine attaque perd un quart">🌀 Attaque −¼</span>' : ''}${pv.br ? `<span class="brchip" title="Colmate la brèche avec de la protection (Écoper, Garde…) avant la fin du tour">💥 Brèche ${pv.br} : dégâts ×1,5</span>` : ''}</div>`;
 
   app.innerHTML = `
     <div class="topline">${quitBtn()}<div class="zone display">${esc(N.z)}${pv.tut ? '' : pv.cp ? `<span class="epb" title="${esc(CAMP[pv.cp].n)}">${pv.cp} · ${esc(CAMP[pv.cp].n)}</span>` : `<span class="epb" title="${esc(EPICS[(pv.ep || 1) - 1].n)}">Épopée ${pv.ep || 1}/${EPICS.length}</span>`}</div>
@@ -3482,7 +3623,7 @@ function diffFx(prev, v){
   fx.reform = v.en.map((e, i) => e.rf && prev.en[i] && (e.rf || 0) > (prev.en[i].rf || 0) && prev.en[i].t === e.t ? i : -1).filter(i => i >= 0);
   fx.dive = v.en.map((e, i) => e.inv && prev.en[i] && !prev.en[i].inv && prev.en[i].t === e.t ? i : -1).filter(i => i >= 0);
   fx.hull = v.hull - prev.hull; fx.prot = v.prot - prev.prot; fx.plug = v.round === prev.round ? (prev.br || 0) - (v.br || 0) : 0;
-  if(v.round !== prev.round){ ui.deal = true; fx.newRound = true; ui.handDown = false; }
+  if(v.round !== prev.round){ ui.deal = true; fx.newRound = true; ui.handDown = false; ui.purge = false; }
   const s = activeSeat();
   const a = prev.seats[s], b = v.seats[s];
   if(a && b && v.round === prev.round){ fx.dg = b.g - a.g; fx.dc = b.c - a.c; fx.g = fx.dg > 0; fx.c = fx.dc > 0; }
@@ -3656,6 +3797,9 @@ function postFx(fx){
     else if(e.t === 'merc') floatAt('#ship', `🫠 ${CARDS[e.c].n} a fondu, faute de bougies`, '#ffe39a');
     else if(e.t === 'thorn') floatAt('#ship', `🌵 Épines : −${e.d}`, '#ff8f7a');
     else if(e.t === 'sac') floatAt('#inplay', '☠ Sacrifice', '#ffb9a8');
+    else if(e.t === 'combo') banner(`${FACTIONS[e.f].ic} ${e.lv >= 2 ? 'Grand combo' : 'Combo'} : ${e.lv >= 2 ? COMBO_FX[e.f][1][0] : COMBO_FX[e.f][0][0]} !`, e.lv >= 2 ? 'Le capitaine peut le déclencher (bouton sous la coque)' : COMBO_FX[e.f][0][1]);
+    else if(e.t === 'cross') banner(`${e.k.split('').map(f => FACTIONS[f].ic).join('')} Combo croisé : ${CROSS[e.k][0]} !`, CROSS[e.k][1]);
+    else if(e.t === 'gcombo') banner(`${FACTIONS[e.f].ic}★ ${COMBO_FX[e.f][1][0]} !`, COMBO_FX[e.f][1][1].replace(/^Le capitaine l[ea] déclenche : /, ''));
     else if(e.t === 'sact' && e.k === 'bell') banner('🔔 Cloche du bord', 'Chaque matelot pioche une carte', true);
     else if(e.t === 'loot' && mySeats().includes(e.s) && CARDS[e.c]) toast(`🎁 Butin de l’élite : ${CARDS[e.c].n} rejoint ${mySeats().length > 1 ? 'le deck de ' + (pv.seats[e.s] ? pv.seats[e.s].n : '') : 'ton deck'}.`);
     else if(e.t === 'shuf'){ if(!fx.newRound) banner('🧭 La boussole s\'affole', 'Toutes les cartes de la cale ont changé', true); }
@@ -3908,6 +4052,7 @@ const ALL_FOES = Object.keys(FOES).filter(t => t !== 'tut');
 const BADGE_CATS = [['pp', '🧭 Premiers pas'], ['eq', '⚓ Équipages'], ['cb', '⚔️ Combats'], ['nf', '☠️ Naufrages et miracles'], ['sv', '🛡️ Serviteurs et abordages'], ['cd', '🃏 Cartes et bestiaire'], ['el', '👑 Élite']];
 const n0 = v => v || 0, len = a => (a || []).length;
 const BADGES = [
+  ['cmb', 'el', '⚡', 'Livre des combos', 'Découvrir les 14 combos : 4 combos, 4 grands combos et 6 combos croisés', s => Object.keys(s.combos || {}).length >= 14, 14, s => Object.keys(s.combos || {}).length],
   ['tut', 'pp', '🐣', 'Premier pas', 'Terminer le tutoriel', s => s.tut],
   ['port', 'pp', '⚓', 'Premier port', 'Atteindre le port pour la première fois', s => s.port],
   ['b1', 'pp', '🌫️', 'Brumes dissipées', 'Battre le boss de la 1re épopée', s => s.ep1],
@@ -3982,6 +4127,7 @@ function track(v){
   const evs = v.ev || []; const fresh = !p || trk.ev == null ? evs : evs.filter(e => e.id > trk.ev); if(evs.length) trk.ev = Math.max(trk.ev || 0, evs[evs.length - 1].id);
   if(v.phase === 'tutend') s.tut = 1;
   if(v.tut){ finishTrack(); return; }
+  for(const e of fresh){ if(e.t === 'combo') (s.combos = s.combos || {})[e.f + (e.lv >= 2 ? '2' : '1')] = 1; if(e.t === 'cross') (s.combos = s.combos || {})[e.k] = 1; }
   // a new crossing begins
   for(const e of fresh) if(e.t === 'fight' && e.first && e.ep === 1 && !v.cp){ s.played = n0(s.played) + 1; trk.run = {minR:1, minH:v.hull, lost:0, rec:0, reward:0, rounds:0}; }
   const R = trk.run || (trk.run = {minR:1, minH:v.hull, lost:1, rec:1, reward:1, rounds:0});   // joined mid-way: no clean-run badges
@@ -4093,7 +4239,7 @@ function intentLine(x){
   return k === 'hit' ? `Frappe la coque (${a})` : k === 'multi' ? `Frappe ${b} fois (${a} chacune)` : k === 'board' ? `Abordage de force ${a}` : k === 'shield' ? `Se protège (${a})`
     : k === 'grow' ? `Se renforce (+${a} de force)` : k === 'heal' ? `Soigne toutes les menaces (${a})` : k === 'curse' ? `Malédiction : ${a} blessure par matelot` : k === 'summon' ? `Appelle ${b} ${M.n.toLowerCase()}${b > 1 ? 's' : ''} ${M.ic}`
     : k === 'buff' ? `Renforce les autres menaces (+${a})` : k === 'steal' ? `Souffle ${a} bougie${a > 1 ? 's' : ''} à chaque matelot` : k === 'fog' ? `Brouillard : ${a} carte de moins au prochain tour` : k === 'pierce' ? `Morsure qui ignore la protection (${a})`
-    : k === 'ram' ? `Éperonne (${a}) et renverse ton serviteur le plus faible` : k === 'bind' ? `Enserre tes ${a} serviteurs les plus solides` : k === 'siphon' ? 'Aspire toute la protection du navire'
+    : k === 'ram' ? (featOn(pv && pv.cp, 'srv') ? `Éperonne (${a}) et renverse ton serviteur le plus faible` : `Éperonne (${a})`) : k === 'bind' ? `Enserre tes ${a} serviteurs les plus solides` : k === 'siphon' ? 'Aspire toute la protection du navire'
     : k === 'charm' ? `Ensorcelle tes ${a} serviteurs les plus solides` : k === 'wave' ? `Raz-de-marée : tous les serviteurs de défense ${a} ou moins à l'eau` : k === 'devour' ? 'Dévore pour de bon une carte jouée' : k === 'mutiny' ? 'Mutinerie : aucune alliance au tour suivant'
     : k === 'tax' ? `Prélève ${a} bougie${a > 1 ? 's' : ''} par matelot et s'en fait un bouclier` : k === 'vanish' ? `Disparaît dans la brume, puis ressurgit (${a})` : k === 'bordee' ? `Bordée (${a}) puis se protège (${b})`
     : k === 'courant' ? 'Contre-courant : votre prochaine attaque perd un quart' : k === 'radoub' ? `Radoub : soigne les menaces (${a}) et se protège (${b})` : k === 'voiles' ? `Hisse les voiles : +${a} force et protection pour toutes les menaces` : k;
@@ -4349,7 +4495,7 @@ function openCardZoom(code){
 document.addEventListener('click', ev => {
   if(ui.lpDone && Date.now() - ui.lpDone < 1500 && !ev.target.closest('.cardzoom')){ ui.lpDone = 0; return; }   // end of a long press: only the zoom
   const b = ev.target.closest('[data-act]'); if(!b || b.disabled) return;
-  if(ui.playing && !['menu','quit','ask-quit','quit-ok','foe-info','coll-close','deck','deck-close','deck-f','zoom','cale-info','hand-toggle'].includes(b.dataset.act)) return; // the enemy turn is being replayed
+  if(ui.playing && !['menu','quit','ask-quit','quit-ok','foe-info','coll-close','deck','deck-close','deck-f','zoom','cale-info','hand-toggle','combo-info'].includes(b.dataset.act)) return; // the enemy turn is being replayed
   const A = b.dataset.act, s = activeSeat(), S = s >= 0 && pv ? pv.seats[s] : null;
   const busy = () => { if(S && S.rd){ toast('Tu as terminé ton tour. Touche « Annuler » pour rejouer.'); return true; } return false; };
   switch(A){
@@ -4361,6 +4507,8 @@ document.addEventListener('click', ev => {
     case 'camp-sel': ui.campSel = ui.campSel === b.dataset.id ? null : b.dataset.id; render(); break;
     case 'camp-set': { const have = campClasses(); ui.cloc[b.dataset.r] = b.dataset.v; render(); break; }
     case 'camp-helm': ui.chelm = b.dataset.r; render(); break;
+    case 'camp-flag': ui.cflag = {...(ui.cflag || {}), [b.dataset.r]:b.dataset.f}; render(); break;
+    case 'lob-flag': act({a:'flag', r:b.dataset.r, f:b.dataset.f}); break;
     case 'lob-helm': act({a:'helm', r:b.dataset.r}); break;
     case 'camp-go': startCamp(b.dataset.id); break;
     case 'camp-retry': { const id = pv && pv.cp; if(id){ quitToMenu(); startCamp(id); } break; }
@@ -4424,6 +4572,8 @@ document.addEventListener('click', ev => {
     case 'hand-toggle': ui.handDown = !ui.handDown; render(); break;
     case 'zoom': openCardZoom(b.dataset.c); break;
     case 'sact': if(pv && mySeats().includes(pv.cps)) act({a:'sact', s:pv.cps, k:b.dataset.k}); break;
+    case 'gcombo': if(pv && mySeats().includes(pv.cps)) act({a:'gcombo', s:pv.cps, f:b.dataset.f}); break;
+    case 'combo-info': openComboInfo(); break;
     case 'up-pick': { const k = +b.dataset.k; if(SHIP_UPS[k] && upsPending().includes(k)){ CAMP_PROG.up = {...(CAMP_PROG.up || {}), [k]:b.dataset.c}; campSave(); toast(`${UP[b.dataset.c].ic} ${UP[b.dataset.c].n} installé sur le navire.`); render(); } break; }
     case 'all': {
       if(!S || busy()) return;
