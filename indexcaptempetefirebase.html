@@ -685,14 +685,13 @@ body.enemy-turn #dock .dock-in{ opacity:.4; filter:saturate(.6); transition:opac
 .caleinfo .fi-list li{ display:flex; gap:10px; align-items:flex-start; font-size:14px; line-height:1.38; }
 .caleinfo .fi-list li > span{ font-size:20px; line-height:1.2; flex:none; width:26px; text-align:center; }
 /* a burnt object of the hold */
-.burnfx{ position:fixed; z-index:40; pointer-events:none; border-radius:12px; overflow:hidden; animation:burnout 1.35s ease-in forwards; }
-.burnfx .card{ width:100% !important; height:100% !important; margin:0; animation:burncard 1.35s ease-in forwards; }
-.burnfx::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, transparent 0 34%, #ffe27a 40%, #ff8a1f 45%, #d63a12 51%, rgba(30,8,0,.96) 58%, rgba(15,4,0,.97) 100%); background-size:100% 260%; background-position:0 0; animation:burnrise 1.35s ease-in forwards; }
-.burnfx i{ position:absolute; bottom:10%; width:6px; height:6px; border-radius:50%; background:#ffb347; box-shadow:0 0 8px 2px #ff7a1f; animation:ember 1.2s ease-out forwards; }
-@keyframes burnrise{ from{ background-position:0 0; } to{ background-position:0 100%; } }
-@keyframes burncard{ 40%{ filter:sepia(1) saturate(2) brightness(.8); } to{ filter:sepia(1) brightness(.15); } }
-@keyframes burnout{ 0%{ opacity:1; transform:none; } 70%{ opacity:1; } to{ opacity:0; transform:translateY(-10px) scale(.94); } }
-@keyframes ember{ to{ transform:translate(var(--dx), -120px); opacity:0; } }
+.burnfx{ position:fixed; z-index:40; pointer-events:none; transform-origin:50% 100%; will-change:transform; }
+.burnfx .bf-card{ position:absolute; inset:0; border-radius:12px; overflow:hidden; -webkit-mask-size:100% 100%; mask-size:100% 100%; -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat; }
+.burnfx .bf-card > .card{ width:100% !important; height:100% !important; margin:0; opacity:1 !important; transform:none !important; animation:none !important; box-shadow:none !important; }
+.burnfx canvas{ position:absolute; left:0; top:0; width:100%; height:100%; }
+.burnfx canvas.bf-glow{ filter:blur(4px) brightness(1.3); mix-blend-mode:screen; }
+.burnfx .coin{ display:none; }
+.bf-parts{ position:fixed; z-index:41; pointer-events:none; }
 .mkrm:disabled{ opacity:.4; cursor:default; }
 .mkrm:not(:disabled):active{ transform:translateY(1px); }
 .deckbtn .drw{ font-size:11px; font-weight:700; color:var(--muted); margin-left:2px; }
@@ -3633,7 +3632,7 @@ function diffFx(prev, v){
   fx.fall = [];
   for(const e of fx.events) if(e.t === 'ko'){ const el = document.querySelector(`.mate[data-c="${e.c}"]`); if(el) fx.fall.push({r:el.getBoundingClientRect(), html:el.innerHTML, st:el.getAttribute('style')}); }
   fx.burn = [];
-  for(const e of fx.events) if(e.t === 'mkrm'){ const el = document.querySelector(`#market .card[data-m="${e.m}"]`); if(el) fx.burn.push({r:el.getBoundingClientRect(), html:el.outerHTML}); }
+  for(const e of fx.events) if(e.t === 'mkrm'){ const el = document.querySelector(`#market .card[data-m="${e.m}"]`); if(el) fx.burn.push({r:el.getBoundingClientRect(), html:el.outerHTML, m:e.m}); }
   const changed = new Set(); v.mk.forEach((c, i) => { if(prev.mk[i] !== c) changed.add(i); }); if(changed.size) ui.flip = changed;
   return fx;
 }
@@ -3738,6 +3737,115 @@ async function playShots(shots, prev){
   }
   await sleep(tail);
 }
+/* Brûler une carte de la cale : front de flamme irrégulier, braises, fumée, cendres */
+function burnCard(b){
+  const W = b.r.width, H = b.r.height; if(!W || !H) return;
+  const S = 2, w = Math.ceil(W / S), h = Math.ceil(H / S), N = w * h;
+  // champ de combustion : distance au point d'allumage (bas de la carte) + bruit
+  const rnd = mulberry(Math.random() * 1e9 | 0), grid = (g) => { const a = new Float32Array((g + 2) * (g + 2)); for(let i = 0; i < a.length; i++) a[i] = rnd(); return a; };
+  const g1 = 4, g2 = 11, n1 = grid(g1), n2 = grid(g2);
+  const vn = (a, g, x, y) => { const X = x * g, Y = y * g, i = X | 0, j = Y | 0, fx = X - i, fy = Y - j, sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy), G = g + 2;
+    const v00 = a[j * G + i], v10 = a[j * G + i + 1], v01 = a[(j + 1) * G + i], v11 = a[(j + 1) * G + i + 1];
+    return (v00 + (v10 - v00) * sx) + ((v01 + (v11 - v01) * sx) - (v00 + (v10 - v00) * sx)) * sy; };
+  const x0 = .25 + rnd() * .5, fld = new Float32Array(N); let mx = 0;
+  for(let y = 0; y < h; y++) for(let x = 0; x < w; x++){
+    const u = x / (w - 1), v = y / (h - 1), dx = (u - x0) * W / H * 1.1, dy = 1.04 - v;
+    const n = vn(n1, g1, u, v) * .65 + vn(n2, g2, u, v) * .35;
+    const f = Math.hypot(dx, dy) + n * .42; fld[y * w + x] = f; if(f > mx) mx = f;
+  }
+  let mn = Infinity; for(let i = 0; i < N; i++){ fld[i] /= mx; if(fld[i] < mn) mn = fld[i]; }
+  for(let i = 0; i < N; i++) fld[i] = (fld[i] - mn) / (1 - mn);
+  // calques
+  const d = document.createElement('div'); d.className = 'burnfx';
+  Object.assign(d.style, {left:b.r.left + 'px', top:b.r.top + 'px', width:W + 'px', height:H + 'px'});
+  const inner = document.createElement('div'); inner.className = 'bf-card'; inner.innerHTML = b.html; d.appendChild(inner);
+  const cardEl = inner.firstElementChild;
+  const mk = document.createElement('canvas'); mk.width = w; mk.height = h; const mc = mk.getContext('2d'), mImg = mc.createImageData(w, h);
+  const ed = document.createElement('canvas'); ed.width = w; ed.height = h; const ec = ed.getContext('2d'), eImg = ec.createImageData(w, h); inner.appendChild(ed);
+  const gl = document.createElement('canvas'); gl.className = 'bf-glow'; gl.width = w; gl.height = h; const gc = gl.getContext('2d'), gImg = gc.createImageData(w, h); d.appendChild(gl);
+  const maskOK = CSS.supports('mask-image', 'url(x.png)') || CSS.supports('-webkit-mask-image', 'url(x.png)');
+  const PX = 50, PT = 150, PB = 40, dpr = Math.min(2, window.devicePixelRatio || 1);
+  const pc = document.createElement('canvas'); pc.className = 'bf-parts';
+  const PW = W + PX * 2, PH = H + PT + PB; pc.width = PW * dpr; pc.height = PH * dpr;
+  Object.assign(pc.style, {left:(b.r.left - PX) + 'px', top:(b.r.top - PT) + 'px', width:PW + 'px', height:PH + 'px'});
+  const px = pc.getContext('2d'); px.scale(dpr, dpr);
+  document.body.appendChild(d); document.body.appendChild(pc);
+  const nxt = () => document.querySelector(`#market .card[data-m="${b.m}"]`); let shown = false;
+  { const n = nxt(); if(n) n.style.opacity = '0'; }   // the next object comes forward once the fire is out
+  const parts = [], edge = [], acc = [0, 0, 0];
+  const T0 = performance.now(), PRE = 180, DUR = 1250, END = PRE + DUR + 700;
+  let last = T0;
+  const frame = (now) => {
+    const el = now - T0, dt = Math.min(.05, (now - last) / 1000); last = now;
+    const t = el < PRE ? -.06 + .06 * el / PRE : Math.min(1.12, ((el - PRE) / DUR) ** 1.15 * 1.12);
+    const k = Math.max(0, Math.min(1, t));
+    // front de flamme
+    const M = mImg.data, E = eImg.data, Gd = gImg.data; edge.length = 0;
+    const fl = (Math.random() - .5) * .006;
+    for(let i = 0; i < N; i++){
+      const e = fld[i] - t + fl, o = i * 4;
+      // masque : transparent là où c'est brûlé
+      M[o] = M[o + 1] = M[o + 2] = 0; M[o + 3] = e <= 0 ? 0 : e < .012 ? e / .012 * 255 : 255;
+      let r = 0, g = 0, bl = 0, a = 0, ga = 0;
+      if(e > 0){
+        if(e < .018){ r = 255; g = 245 - e / .018 * 70; bl = 190 - e / .018 * 150; a = 255; ga = 255; if(Math.random() < .5) edge.push(i); }
+        else if(e < .04){ const q = (e - .018) / .022; r = 255 - q * 70; g = 175 - q * 130; bl = 40 - q * 30; a = 255; ga = 200 * (1 - q); }
+        else if(e < .12){ const q = (e - .04) / .08; r = 185 - q * 150; g = 45 - q * 30; bl = 10; a = 255 * (1 - q * .15); }
+        else if(e < .30){ const q = (e - .12) / .18; r = 35 + q * 60; g = 15 + q * 35; bl = 5 + q * 10; a = 215 * (1 - q); }
+        else { const q = Math.max(0, 1 - (e - .3) * 3.2); r = 110; g = 60; bl = 15; a = 80 * q * k * 1.6; }
+        if(el < PRE && e > 0) a *= el / PRE;
+      }
+      E[o] = r; E[o + 1] = g; E[o + 2] = bl; E[o + 3] = a;
+      Gd[o] = 255; Gd[o + 1] = 120 + (ga > 200 ? 80 : 0); Gd[o + 2] = 20; Gd[o + 3] = ga;
+    }
+    if(t < 1.1){
+      ec.putImageData(eImg, 0, 0); gc.putImageData(gImg, 0, 0);
+      if(maskOK){ mc.putImageData(mImg, 0, 0); const u = `url(${mk.toDataURL()})`; inner.style.webkitMaskImage = u; inner.style.maskImage = u; }
+      else inner.style.opacity = String(Math.max(0, 1 - k));
+    } else { d.style.opacity = '0'; }
+    if(!shown && t >= .95){ shown = true; const n = nxt(); if(n){ n.style.opacity = ''; n.animate([{opacity:0, transform:'translateY(-18px) scale(.92)'}, {opacity:1, transform:'none'}], {duration:420, easing:'cubic-bezier(.2,.8,.3,1.2)'}); } }
+    // la carte se tord et roussit
+    d.style.transform = `perspective(700px) rotateX(${k * 10}deg) rotateZ(${(x0 - .5) * k * 5}deg) translateY(${-k * 6}px)`;
+    if(cardEl) cardEl.style.filter = `sepia(${Math.min(1, k * 2.2) * .7}) saturate(${1 + k * .6}) brightness(${1 - k * .35})`;
+    // particules
+    const toP = (i) => { const x = i % w, y = i / w | 0; return [PX + (x + .5) * S, PT + (y + .5) * S]; };
+    if(t < 1.1 && edge.length){
+      const kk = Math.min(1, edge.length / 30); acc[0] += 75 * kk * dt; acc[1] += 14 * kk * dt; acc[2] += 9 * kk * dt;   // per second, whatever the frame rate
+      for(; acc[0] >= 1; acc[0]--){ const [X, Y] = toP(edge[Math.random() * edge.length | 0]);
+        parts.push({k:0, x:X, y:Y, vx:(Math.random() - .5) * 40, vy:-50 - Math.random() * 110, l:0, L:.5 + Math.random() * .8, s:.7 + Math.random() * 1.4, w:Math.random() * 6}); }
+      for(; acc[1] >= 1; acc[1]--){ const [X, Y] = toP(edge[Math.random() * edge.length | 0]);
+        parts.push({k:1, x:X, y:Y, vx:(Math.random() - .5) * 18, vy:-30 - Math.random() * 30, l:0, L:1 + Math.random() * .7, s:5 + Math.random() * 6, w:Math.random() * 6}); }
+      for(; acc[2] >= 1; acc[2]--){ const [X, Y] = toP(edge[Math.random() * edge.length | 0]);
+        parts.push({k:2, x:X, y:Y, vx:(Math.random() - .5) * 30, vy:-70 - Math.random() * 60, l:0, L:1.1 + Math.random() * .6, s:.8 + Math.random() * 1.4, w:Math.random() * 6, r:Math.random() * 6}); }
+    }
+    px.clearRect(0, 0, PW, PH);
+    for(let q = parts.length - 1; q >= 0; q--){
+      const p = parts[q]; p.l += dt; if(p.l >= p.L){ parts.splice(q, 1); continue; }
+      const f = p.l / p.L;
+      if(p.k === 0){ // braise
+        p.vx += Math.sin(now / 90 + p.w) * 60 * dt; p.vy -= 20 * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+        const c = f < .4 ? '255,230,140' : f < .75 ? '255,150,40' : '200,60,20';
+        px.globalCompositeOperation = 'lighter'; px.fillStyle = `rgba(${c},${1 - f * f})`;
+        px.beginPath(); px.arc(p.x, p.y, p.s * (1 - f * .5), 0, 7); px.fill();
+        px.fillStyle = `rgba(255,110,30,${.12 * (1 - f)})`; px.beginPath(); px.arc(p.x, p.y, p.s * 2.6, 0, 7); px.fill();
+      } else if(p.k === 1){ // fumée
+        p.vx += Math.sin(now / 300 + p.w) * 10 * dt; p.x += p.vx * dt; p.y += p.vy * dt; const R = p.s + f * 22;
+        px.globalCompositeOperation = 'source-over';
+        const gr = px.createRadialGradient(p.x, p.y, 0, p.x, p.y, R); gr.addColorStop(0, `rgba(60,54,50,${.2 * Math.sin(f * Math.PI)})`); gr.addColorStop(1, 'rgba(70,62,58,0)');
+        px.fillStyle = gr; px.beginPath(); px.arc(p.x, p.y, R, 0, 7); px.fill();
+      } else { // cendre qui voltige
+        p.vy += 45 * dt; p.vx += Math.sin(now / 160 + p.w) * 50 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.r += dt * 6;
+        px.globalCompositeOperation = 'source-over'; px.save(); px.translate(p.x, p.y); px.rotate(p.r); px.scale(1, Math.abs(Math.cos(p.r * .7)) + .2);
+        px.fillStyle = f < .25 ? `rgba(255,140,50,${1 - f})` : `rgba(55,48,44,${.75 * (1 - f)})`; px.beginPath(); px.moveTo(-p.s, -p.s * .4); px.lineTo(p.s * .7, -p.s * .7); px.lineTo(p.s, p.s * .5); px.lineTo(-p.s * .5, p.s * .6); px.fill(); px.restore();
+      }
+    }
+    px.globalCompositeOperation = 'source-over';
+    if(el < END && (t < 1.1 || parts.length)) requestAnimationFrame(frame);
+    else { d.remove(); pc.remove(); }
+  };
+  requestAnimationFrame(frame);
+}
+function mulberry(a){ return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 function postFx(fx){
   if(!fx) return;
   if(fx.newRound && pv && pv.phase === 'fight' && pv.round >= 2 && !fx.transit) roundBanner();
@@ -3760,12 +3868,7 @@ function postFx(fx){
     const el = document.querySelector(`.mate[data-s="${si}"][data-i="${k}"]`); if(!el) return;
     el.classList.add('fire'); floatAt(el, fxText(CARDS[c].ex), '#fff1c2');
   });
-  if(!reduced) (fx.burn || []).forEach(b => {
-    const d = document.createElement('div'); d.className = 'burnfx';
-    Object.assign(d.style, {left:b.r.left + 'px', top:b.r.top + 'px', width:b.r.width + 'px', height:b.r.height + 'px'}); d.innerHTML = b.html;
-    for(let k = 0; k < 8; k++){ const i = document.createElement('i'); i.style.left = (10 + Math.random() * 80) + '%'; i.style.setProperty('--dx', (Math.random() * 40 - 20) + 'px'); i.style.animationDelay = (.2 + Math.random() * .6) + 's'; d.appendChild(i); }
-    document.body.appendChild(d); setTimeout(() => d.remove(), 1450);
-  });
+  if(!reduced) (fx.burn || []).forEach(burnCard);
   (fx.fall || []).forEach(f => {
     if(reduced) return; const d = document.createElement('div'); d.className = 'mate-fall'; d.setAttribute('style', f.st || ''); d.innerHTML = f.html;
     Object.assign(d.style, {left:f.r.left + 'px', top:f.r.top + 'px', width:f.r.width + 'px', height:f.r.height + 'px'});
