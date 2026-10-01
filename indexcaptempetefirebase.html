@@ -692,6 +692,11 @@ body.enemy-turn #dock .dock-in{ opacity:.4; filter:saturate(.6); transition:opac
 .caleinfo .fi-list li{ display:flex; gap:10px; align-items:flex-start; font-size:14px; line-height:1.38; }
 .caleinfo .fi-list li > span{ font-size:20px; line-height:1.2; flex:none; width:26px; text-align:center; }
 /* a burnt object of the hold */
+.deckbtn.bump, #crew .seat.bump, .pools .who.bump{ animation:bump .45s; }
+.takefx{ position:fixed; z-index:41; pointer-events:none; }
+.takefx.dgrid, .bf-card.dgrid{ display:block !important; padding:0 !important; }
+.takefx .card{ width:100% !important; height:100% !important; margin:0; animation:none !important; opacity:1 !important; }
+.takefx .coin, .takefx .mkrm{ display:none; }
 .burnfx{ position:fixed; z-index:40; pointer-events:none; transform-origin:50% 100%; will-change:transform; }
 .burnfx .bf-card{ position:absolute; inset:0; border-radius:12px; overflow:hidden; -webkit-mask-size:100% 100%; mask-size:100% 100%; -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat; }
 .burnfx .bf-card > .card{ width:100% !important; height:100% !important; margin:0; opacity:1 !important; transform:none !important; animation:none !important; box-shadow:none !important; }
@@ -1172,9 +1177,9 @@ input.txt{ width:100%; font:inherit; font-size:17px; padding:10px 12px; border-r
   #inplay .tpip{ padding:1px 6px 1px 1px; font-size:11px; gap:3px; }
   #inplay .tpip .ic{ width:20px; height:20px; font-size:11px; }
   #inplay .tpip .st{ display:none; }
-  #inplay .prows{ display:flex; gap:6px; overflow-x:auto; margin:0 -4px; padding:0 4px; }
-  #inplay .prow{ flex:none; margin-top:5px; }
-  #inplay .minis{ padding:6px 2px 8px; gap:5px; overflow:visible; }
+  #inplay .prows{ display:block; }
+  #inplay .prow{ margin-top:5px; }
+  #inplay .minis{ padding:6px 2px 8px; gap:5px; overflow-x:auto; }
   #inplay .mini{ width:48px; height:62px; }
   #inplay .mini .mf{ padding:3px 1px; }
   #inplay .mini .pic{ font-size:18px; } #inplay .mini .mn{ font-size:8px; } #inplay .mini .fx{ font-size:9.5px; }
@@ -1233,7 +1238,7 @@ const ROLES = {
 
 // pl: when played · al: ally bonus (another card of the same faction in play in the whole crew) · sac: sacrifice bonus · ch: champion defence, ex: its effect each turn
 const CARDS = {
-  dou:{n:'Bougie', pl:{g:1}}, ec:{n:'Écoper', pl:{p:3}}, bou:{n:'Allumettes', pl:{g:2}}, dag:{n:'Dague', pl:{c:1}}, sab:{n:'Sabre', pl:{c:2}},
+  dou:{n:'Bougie et allumettes', sn:'Bougie', pl:{g:1}}, ec:{n:'Écoper', pl:{p:3}}, bou:{n:'Chandelier et allumettes', sn:'Chandelier', pl:{g:2}}, dag:{n:'Dague', pl:{c:1}}, sab:{n:'Sabre', pl:{c:2}},
   rcap:{n:'Ordres du capitaine', role:'cap', pl:{g:1, og:1, p:2, d:1}},
   rcan:{n:'Canon de bord', role:'can', pl:{c:3, p:2, g:1}},
   rcha:{n:'Caisse à outils', role:'cha', pl:{p:2, h:1, d:1, g:1}},
@@ -1379,7 +1384,7 @@ const RELICS = {
 };
 const PURGE_COST = S => 3 + (S.pg || 0);   // throwing a card overboard costs more each time
 const PORT_REMOVALS = 2;
-const ART = {sig3:'🪝', n31:'🧒', n32:'🔭', n33:'🔪', n34:'🏰', sig4:'📜', n41:'⚖️', n42:'🌶️', n43:'🦜', n44:'🧵', sig5:'🏮', n51:'🦴', n52:'💧', n53:'👻', n54:'🛎️', sig6:'⛏️', n61:'🐏', n62:'🧨', n63:'🪨', n64:'🪸', sig7:'🧭', n71:'🌟', n72:'⚡', n73:'🌊', n74:'💦', sig8:'🔱', n81:'⚫', n82:'🐋', n83:'⚓', sig9:'🌄', n91:'🤝', n92:'🌴', p1:'🔱', p2:'🪣', p3:'🪔', p4:'🔫', p5:'🪵', p6:'🔔', sig2:'🐚', m14:'⚜️', c15:'🪓', f16:'🔥', dou:'🕯️', ec:'🪣', x1:'🧹', f13:'🗺️', f15:'🏴', f14:'🏝️', m12:'🕸️', m13:'🚩', c12:'🩸', c13:'🙏', c14:'📿', t12:'🪘', t13:'👦', t14:'🐘', x2:'🎇', x3:'🫠', x4:'🎁', x5:'🗼', x6:'🚩', x7:'🧓', x8:'🧘', bou:'<svg class="match" viewBox="0 0 32 32" aria-hidden="true"><g stroke-linecap="round"><path d="M7 27L17 9" stroke="#e9c58a" stroke-width="3"/><path d="M13 28L19 8" stroke="#d9b071" stroke-width="3"/><path d="M19 28L21 8" stroke="#e9c58a" stroke-width="3"/></g><ellipse cx="17.6" cy="7.6" rx="2.6" ry="3.2" fill="#c0392b" transform="rotate(28 17.6 7.6)"/><ellipse cx="19.4" cy="6.8" rx="2.6" ry="3.2" fill="#a93226" transform="rotate(15 19.4 6.8)"/><ellipse cx="21.2" cy="6.8" rx="2.5" ry="3.1" fill="#c0392b" transform="rotate(4 21.2 6.8)"/><path d="M22 1.5c2 2 2.6 3.8.4 5.6-1.6-1.1-1.9-3-.4-5.6z" fill="#ffb02e"/></svg>', dag:'🗡️', sab:'⚔️', rcap:'📜', rcan:'💣', rcha:'🧰', rcar:'🗺️', rhu:'🛢️', bl:'🩹',
+const ART = {sig3:'🪝', n31:'🧒', n32:'🔭', n33:'🔪', n34:'🏰', sig4:'📜', n41:'⚖️', n42:'🌶️', n43:'🦜', n44:'🧵', sig5:'🏮', n51:'🦴', n52:'💧', n53:'👻', n54:'🛎️', sig6:'⛏️', n61:'🐏', n62:'🧨', n63:'🪨', n64:'🪸', sig7:'🧭', n71:'🌟', n72:'⚡', n73:'🌊', n74:'💦', sig8:'🔱', n81:'⚫', n82:'🐋', n83:'⚓', sig9:'🌄', n91:'🤝', n92:'🌴', p1:'🔱', p2:'🪣', p3:'🪔', p4:'🔫', p5:'🪵', p6:'🔔', sig2:'🐚', m14:'⚜️', c15:'🪓', f16:'🔥', dou:'<svg class="match" viewBox="0 0 34 34" aria-hidden="true"><rect x="9" y="12" width="9" height="18" rx="1.6" fill="#f6eedb" stroke="#c9b48a" stroke-width="1"/><path d="M13.5 12v-2.4" stroke="#3a2a18" stroke-width="1.2"/><path d="M13.5 2.6c2.6 2.6 3.2 5 .2 7.2-2.9-2.2-2.4-4.6-.2-7.2z" fill="#ffb02e"/><path d="M13.5 5.6c1.2 1.3 1.4 2.5.1 3.6-1.3-1.1-1.2-2.3-.1-3.6z" fill="#fff3b0"/><g stroke-linecap="round"><path d="M15 30.5L29 24" stroke="#e9c58a" stroke-width="2.4"/><path d="M17 31.5L30.5 27.5" stroke="#d9b071" stroke-width="2.4"/></g><ellipse cx="29.6" cy="23.7" rx="1.9" ry="1.5" fill="#c0392b"/><ellipse cx="31" cy="27.4" rx="1.9" ry="1.5" fill="#a93226"/></svg>', ec:'🪣', x1:'🧹', f13:'🗺️', f15:'🏴', f14:'🏝️', m12:'🕸️', m13:'🚩', c12:'🩸', c13:'🙏', c14:'📿', t12:'🪘', t13:'👦', t14:'🐘', x2:'🎇', x3:'🫠', x4:'🎁', x5:'🗼', x6:'🚩', x7:'🧓', x8:'🧘', bou:'<svg class="match" viewBox="0 0 34 34" aria-hidden="true"><rect x="4" y="13" width="7" height="15" rx="1.4" fill="#f6eedb" stroke="#c9b48a" stroke-width="1"/><rect x="14" y="10" width="7" height="18" rx="1.4" fill="#f6eedb" stroke="#c9b48a" stroke-width="1"/><path d="M7.5 13v-2M17.5 10v-2" stroke="#3a2a18" stroke-width="1.1"/><path d="M7.5 4.2c2.6 2.6 3.2 5 .2 7.2-2.9-2.2-2.4-4.6-.2-7.2z" fill="#ffb02e"/><path d="M7.5 7.2c1.2 1.3 1.4 2.5.1 3.6-1.3-1.1-1.2-2.3-.1-3.6z" fill="#fff3b0"/><path d="M17.5 1.2c2.6 2.6 3.2 5 .2 7.2-2.9-2.2-2.4-4.6-.2-7.2z" fill="#ffb02e"/><path d="M17.5 4.2c1.2 1.3 1.4 2.5.1 3.6-1.3-1.1-1.2-2.3-.1-3.6z" fill="#fff3b0"/><path d="M2 28.5h21l-2.5 3h-16z" fill="#c9962f"/><g stroke-linecap="round"><path d="M15 30.5L29 24" stroke="#e9c58a" stroke-width="2.4"/><path d="M17 31.5L30.5 27.5" stroke="#d9b071" stroke-width="2.4"/></g><ellipse cx="29.6" cy="23.7" rx="1.9" ry="1.5" fill="#c0392b"/><ellipse cx="31" cy="27.4" rx="1.9" ry="1.5" fill="#a93226"/></svg>', dag:'🗡️', sab:'⚔️', rcap:'📜', rcan:'💣', rcha:'🧰', rcar:'🗺️', rhu:'🛢️', bl:'🩹',
   f1:'🐒', f2:'🌙', f3:'🔫', f4:'🕯️', f5:'🦜', f6:'🥃', f7:'✨', f8:'☠️',
   m1:'🎖️', m2:'🎯', m3:'🩺', m4:'🧱', m5:'💂', m6:'🔭', m7:'⛴️',
   c1:'💀', c2:'🦑', c3:'🩸', c4:'🗿', c5:'🕯️', c6:'🌊', c7:'👻',
@@ -1569,14 +1574,14 @@ const EPICS = [
 /* =========================================================== CAMPAIGN (Aventure) */
 // each epic of the Aventure is a complete game of 1 to 6 steps; 9 sectors of 4 epics, built sector by sector
 // ft: features switched on from a given epic (the novelty it teaches); market: [card, first epic index in the sector (0-3), copies]
-const CAMP_FEAT = {gold:'1.2', mk:'1.2', prot:'1.3', deck:'1.3', ecl:'1.4', purge:'2.2', esc:'2.4', srv:'3.1', mkrm:'1.3', sac:'5.1', combo:'5.1'};
+const CAMP_FEAT = {gold:'1.2', mk:'1.2', prot:'1.3', deck:'1.3', ecl:'1.4', purge:'2.2', esc:'2.4', srv:'3.1', mkrm:'1.2', sac:'5.1', combo:'5.1'};
 const CAMP_SECTORS = [
   {id:1, n:'Le Port à quai', ic:'⚓', z:'Le port', tr:"Le navire est encore à quai : quatre sorties courtes pour apprendre.",
    market:[['p1',1,3],['p2',2,3],['p3',1,3],['f13',1,1],['p4',2,2],['p5',2,2],['p6',3,2]],
    eps:[
-    {n:'Premier quart', steps:['boss'], boss:'qcrab', pool:[], mech:['Jouer un tour', "Jouer ses cartes, attaquer la menace, puis finir son tour."], star:['r4', 'Gagner en 4 tours ou moins'], coach:1},
-    {n:'Le chargement de la cale', steps:['f', 'boss'], boss:'gulb', pool:[['gulp', 'gulp'], ['crab']], mech:['La cale sombre', "Les bougies 🕯️ de tes cartes éclairent la cale : plus tu en as, plus tu vas chercher loin. Les cartes que tu en remontes rejoignent ta défausse et reviennent plus tard dans ta main : ton deck grandit."], star:['buy3', 'Remonter 3 cartes de la cale'], guide:1, lock:1, first:'bou'},
-    {n:'La jetée', steps:['f', 'f', 'boss'], boss:'bshk', pool:[['req'], ['crab'], ['gulp', 'gulp']], mech:['Protection, deck et brûler', "La bulle au-dessus de chaque menace annonce son prochain coup. La protection 🛡 que tu gagnes absorbe ces dégâts avant la coque : protège-toi quand un gros coup arrive. Nouveau aussi : le paquet Deck, et le 🔥 pour brûler un objet de la cale qui ne te plaît pas."], star:['full', 'Finir avec la coque pleine'], guide:1, first:['ec', 'ROLE']},
+    {n:'Premier quart', steps:['boss'], boss:'qcrab', pool:[], mech:['Le combat', "Ton équipage contre une menace, tour par tour : chaque tour, tu tires 5 cartes de ton deck, tu les joues, puis le navire attaque et la menace riposte."], star:['r4', 'Gagner en 4 tours ou moins'], coach:1},
+    {n:'Le chargement de la cale', steps:['f', 'boss'], boss:'gulb', pool:[['gulp', 'gulp'], ['crab']], mech:['La cale sombre', "Ton navire a une cale, sous le pont : sombre, encombrée de matériel, d'armes et de recrues. Allume des bougies 🕯️ avec tes cartes, et tu pourras y descendre chercher de nouvelles cartes, bien plus utiles que celles du départ."], star:['buy3', 'Remonter 3 cartes de la cale'], guide:1, lock:1, first:'bou'},
+    {n:'La jetée', steps:['f', 'f', 'boss'], boss:'bshk', pool:[['req'], ['crab'], ['gulp', 'gulp']], mech:['Protection et deck', "La bulle au-dessus de chaque menace annonce son prochain coup. La protection 🛡 que tu gagnes absorbe ces dégâts avant la coque : protège-toi quand un gros coup arrive. Nouveau aussi : le paquet Deck, pour voir toutes tes cartes."], star:['full', 'Finir avec la coque pleine'], guide:1, first:['ec', 'ROLE']},
     {n:'La sortie du port', steps:['f', 'rest', 'boss'], boss:'orcl', pool:[['eel'], ['req'], ['crab', 'gulp']], mech:['Capacités spéciales', "Chaque classe a un pouvoir, le médaillon en bas de l'écran, utilisable une fois par combat. Garde-le pour le bon moment."], star:['ecl', 'Utiliser chaque capacité spéciale'], unlock:'cha', guide:1},
    ]},
   {id:2, n:'La Baie des Mouettes', ic:'🐚', z:'La baie', tr:"Des créatures côtières, franches et prévisibles.",
@@ -2088,7 +2093,7 @@ function buy(G, s, m){
   if(G.cs) G.cs.buys++;
   S.g -= cost; S.rb = 0; S.deck.push(code); S.disc.push(code);
   if(!G.mdeck.length) G.mdeck = shuffle(mkPool(G)); G.mk[m] = G.mdeck.pop();
-  logf(G, `${S.n} remonte ${CARDS[code].n} de la cale`);
+  logf(G, `${S.n} remonte ${CARDS[code].n} de la cale sombre`);
   evt(G, {t:'buy', s, c:code, m});
 }
 // pay to throw an unwanted card out of the market: it goes under the market pile and is replaced
@@ -3464,7 +3469,7 @@ function miniHTML(p, S, si, i, mine){
   const st = C.al ? (p.a ? 'linked' : 'pending') : '';
   const tip = C.n + (C.al ? (p.a ? ` : alliance ${FACTIONS[C.f].n} déclenchée (${fxText(C.al)})` : ` : alliance en attente d'une autre carte ${FACTIONS[C.f].n}`) : '');
   return `<div class="mini ${st}" style="--fc:${colOf(p.c)}" data-f="${C.f || ''}" data-act="zoom" data-c="${p.c}" title="${esc(tip)}">
-    <div class="mf"><span class="pic">${ART[p.c] || '⚓'}</span><span class="mn">${esc(C.n)}</span><span class="fxrow">${fxChips(gain)}</span></div>
+    <div class="mf"><span class="pic">${ART[p.c] || '⚓'}</span><span class="mn">${esc(C.sn || C.n)}</span><span class="fxrow">${fxChips(gain)}</span></div>
     ${C.al ? `<span class="lk">${p.a ? '🔗' : FACTIONS[C.f].ic}</span>` : ''}
     ${C.sac && mine && featOn(pv.cp, 'sac') ? `<button class="sacb" data-act="sac" data-s="${si}" data-i="${i}" title="Sacrifier : retire la carte de ton deck pour ${esc(fxText(C.sac))}" ${S.rd ? 'disabled' : ''}>☠ ${fxChips(C.sac)}</button>` : ''}</div>`;
 }
@@ -3583,7 +3588,7 @@ function optHTML(opt, o, picked){
   if(k === 'D') return tile('⛵', 'Tenir la barre', `La coque perd ${a} points`, 'Ton deck ne bouge pas', true);
   if(k === 'N') return tile('🚣', 'Passer son chemin', 'Rien ne change', 'Prudence');
   const code = k === 'HC' ? b : a;
-  const note = k === 'C' ? 'Ajoute cette carte à ton deck' : k === 'CW' ? `Descendre dans la cale : cette carte, mais ${W}` : k === 'T' ? "Troc : contre une Bougie de ton deck"
+  const note = k === 'C' ? 'Ajoute cette carte à ton deck' : k === 'CW' ? `Descendre dans la cale : cette carte, mais ${W}` : k === 'T' ? "Troc : contre une Bougie et allumettes de ton deck"
     : k === 'HC' ? `Contre <span class="bad">${a} points de coque</span>` : k === 'LW' ? `Écouter le chant : carte légendaire, mais ${W}` : 'Jeter cette carte par-dessus bord : elle quitte ton deck';
   return `<div class="opt">${cardHTML(code, at, `${pk} ${k === 'J' ? 'marked' : ''}`)}<small>${note}</small></div>`;
 }
@@ -3779,8 +3784,10 @@ function diffFx(prev, v){
   fx.net = (v.net || 0) > (nr ? 0 : prev.net || 0) ? (v.net || 0) - (nr ? 0 : prev.net || 0) : 0;
   fx.fall = [];
   for(const e of fx.events) if(e.t === 'ko'){ const el = document.querySelector(`.mate[data-c="${e.c}"]`); if(el) fx.fall.push({r:el.getBoundingClientRect(), html:el.innerHTML, st:el.getAttribute('style')}); }
+  fx.take = [];
+  for(const e of fx.events) if(e.t === 'buy'){ const el = document.querySelector(`#market .card[data-m="${e.m}"]`); if(el) fx.take.push({r:el.getBoundingClientRect(), html:el.outerHTML, s:e.s, compact:!!el.closest('.dgrid') && innerWidth <= 540}); }
   fx.burn = [];
-  for(const e of fx.events) if(e.t === 'mkrm'){ const el = document.querySelector(`#market .card[data-m="${e.m}"]`); if(el) fx.burn.push({r:el.getBoundingClientRect(), html:el.outerHTML, m:e.m}); }
+  for(const e of fx.events) if(e.t === 'mkrm'){ const el = document.querySelector(`#market .card[data-m="${e.m}"]`); if(el) fx.burn.push({r:el.getBoundingClientRect(), html:el.outerHTML, m:e.m, compact:!!el.closest('.dgrid') && innerWidth <= 540}); }
   const changed = new Set(); v.mk.forEach((c, i) => { if(prev.mk[i] !== c) changed.add(i); }); if(changed.size) ui.flip = changed;
   return fx;
 }
@@ -3906,7 +3913,7 @@ function burnCard(b){
   // calques
   const d = document.createElement('div'); d.className = 'burnfx';
   Object.assign(d.style, {left:b.r.left + 'px', top:b.r.top + 'px', width:W + 'px', height:H + 'px'});
-  const inner = document.createElement('div'); inner.className = 'bf-card'; inner.innerHTML = b.html; d.appendChild(inner);
+  const inner = document.createElement('div'); inner.className = 'bf-card' + (b.compact ? ' dgrid' : ''); inner.innerHTML = b.html; d.appendChild(inner);
   const cardEl = inner.firstElementChild;
   const mk = document.createElement('canvas'); mk.width = w; mk.height = h; const mc = mk.getContext('2d'), mImg = mc.createImageData(w, h);
   const ed = document.createElement('canvas'); ed.width = w; ed.height = h; const ec = ed.getContext('2d'), eImg = ec.createImageData(w, h); inner.appendChild(ed);
@@ -3993,6 +4000,23 @@ function burnCard(b){
   };
   requestAnimationFrame(frame);
 }
+// a card taken from the dark hold: it rises into the light, then flies to the deck of the one who took it
+function takeCard(t){
+  const mine = mySeats().includes(t.s);
+  const dst = (mine ? $('#pile') || $('#dock .pools .who') || $('#gold') : null) || document.querySelector(`#crew .seat[data-s="${t.s}"]`);
+  const d = document.createElement('div'); d.className = 'takefx' + (t.compact ? ' dgrid' : ''); d.innerHTML = t.html;
+  Object.assign(d.style, {left:t.r.left + 'px', top:t.r.top + 'px', width:t.r.width + 'px', height:t.r.height + 'px'});
+  document.body.appendChild(d);
+  const q = dst ? dst.getBoundingClientRect() : {left:innerWidth / 2, top:innerHeight - 60, width:0, height:0};
+  const dx = q.left + q.width / 2 - (t.r.left + t.r.width / 2), dy = q.top + q.height / 2 - (t.r.top + t.r.height / 2);
+  const a = d.animate([
+    {transform:'translate(0,0) scale(1) rotate(0)', filter:'brightness(1)', offset:0},
+    {transform:'translate(0,-26px) scale(1.12) rotate(-3deg)', filter:'brightness(1.5) drop-shadow(0 0 14px #ffcf7a)', offset:.28},
+    {transform:`translate(${dx * .55}px, ${dy * .55 - 50}px) scale(.7) rotate(8deg)`, filter:'brightness(1.2) drop-shadow(0 0 10px #ffcf7a)', offset:.62},
+    {transform:`translate(${dx}px, ${dy}px) scale(.18) rotate(18deg)`, filter:'brightness(1)', opacity:.2, offset:1}
+  ], {duration:950, easing:'cubic-bezier(.4,0,.3,1)', fill:'forwards'});
+  a.onfinish = () => { d.remove(); if(dst && document.body.contains(dst)){ dst.classList.remove('bump'); void dst.offsetWidth; dst.classList.add('bump'); if(mine) floatAt(dst, '+1 carte au deck', '#ffe39a'); } };
+}
 function mulberry(a){ return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 function postFx(fx){
   if(!fx) return;
@@ -4022,6 +4046,7 @@ function postFx(fx){
   }
   if(fx.net) document.querySelectorAll('.mate').forEach((el, j) => { if(j < 6) setTimeout(() => floatAt(el, '+' + fx.net + ' 🛡', '#9ff0c8'), j * 90); });
   if(!reduced) (fx.burn || []).forEach(burnCard);
+  if(!reduced) (fx.take || []).forEach(takeCard);
   (fx.fall || []).forEach(f => {
     if(reduced) return; const d = document.createElement('div'); d.className = 'mate-fall'; d.setAttribute('style', f.st || ''); d.innerHTML = f.html;
     Object.assign(d.style, {left:f.r.left + 'px', top:f.r.top + 'px', width:f.r.width + 'px', height:f.r.height + 'px'});
@@ -4589,34 +4614,44 @@ function renderColl(app){
 // wait: what the player has to do (shown when there is no "Suivant" button)
 const attacked = v => v.en[0] && v.en[0].hp < v.en[0].mx;
 const COACH_P = [
-  {t:"Bienvenue à bord, capitaine ! Voici le <b>vieux crabe</b> qui squatte le quai. La bulle au-dessus de lui annonce son prochain coup : il va <b>frapper ta coque</b>.", hl:'#enemies, #enemies .intent', next:1},
-  {t:"Ta <b>coque</b>, c'est la barre en haut du navire. Si elle tombe à zéro, c'est le naufrage : ne laisse pas traîner le crabe !", hl:'#hull', next:1},
-  {t:"En bas, <b>ta main</b>. Chaque carte rapporte du <b>combat ⚔</b>. <b>Touche une carte</b> pour la jouer.", hl:'#hand', wait:'Touche une carte de ta main.', until:v => coachSeat(v).hand.length < 5 || !!v.sub || v.round >= 2},
+  {t:"Bienvenue à bord, capitaine ! Un combat, c'est ton équipage contre une <b>menace</b>. Ici, le vieux crabe qui squatte le quai : chasse-le !", hl:'#enemies', next:1},
+  {t:"La bulle au-dessus du crabe annonce son <b>prochain coup</b> : il va frapper ta coque à la fin du tour. Garde toujours un œil dessus.", hl:'#enemies .intent', next:1},
+  {t:"Ta <b>coque</b>, c'est la barre en haut du navire. Elle est commune à tout l'équipage : si elle tombe à zéro, c'est le naufrage.", hl:'#hull', next:1},
+  {t:"Pour te battre, tu as un <b>deck</b> : un paquet de cartes de départ. Le combat se joue <b>tour par tour</b>. Au début de chaque tour, tu tires <b>5 cartes au hasard</b> dans ton deck : c'est ta <b>main</b>, en bas.", hl:'#hand', next:1},
+  {t:"Chaque carte a un <b>effet</b>, inscrit en bas : ici, du <b>combat ⚔</b>. Jouer une carte ne coûte rien. <b>Touche une carte</b> pour la jouer.", hl:'#hand', wait:'Touche une carte de ta main.', until:v => coachSeat(v).hand.length < 5 || !!v.sub || v.round >= 2},
   {t:"Son combat s'ajoute à ton compteur ⚔, en bas à droite. <b>Joue toutes tes cartes.</b>", hl:'#combat, #hand', wait:'Joue toutes tes cartes.', until:v => !coachSeat(v).hand.length || !!v.sub || v.round >= 2},
-  {t:"Ton combat rejoint l'<b>attaque du navire</b>, le badge rouge ⚔. Le Canonnier 🤖 y ajoutera le sien. <b>Touche « Terminé ».</b>", hl:'#shipatk, #readyBtn', wait:'Touche « Terminé ».', until:v => !!v.sub || v.round >= 2 || attacked(v)},
+  {t:"Tes cartes jouées se posent <b>sur le pont</b>. À la fin du tour, elles iront dans ta <b>défausse</b>, et tu tireras 5 nouvelles cartes.", hl:'#inplay', next:1, until:v => !!v.sub || v.round >= 2},
+  {t:"Le combat de tout l'équipage rejoint l'<b>attaque du navire</b>, le badge rouge ⚔. Le Canonnier 🤖 y ajoutera le sien. <b>Touche « Terminé ».</b>", hl:'#shipatk, #readyBtn', wait:'Touche « Terminé ».', until:v => !!v.sub || v.round >= 2 || attacked(v)},
   {t:"Phase d'attaque ! <b>Touche la bulle ⚔</b> sur le crabe pour faire feu.", hl:'#enemies', wait:'Touche la bulle ⚔.', until:v => attacked(v) || v.round >= 2},
-  {t:"Touché ! <b>Touche « Fin de l'attaque »</b> : le crabe joue son coup, puis une nouvelle main arrive.", hl:'#readyBtn', wait:"Touche « Fin de l'attaque ».", until:v => v.round >= 2 || v.phase !== 'fight'},
-  {t:"Le crabe a frappé ta coque. Nouveau tour, nouvelle main : <b>recommence</b> jusqu'à la victoire ! Astuce : appuie longuement sur une carte pour la lire en grand.", hl:'#hand', next:1},
+  {t:"Touché ! <b>Touche « Fin de l'attaque »</b> : c'est ensuite au crabe de jouer.", hl:'#readyBtn', wait:"Touche « Fin de l'attaque ».", until:v => v.round >= 2 || v.phase !== 'fight'},
+  {t:"Le crabe a joué le coup qu'il annonçait. <b>Nouveau tour</b> : 5 nouvelles cartes dans ta main, une nouvelle bulle au-dessus du crabe. Recommence jusqu'à la victoire ! Astuce : appuie longuement sur une carte pour la lire en grand.", hl:'#hand, #enemies .intent', next:1},
 ];
 // 1.2: the route, a card with several effects, the market
 const coachSeat = v => v.seats[activeSeat()] || v.seats[0];
 const roleCardOf = v => ROLES[coachSeat(v).r].card;
+const candleHl = '#hand .card[data-c="dou"], #hand .card[data-c="bou"]';
 const COACH_M = [
-  {t:"Nouveau : les <b>bougies</b> 🕯️. Les cartes Bougie et Allumettes en allument. <b>Joue toute ta main.</b>", hl:'#hand', wait:'Joue toutes tes cartes.', until:v => !coachSeat(v).hand.length || !!v.sub || v.round >= 2},
-  {t:v => `Tes bougies éclairent <b>la cale sombre</b> : des cartes à ajouter à ton deck. La pastille 🕯️ d'une carte dit combien de bougies il faut pour l'atteindre. <b>Touche une carte éclairée</b> pour la remonter.`, hl:'#market .card.afford', wait:'Remonte une carte de la cale.', until:v => !!v.sub || v.round >= 2 || coachSeat(v).dk > (ui.coachDk || 10) || !v.mk.some(c => c && CARDS[c].$ <= coachSeat(v).g + (coachSeat(v).rb || 0))},
-  {t:"Bien joué ! Elle file dans ta <b>défausse</b> : tu la piocheras dans un prochain tour. L'objet de derrière s'est avancé à sa place.", hl:'#market', next:1, until:v => !!v.sub || v.round >= 2},
-  {t:"Tes bougies <b>s'éteignent à la fin du tour</b> : dépense-les, puis <b>touche « Terminé »</b>. Au prochain tour, l'onglet <b>La cale sombre</b>, au-dessus du pont, brillera dès que tes bougies éclairent une carte.", hl:'#holdTab, #readyBtn', wait:'Dépense tes bougies, puis « Terminé ».', until:v => !!v.sub || v.round >= 2},
+  {t:"Nouveau : ton deck contient des <b>cartes de bougies</b>, Bougie et Chandelier, avec leurs allumettes. Joue-les : elles allument des <b>bougies</b> 🕯️.", hl:candleHl, wait:'Joue tes cartes de bougies.', until:v => !coachSeat(v).hand.some(c => c === 'dou' || c === 'bou') || !!v.sub || v.round >= 2},
+  {t:v => `Tes bougies brillent ici : tu en as <b>${coachSeat(v).g}</b> pour ce tour. Elles vont t'ouvrir la cale sombre.`, hl:'#gold', next:1, until:v => !!v.sub || v.round >= 2},
+  {t:"<b>Joue le reste de ta main.</b>", hl:'#hand', wait:'Joue toutes tes cartes.', until:v => !coachSeat(v).hand.length || !!v.sub || v.round >= 2},
+  {t:"Voici <b>la cale sombre</b>, sous le pont du navire. Dans le noir s'entassent du matériel, des armes et des recrues : chaque objet est une <b>carte</b> que tu peux ajouter à ton deck.", hl:'#market', next:1, until:v => !!v.sub || v.round >= 2},
+  {t:"La pastille 🕯️ en haut à gauche d'une carte, c'est sa <b>profondeur</b> : il te faut <b>au moins autant de bougies</b> pour descendre la chercher. Les cartes à ta portée <b>s'éclairent</b>.", hl:'#market .card .coin', next:1, until:v => !!v.sub || v.round >= 2},
+  {t:"<b>Touche une carte éclairée</b> pour la remonter de la cale sombre.", hl:'#market .card.afford', wait:'Remonte une carte de la cale sombre.', until:v => !!v.sub || v.round >= 2 || coachSeat(v).dk > (ui.coachDk || 10) || !v.mk.some(c => c && CARDS[c].$ <= coachSeat(v).g + (coachSeat(v).rb || 0))},
+  {t:"Elle rejoint ton deck ! Pour l'instant, elle attend dans ta <b>défausse</b> : quand ta pioche sera épuisée, la défausse sera mélangée et tu pourras la tirer dans un prochain tour. Et regarde : un autre objet est sorti de l'ombre à sa place.", hl:'#market', next:1, until:v => !!v.sub || v.round >= 2},
+  {t:"Rien ne te plaît ? Le <b>🔥</b> sur une carte la <b>brûle</b> : elle est détruite, et l'objet suivant s'avance à sa place.", hl:'#market .mkrm', next:1, until:v => !!v.sub || v.round >= 2},
+  {t:v => `Attention : le prix pour brûler, ici <b>🔥${mkCost(v)}</b>, est <b>commun à tout l'équipage</b>. Il monte de 1 à chaque objet brûlé, et revient à 1 à chaque nouvelle étape. Parlez-en entre matelots avant de brûler !`, hl:'.mkinfo .burnp', next:1, until:v => !!v.sub || v.round >= 2},
+  {t:v => `Seul le premier rang, ${v.mk.filter(Boolean).length} cartes, est à portée. 📦 compte les objets encore entassés derrière, dans le noir. Et le bouton <b>i</b> rappelle toutes les règles de la cale sombre.`, hl:'.mkinfo', next:1, until:v => !!v.sub || v.round >= 2},
+  {t:"Tes bougies <b>s'éteignent à la fin du tour</b> : remonte ou brûle tant que tu en as, puis <b>touche « Terminé »</b>. Aux prochains tours, l'onglet La cale sombre brillera dès que tes bougies éclairent une carte.", hl:'#readyBtn', wait:'Dépense tes bougies, puis « Terminé ».', until:v => !!v.sub || v.round >= 2},
   {t:v => `En haut à droite, le <b>parcours</b> de l'épopée : ${routeFromView(v).length} étapes, le boss 👑 au bout. Les cartes remontées de la cale sombre restent dans ton deck jusqu'à la fin de l'épopée.`, hl:'.route', next:1},
 ];
-// 1.3: protection, the role card, the deck, burning
+// 1.3: protection, the role card, the deck
 const COACH_J = [
   {t:"Nouveau : la <b>protection</b> 🛡. Écoper en donne 3 : elle absorbe les coups avant la coque. <b>Joue Écoper.</b>", hl:'#hand .card[data-c="ec"]', wait:'Joue Écoper.', until:v => !!v.sub || v.round >= 2 || !coachSeat(v).hand.includes('ec')},
-  {t:"Le bouclier bleu 🛡 du navire compte ta protection. Elle absorbe les coups annoncés dans les bulles, puis <b>disparaît à la fin du tour</b> : protège-toi quand un gros coup arrive.", hl:'#prot, #enemies', next:1, until:v => !!v.sub || v.round >= 2},
+  {t:"Le bouclier bleu 🛡 du navire compte ta protection. Elle absorbe les coups annoncés dans les bulles, puis <b>disparaît à la fin du tour</b> : protège-toi quand un gros coup arrive.", hl:'#prot, #enemies .intent', next:1, until:v => !!v.sub || v.round >= 2},
   {t:v => { const C = CARDS[roleCardOf(v)]; return `Ta <b>carte de rôle</b>, ${esc(C.n)}, fait plusieurs choses d'un coup : ${esc(fxText(C.pl))}. <b>Joue-la.</b>`; }, hl:v => `#hand .card[data-c="${roleCardOf(v)}"]`, wait:'Joue ta carte de rôle.', until:v => !!v.sub || v.round >= 2 || !coachSeat(v).hand.includes(roleCardOf(v))},
   {t:"Le paquet <b>Deck</b> rassemble toutes tes cartes. <b>Touche-le</b> pour l'ouvrir.", hl:'#pile', wait:'Touche le paquet Deck.', until:v => !!v.sub || v.round >= 2 || ui.deckOpen != null},
-  {t:"<b>Pioche</b> : les cartes qu'il te reste à piocher, 5 par tour. <b>Défausse</b> : tes cartes jouées et celles remontées de la cale sombre. Quand la pioche est vide, la défausse est mélangée pour en refaire une.", hl:'#sheet .where', over:1, close:1, next:1, until:v => !!v.sub || v.round >= 2 || ui.deckOpen == null},
-  {t:v => `Dernière nouveauté : dans la cale, le <b>🔥</b> sur une carte la brûle pour dégager le passage. Le prix, ${mkCost(v)} bougie${mkCost(v) > 1 ? 's' : ''} pour l'instant, est commun à l'équipage et monte à chaque objet brûlé. <b>Ouvre l'onglet de la cale sombre.</b>`, hl:'#holdTab', wait:"Touche l'onglet La cale sombre.", until:v => !!v.sub || v.round >= 2 || ui.zone === 'cale' || (!ui.zone && !coachSeat(v).hand.length)},
-  {t:"Remonte ou brûle avec tes bougies, puis touche « Terminé ». Bonne chasse !", hl:'#market .mkrm', next:1, until:v => !!v.sub || v.round >= 2},
+  {t:"<b>Pioche</b> : les cartes qu'il te reste à tirer, 5 par tour. <b>Défausse</b> : tes cartes jouées et celles remontées de la cale sombre. Quand la pioche est vide, la défausse est mélangée pour en refaire une.", hl:'#sheet .where', over:1, close:1, next:1, until:v => !!v.sub || v.round >= 2 || ui.deckOpen == null},
+  {t:"Joue le reste de ta main, fouille la cale sombre, puis touche « Terminé ». Bonne chasse !", hl:'#readyBtn', next:1, until:v => !!v.sub || v.round >= 2},
 ];
 // 3.1: servants stay aboard and hold the deck
 const COACH_S = [
