@@ -815,15 +815,25 @@ body.enemy-turn #dock .dock-in{ opacity:.4; filter:saturate(.6); transition:opac
 .dtab.glow{ color:#ffe6b0; animation:tabglow 1.6s ease-in-out infinite; }
 @keyframes tabglow{ 50%{ box-shadow:0 0 0 1.5px #ffcf7a, 0 0 16px 3px rgba(255,170,60,.65); } }
 @media (prefers-reduced-motion:reduce){ .dtab.glow{ animation:none; box-shadow:0 0 0 1.5px #ffcf7a; } }
+.match{ width:1em; height:1em; display:inline-block; vertical-align:middle; filter:drop-shadow(0 2px 1px rgba(0,0,0,.4)); }
+.zonetabs{ display:flex; align-items:center; gap:6px; margin-bottom:-4px; position:relative; z-index:2; }
+.ztab{ font:inherit; font-family:"Pirata One", Georgia, serif; font-size:19px; line-height:1; color:var(--muted); background:rgba(10,24,32,.6); border:1px solid var(--line); border-bottom:none; border-radius:12px 12px 0 0; padding:7px 12px 9px; cursor:pointer; white-space:nowrap; touch-action:manipulation; }
+.ztab.on{ color:#ffeccb; background:linear-gradient(#5a3a1e, #3a2412); border-color:#7a5530; }
+.ztab.cale.on{ color:#ffe6b0; background:linear-gradient(#2a1d10, #17100a); border-color:#4a3420; }
+.ztab.glow{ color:#ffe6b0; animation:tabglow 1.6s ease-in-out infinite; }
+.zonetabs .mkinfo{ margin-left:auto; }
+.zone > .sect{ border-top-left-radius:4px; }
+.zone #inplay > header h2{ display:none; }
+.zone #inplay > header{ justify-content:flex-end; }
+#market .mkslot{ align-items:stretch; }
 .dhold{ border-radius:12px; padding:0 8px 2px; border:1px solid #3a2a18; }
 .dhold .cards{ padding-top:14px; padding-bottom:4px; }
 .mkinfo{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:#e9cf9c; white-space:nowrap; }
 .mkinfo .infob{ margin:0; }
-.dhold .mkrm{ position:absolute; z-index:4; top:-10px; right:0; width:28px; height:28px; padding:0; border-radius:50%; display:grid; place-items:center; font-size:14px; }
-.dhold .mkrm:disabled{ opacity:.35; filter:grayscale(.6); }
+#market .mkrm{ position:absolute; z-index:4; top:-10px; right:0; width:28px; height:28px; padding:0; border-radius:50%; display:grid; place-items:center; font-size:14px; }
+#market .mkrm:disabled{ opacity:.35; filter:grayscale(.6); }
 .mkinfo .burnp{ color:#ffb889; }
 .dock-in.compact #market{ display:none; }
-.dock-in.holdtab .eclat .etx span{ -webkit-line-clamp:1; }
 .seatsw{ display:flex; gap:6px; margin:0 0 8px; }
 .seatsw button{ flex:1; min-width:0; font:inherit; font-size:13.5px; font-weight:700; padding:7px 8px; border-radius:10px; color:var(--ink); background:var(--sea-2); border:2px solid transparent; box-shadow:0 2px 0 rgba(0,0,0,.35); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; touch-action:manipulation; }
 .seatsw button.on{ border-color:var(--rc); background:color-mix(in srgb, var(--rc) 28%, var(--sea-2)); color:#fff; }
@@ -976,8 +986,8 @@ body.enemy-turn #dock .dock-in{ opacity:.4; filter:saturate(.6); transition:opac
 .panel{ background:var(--sea-2); border:1px solid var(--line); border-radius:16px; padding:14px; }
 .panel h2{ font-family:"Pirata One", Georgia, serif; font-weight:400; font-size:30px; margin:0 0 6px; line-height:1; color:var(--parch); }
 .panel p{ margin:6px 0; color:var(--muted); }
-.back{ position:sticky; top:calc(6px + env(safe-area-inset-top,0px)); z-index:15; align-self:flex-start; width:max-content; background:rgba(10,24,32,.92); border:1px solid var(--line); border-radius:20px; color:var(--ink); padding:7px 14px 7px 11px; font-size:14px; font-weight:700; text-align:left; box-shadow:0 4px 12px rgba(0,0,0,.35); cursor:pointer; }
-.back:hover{ border-color:var(--brass); }
+button.back{ position:sticky; top:calc(6px + env(safe-area-inset-top,0px)); z-index:15; align-self:flex-start; width:max-content; background:rgba(10,24,32,.92); border:1px solid var(--line); border-radius:20px; color:var(--ink); padding:7px 14px 7px 11px; font-size:14px; font-weight:700; text-align:left; box-shadow:0 4px 12px rgba(0,0,0,.35); cursor:pointer; }
+button.back:hover{ border-color:var(--brass); }
 input.txt{ width:100%; font:inherit; font-size:17px; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:var(--abyss); color:var(--ink); }
 .roles{ display:grid; grid-template-columns:repeat(2, 1fr); gap:8px; margin:10px 0; }
 .role{ border:2px solid var(--line); background:var(--abyss); border-radius:12px; padding:10px; text-align:left; }
@@ -1178,9 +1188,15 @@ input.txt{ width:100%; font:inherit; font-size:17px; padding:10px 12px; border-r
   .deckbtn b{ display:none; }
   .dhold .mkslot{ min-width:0; gap:4px; }
   .dhold .mkslot.deep1::before, .dhold .mkslot.deep2::before, .dhold .mkslot.deep2::after{ width:100%; height:calc(100% - 28px); left:0; margin-left:0; }
-  .dhold .card .coin{ top:-9px; left:-5px; height:21px; font-size:12.5px; padding:0 6px 0 3px; }
+  .dhold .card .coin{ top:-14px; left:-5px; height:21px; font-size:12.5px; padding:0 6px 0 3px; }
   .dhold .card .coin i{ font-size:11px; }
-  .dhold .mkrm{ width:24px; height:24px; font-size:12px; top:-9px; right:0; }
+  #market .mkrm{ width:24px; height:24px; font-size:12px; top:-14px; right:0; }
+  #market .dgrid{ padding-top:17px; }
+}
+@media (max-width:540px){
+  .ztab{ font-size:16px; padding:6px 10px 8px; }
+  .zonetabs .mkinfo{ font-size:11.5px; gap:4px; }
+  #market.dhold{ padding:0 6px 2px; }
 }
 @media (max-width:540px) and (max-height:780px){
   .scene{ height:clamp(172px, 46vw, 220px); }
@@ -1217,7 +1233,7 @@ const ROLES = {
 
 // pl: when played · al: ally bonus (another card of the same faction in play in the whole crew) · sac: sacrifice bonus · ch: champion defence, ex: its effect each turn
 const CARDS = {
-  dou:{n:'Bout de chandelle', pl:{g:1}}, ec:{n:'Écoper', pl:{p:3}}, bou:{n:'Lanterne', pl:{g:2}}, dag:{n:'Dague', pl:{c:1}}, sab:{n:'Sabre', pl:{c:2}},
+  dou:{n:'Bougie', pl:{g:1}}, ec:{n:'Écoper', pl:{p:3}}, bou:{n:'Allumettes', pl:{g:2}}, dag:{n:'Dague', pl:{c:1}}, sab:{n:'Sabre', pl:{c:2}},
   rcap:{n:'Ordres du capitaine', role:'cap', pl:{g:1, og:1, p:2, d:1}},
   rcan:{n:'Canon de bord', role:'can', pl:{c:3, p:2, g:1}},
   rcha:{n:'Caisse à outils', role:'cha', pl:{p:2, h:1, d:1, g:1}},
@@ -1363,7 +1379,7 @@ const RELICS = {
 };
 const PURGE_COST = S => 3 + (S.pg || 0);   // throwing a card overboard costs more each time
 const PORT_REMOVALS = 2;
-const ART = {sig3:'🪝', n31:'🧒', n32:'🔭', n33:'🔪', n34:'🏰', sig4:'📜', n41:'⚖️', n42:'🌶️', n43:'🦜', n44:'🧵', sig5:'🏮', n51:'🦴', n52:'💧', n53:'👻', n54:'🛎️', sig6:'⛏️', n61:'🐏', n62:'🧨', n63:'🪨', n64:'🪸', sig7:'🧭', n71:'🌟', n72:'⚡', n73:'🌊', n74:'💦', sig8:'🔱', n81:'⚫', n82:'🐋', n83:'⚓', sig9:'🌄', n91:'🤝', n92:'🌴', p1:'🔱', p2:'🪣', p3:'🪔', p4:'🔫', p5:'🪵', p6:'🔔', sig2:'🐚', m14:'⚜️', c15:'🪓', f16:'🔥', dou:'🕯️', ec:'🪣', x1:'🧹', f13:'🗺️', f15:'🏴', f14:'🏝️', m12:'🕸️', m13:'🚩', c12:'🩸', c13:'🙏', c14:'📿', t12:'🪘', t13:'👦', t14:'🐘', x2:'🎇', x3:'🫠', x4:'🎁', x5:'🗼', x6:'🚩', x7:'🧓', x8:'🧘', bou:'🏮', dag:'🗡️', sab:'⚔️', rcap:'📜', rcan:'💣', rcha:'🧰', rcar:'🗺️', rhu:'🛢️', bl:'🩹',
+const ART = {sig3:'🪝', n31:'🧒', n32:'🔭', n33:'🔪', n34:'🏰', sig4:'📜', n41:'⚖️', n42:'🌶️', n43:'🦜', n44:'🧵', sig5:'🏮', n51:'🦴', n52:'💧', n53:'👻', n54:'🛎️', sig6:'⛏️', n61:'🐏', n62:'🧨', n63:'🪨', n64:'🪸', sig7:'🧭', n71:'🌟', n72:'⚡', n73:'🌊', n74:'💦', sig8:'🔱', n81:'⚫', n82:'🐋', n83:'⚓', sig9:'🌄', n91:'🤝', n92:'🌴', p1:'🔱', p2:'🪣', p3:'🪔', p4:'🔫', p5:'🪵', p6:'🔔', sig2:'🐚', m14:'⚜️', c15:'🪓', f16:'🔥', dou:'🕯️', ec:'🪣', x1:'🧹', f13:'🗺️', f15:'🏴', f14:'🏝️', m12:'🕸️', m13:'🚩', c12:'🩸', c13:'🙏', c14:'📿', t12:'🪘', t13:'👦', t14:'🐘', x2:'🎇', x3:'🫠', x4:'🎁', x5:'🗼', x6:'🚩', x7:'🧓', x8:'🧘', bou:'<svg class="match" viewBox="0 0 32 32" aria-hidden="true"><g stroke-linecap="round"><path d="M7 27L17 9" stroke="#e9c58a" stroke-width="3"/><path d="M13 28L19 8" stroke="#d9b071" stroke-width="3"/><path d="M19 28L21 8" stroke="#e9c58a" stroke-width="3"/></g><ellipse cx="17.6" cy="7.6" rx="2.6" ry="3.2" fill="#c0392b" transform="rotate(28 17.6 7.6)"/><ellipse cx="19.4" cy="6.8" rx="2.6" ry="3.2" fill="#a93226" transform="rotate(15 19.4 6.8)"/><ellipse cx="21.2" cy="6.8" rx="2.5" ry="3.1" fill="#c0392b" transform="rotate(4 21.2 6.8)"/><path d="M22 1.5c2 2 2.6 3.8.4 5.6-1.6-1.1-1.9-3-.4-5.6z" fill="#ffb02e"/></svg>', dag:'🗡️', sab:'⚔️', rcap:'📜', rcan:'💣', rcha:'🧰', rcar:'🗺️', rhu:'🛢️', bl:'🩹',
   f1:'🐒', f2:'🌙', f3:'🔫', f4:'🕯️', f5:'🦜', f6:'🥃', f7:'✨', f8:'☠️',
   m1:'🎖️', m2:'🎯', m3:'🩺', m4:'🧱', m5:'💂', m6:'🔭', m7:'⛴️',
   c1:'💀', c2:'🦑', c3:'🩸', c4:'🗿', c5:'🕯️', c6:'🌊', c7:'👻',
@@ -3031,7 +3047,7 @@ function openCaleInfo(){
     ['📦', 'Les compteurs', "📦 le nombre d'objets entassés derrière le premier rang, ⬇ la profondeur maximale de la cale dans cette épopée."],
     ['🔣', 'Les symboles des cartes', Object.values(FACTIONS).map(f => `${f.ic} ${f.n}`).join(' · ') + " · 💥 toutes les menaces · 👥 chaque coéquipier · 🃏 pioche · ❤ coque · ☠ sacrifier"],
     ['👥', 'Une cale pour tout l\'équipage', "Ce qu'un matelot remonte ou brûle disparaît pour tout le monde. Parlez-vous pour vous partager les bonnes trouvailles !"],
-    pv && pv.cp ? ['🧭', 'Le temps d\'une épopée', "Les cartes remontées restent dans ton deck jusqu'à la fin de l'épopée. La suivante repartira de ton deck de départ."] : null,
+    pv && pv.cp ? ['🧭', 'Le temps d\'une épopée', "Les cartes remontées de la cale sombre restent dans ton deck jusqu'à la fin de l'épopée. La suivante repartira de ton deck de départ."] : null,
   ].filter(Boolean);
   const d = document.createElement('div'); d.className = 'collmodal'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
   d.innerHTML = `<div class="cm-box caleinfo"><button class="close" data-act="coll-close" aria-label="Fermer">✕</button>
@@ -3418,7 +3434,7 @@ function renderSheet(){
     <div class="scroll">${F !== 'all' ? `<p class="fnote">${F === 'dr' ? `${IC_DRAW} Les ${S.dr} carte${S.dr > 1 ? 's' : ''} qu'il ${mine ? 'te' : 'lui'} reste à piocher, dans le désordre.` : `${IC_DISC} Les ${S.di} carte${S.di > 1 ? 's' : ''} de ${mine ? 'ta' : 'sa'} défausse. Elles seront remélangées dans ${mine ? 'ta' : 'sa'} pioche quand elle sera vide.`} <button class="fclr" data-act="deck-f" data-f="all">Tout voir</button></p>` : ''}
       ${list.length ? deckGroups(list, F !== 'all').map(g => `<div class="group">${g.label}</div><div class="grid">${g.items.map(([c, n]) => cardHTML(c, 'tabindex="-1" aria-disabled="true"', '', {cnt:n})).join('')}</div>`).join('') : `<p class="note empty">${mine ? (F === 'dr' ? 'Ta pioche est vide.' : 'Ta défausse est vide.') : (F === 'dr' ? 'Sa pioche est vide.' : 'Sa défausse est vide.')}</p>`}
       ${S.bl ? `<p class="wounds">🩹 ${S.bl} blessure${S.bl > 1 ? 's' : ''} en plus jusqu'à la fin du combat.</p>` : ''}${S.nw ? `<p class="wounds">🩹 ${S.nw} blessures t'attendent au prochain combat.</p>` : ''}
-      <p class="hint">${S.pg ? `${S.pg} carte${S.pg > 1 ? 's' : ''} jetée${S.pg > 1 ? 's' : ''} par-dessus bord pendant cette traversée. ` : ''}Les cartes remontées de la cale vont dans ta défausse : tu les piocheras quand ta pioche sera vide et que la défausse sera mélangée.</p></div>`;
+      <p class="hint">${S.pg ? `${S.pg} carte${S.pg > 1 ? 's' : ''} jetée${S.pg > 1 ? 's' : ''} par-dessus bord pendant cette traversée. ` : ''}Les cartes remontées de la cale sombre vont dans ta défausse : tu les piocheras quand ta pioche sera vide et que la défausse sera mélangée.</p></div>`;
   const open = host.querySelector('.sheet');
   if(open){ open.querySelector('header h2').innerHTML = title; open.querySelector('.sbody').innerHTML = body; }   // keep the header (and its ✕) in place: a tap on it is never lost to a refresh
   else host.innerHTML = `<div class="sheet-bg" data-act="deck-close"><div class="sheet" role="dialog" aria-modal="true" aria-label="Deck">
@@ -3518,9 +3534,16 @@ function setFoeBar(el, hp, mx, blk){
 // the dark hold, in the dock behind its tab: the cards your candles can reach, and the burn buttons
 function holdHTML(S){
   const mc = mkCost(pv), burn = featOn(pv.cp, 'mkrm'), deep = Math.min(2, pv.md || 0), n = pv.mk.filter(Boolean).length;
-  return `<section id="market" class="dhold"><div class="cards dgrid" style="--cols:${Math.max(4, n)}">${pv.mk.map((c, i) => c ? `<div class="mkslot deep${deep}">${cardHTML(c, `data-act="buy" data-m="${i}"`, `${S && S.g + (S.rb || 0) >= CARDS[c].$ && !S.rd ? 'afford' : 'off'} ${ui.flip && ui.flip.has(i) ? 'flipin' : ''}`, {cost:1, rb:S ? S.rb || 0 : 0})}${burn ? `<button class="mkrm" data-act="mkrm" data-m="${i}" title="Brûler cet objet pour dégager le passage : celui qui est derrière s'avance. ${S && S.mf ? 'Gratuit ce tour' : `${mc} bougie${mc > 1 ? 's' : ''}`} ; le prix est commun à tout l'équipage, il monte de 1 à chaque objet brûlé et revient à 1 à chaque nouvelle étape." ${S && (S.mf || S.g >= mc) && !S.rd ? '' : 'disabled'} aria-label="Brûler">🔥</button>` : ''}</div>` : '').join('')}</div></section>`;
+  return `<section id="market" class="sect dhold"><div class="cards dgrid" style="--cols:${Math.max(4, n)}">${pv.mk.map((c, i) => c ? `<div class="mkslot deep${deep}">${cardHTML(c, `data-act="buy" data-m="${i}"`, `${S && S.g + (S.rb || 0) >= CARDS[c].$ && !S.rd ? 'afford' : 'off'} ${ui.flip && ui.flip.has(i) ? 'flipin' : ''}`, {cost:1, rb:S ? S.rb || 0 : 0})}${burn ? `<button class="mkrm" data-act="mkrm" data-m="${i}" title="Brûler cet objet pour dégager le passage : celui qui est derrière s'avance. ${S && S.mf ? 'Gratuit ce tour' : `${mc} bougie${mc > 1 ? 's' : ''}`} ; le prix est commun à tout l'équipage, il monte de 1 à chaque objet brûlé et revient à 1 à chaque nouvelle étape." ${S && (S.mf || S.g >= mc) && !S.rd ? '' : 'disabled'} aria-label="Brûler">🔥</button>` : ''}</div>` : '').join('')}</div></section>`;
 }
 const holdInfo = S => `<span class="mkinfo" title="${pv.md} objet${pv.md > 1 ? 's' : ''} entassé${pv.md > 1 ? 's' : ''} derrière le premier rang${pv.tut ? '' : `, jusqu'à ${pv.mc || 15} bougies de profondeur`}">📦${pv.md}${featOn(pv.cp, 'mkrm') ? `<span class="burnp" title="Prix pour brûler un objet (commun à l'équipage)">🔥${S && S.mf ? '0' : mkCost(pv)}</span>` : ''}<button class="infob" data-act="cale-info" aria-label="Comment marche la cale ?" title="Comment marche la cale ?">i</button></span>`;
+// the deck and the dark hold share the same place on the screen: a switch between them (the hold opens by itself once the hand is played)
+function zoneHTML(s, S){
+  if(!featOn(pv.cp, 'mk')) return playedHTML(s);
+  const z = ui.zone || (S && !S.hand.length && !pv.sub ? 'cale' : 'pont'), glow = z !== 'cale' && holdGlow(S);
+  return `<div class="zonetabs" role="tablist" aria-label="Le pont ou la cale sombre"><button role="tab" aria-selected="${z === 'pont'}" class="ztab ${z === 'pont' ? 'on' : ''}" data-act="zone" data-z="pont">⚓ Sur le pont</button><button role="tab" aria-selected="${z === 'cale'}" class="ztab cale ${z === 'cale' ? 'on' : ''} ${glow ? 'glow' : ''}" id="holdTab" data-act="zone" data-z="cale">🏮 La cale sombre${glow ? ' ✨' : ''}</button>${z === 'cale' ? holdInfo(S) : ''}</div>
+    <div class="zone ${z}">${z === 'cale' ? holdHTML(S) : playedHTML(s)}</div>`;
+}
 const holdGlow = S => !!(S && !S.rd && pv.mk.some(c => c && S.g + (S.rb || 0) >= CARDS[c].$));
 function playedHTML(s){
   const tally = Object.entries(FACTIONS).map(([f, F]) => {
@@ -3560,7 +3583,7 @@ function optHTML(opt, o, picked){
   if(k === 'D') return tile('⛵', 'Tenir la barre', `La coque perd ${a} points`, 'Ton deck ne bouge pas', true);
   if(k === 'N') return tile('🚣', 'Passer son chemin', 'Rien ne change', 'Prudence');
   const code = k === 'HC' ? b : a;
-  const note = k === 'C' ? 'Ajoute cette carte à ton deck' : k === 'CW' ? `Descendre dans la cale : cette carte, mais ${W}` : k === 'T' ? "Troc : contre un Bout de chandelle de ton deck"
+  const note = k === 'C' ? 'Ajoute cette carte à ton deck' : k === 'CW' ? `Descendre dans la cale : cette carte, mais ${W}` : k === 'T' ? "Troc : contre une Bougie de ton deck"
     : k === 'HC' ? `Contre <span class="bad">${a} points de coque</span>` : k === 'LW' ? `Écouter le chant : carte légendaire, mais ${W}` : 'Jeter cette carte par-dessus bord : elle quitte ton deck';
   return `<div class="opt">${cardHTML(code, at, `${pk} ${k === 'J' ? 'marked' : ''}`)}<small>${note}</small></div>`;
 }
@@ -3695,7 +3718,7 @@ function renderFight(app){
         <div class="st">${x.ab ? 'Absent·e' : `${featOn(pv.cp, 'gold') ? `<span title="Bougies">🕯️ ${x.g}</span>` : ''}<span title="Combat">⚔ ${x.c}</span><span title="Cartes en main">🃏 ${x.hand.length}</span>${x.champ.length ? `<span title="Serviteurs à bord">🧍 ${x.champ.length}</span>` : ''}`}</div>
         ${featOn(pv.cp, 'ecl') && !x.ab ? `<div class="es ${x.eu ? 'off' : 'on'}" title="${esc(ROLES[x.r].ecl.n)} : ${x.eu ? 'déjà utilisée pendant ce combat, elle revient au prochain combat' : 'disponible, une fois par combat'}"><span class="eic">${ROLES[x.r].ecl.ic}</span>${x.eu ? 'Compétence utilisée' : 'Compétence prête'}</div>` : ''}</button>`;
     }).join('')}</div>
-    ${playedHTML(s)}
+    ${zoneHTML(s, S)}
     <div class="log">${pv.log.slice(-3).map(l => `<div>${esc(l)}</div>`).join('')}</div>`;
 
   if(!S){ ui.flip = null; return; }
@@ -3704,22 +3727,21 @@ function renderFight(app){
   const mine = mySeats(), allMineReady = mine.every(i => pv.seats[i].rd);
   const readyCount = pv.seats.filter(x => x.rd && !x.ab).length, total = pv.seats.filter(x => !x.ab).length;
   const deal = ui.deal; ui.deal = false;
-  const holdOn = featOn(pv.cp, 'mk'), tab = holdOn && !ui.purge && (ui.dockTab === 'hold' || (!ui.dockTab && !S.hand.length && !pv.sub)) ? 'hold' : 'hand';
-  const lowered = !!ui.handDown && (S.hand.length > 0 || tab === 'hold') && !ui.purge;
-  const compact = ((tab === 'hand' && !S.hand.length) || lowered) && !ui.purge;   // empty or lowered hand: the dock shrinks to its counters and buttons, the hold and the deck behind stay visible
+  const lowered = !!ui.handDown && S.hand.length > 0 && !ui.purge;
+  const compact = (!S.hand.length || lowered) && !ui.purge;   // empty or lowered hand: the dock shrinks to its counters and buttons, the hold and the deck behind stay visible
   const pw = ui.pileWarn && Date.now() < ui.pileWarn.until ? ui.pileWarn.t : '';
   const nh = S.hand.length, cols = nh <= 5 ? 5 : nh === 6 ? 6 : Math.min(6, Math.ceil(nh / 2));
-  dockIn.classList.toggle('compact', compact); dockIn.classList.toggle('holdtab', tab === 'hold');
+  dockIn.classList.toggle('compact', compact);
   ui.flip = null;
   dockIn.innerHTML = `
-    ${(S.hand.length || tab === 'hold') && !ui.purge ? `<button class="handle ${lowered ? 'down' : ''}" data-act="hand-toggle" aria-label="${lowered ? 'Remonter ta main' : 'Baisser ta main pour voir le pont et la cale'}" title="${lowered ? 'Remonter ta main' : 'Baisser ta main pour voir le pont et la cale'}"><i></i>${lowered ? `<span>Ta main · ${S.hand.length}</span>` : ''}</button>` : ''}
+    ${S.hand.length && !ui.purge ? `<button class="handle ${lowered ? 'down' : ''}" data-act="hand-toggle" aria-label="${lowered ? 'Remonter ta main' : 'Baisser ta main pour voir le pont et la cale'}" title="${lowered ? 'Remonter ta main' : 'Baisser ta main pour voir le pont et la cale'}"><i></i>${lowered ? `<span>Ta main · ${S.hand.length}</span>` : ''}</button>` : ''}
     ${mine.length > 1 ? `<div class="seatsw" role="tablist" aria-label="Changer de rôle">${mine.map(i => { const X = pv.seats[i];
       return `<button role="tab" aria-selected="${i === s}" class="${i === s ? 'on' : ''} ${X.rd ? 'done' : ''}" style="--rc:${ROLES[X.r].col}" data-act="seat" data-s="${i}">${ROLES[X.r].ic} ${esc(ROLES[X.r].n)}${X.rd ? ' <i>✓</i>' : leftToPlay(X) ? ' <i class="dot" title="Il reste des choses à jouer"></i>' : ''}</button>`; }).join('')}</div>` : ''}
-    <div class="pools">${holdOn ? `<div class="dtabs" role="tablist" aria-label="Ta main ou la cale"><button role="tab" aria-selected="${tab === 'hand'}" class="dtab hand ${tab === 'hand' ? 'on' : ''}" data-act="dock-tab" data-t="hand" aria-label="Ta main, ${S.hand.length} carte${S.hand.length > 1 ? 's' : ''}">🃏 <span class="tl">Main</span> <b>${S.hand.length}</b></button><button role="tab" aria-selected="${tab === 'hold'}" class="dtab hold ${tab === 'hold' ? 'on' : ''} ${tab !== 'hold' && holdGlow(S) ? 'glow' : ''}" data-act="dock-tab" data-t="hold" id="holdTab"><span class="pool g" id="gold" ${S.dt ? `title="Soufflées : les ${S.dt} prochaines bougies allumées ce tour s'éteindront"` : 'title="Tes bougies : elles éclairent la cale"'}><span class="ico">🕯️</span>${S.g}${S.dt ? `<small class="debt">−${S.dt}</small>` : ''}</span>Cale</button></div>` : `<span class="who">${R2.ic} ${esc(S.n)}</span>`}
-      ${tab === 'hold' ? holdInfo(S) : ''}${featOn(pv.cp, 'purge') && tab === 'hand' ? `<button class="btn ghost small purgebtn ${ui.purge ? 'on' : ''}" data-act="purge-mode" title="Jeter une carte de ta main par-dessus bord : elle quitte ton deck pour de bon" ${!S.rd && (ui.purge || (S.ft && S.hand.length) || (S.g >= PURGE_COST(S) && S.hand.some(c => c !== 'bl'))) ? '' : 'disabled'}>${S.ft ? `🗑 gratuit${S.ft > 1 ? ' ×' + S.ft : ''}` : `🗑 🕯️${PURGE_COST(S)}`}</button>` : ''}
+    <div class="pools"><span class="who">${R2.ic} ${esc(S.n)}</span>
+      ${featOn(pv.cp, 'purge') ? `<button class="btn ghost small purgebtn ${ui.purge ? 'on' : ''}" data-act="purge-mode" title="Jeter une carte de ta main par-dessus bord : elle quitte ton deck pour de bon" ${!S.rd && (ui.purge || (S.ft && S.hand.length) || (S.g >= PURGE_COST(S) && S.hand.some(c => c !== 'bl'))) ? '' : 'disabled'}>${S.ft ? `🗑 gratuit${S.ft > 1 ? ' ×' + S.ft : ''}` : `🗑 🕯️${PURGE_COST(S)}`}</button>` : ''}
       ${featOn(pv.cp, 'deck') ? `<button class="pile deckbtn ${pw ? 'warn' : ''}" id="pile" data-act="deck" data-s="${s}" title="Voir ton deck (touche D)" aria-label="Voir ton deck, ${S.dk} cartes"><span class="dk-stack" aria-hidden="true"><i></i><i></i><i></i></span><b>Deck</b><span>${S.dk}</span><small class="drw ${S.dr ? '' : 'empty'}" title="Pioche : ${S.dr} carte${S.dr > 1 ? 's' : ''} · Défausse : ${S.di} carte${S.di > 1 ? 's' : ''}. La défausse est remélangée dans la pioche au début d'un tour, quand la pioche ne suffit plus.">${IC_DRAW}${S.dr}${S.di ? ` ${IC_DISC}${S.di}` : ''}</small>${pw ? `<span class="pilewarn">${pw}</span>` : ''}</button>` : ''}
-      ${S.rb ? `<span class="rbchip" title="Plan de la cale : la prochaine carte que tu remontes coûte ${S.rb} bougie${S.rb > 1 ? 's' : ''} de moins">🗺️ −${S.rb}🕯️</span>` : ''}<span class="resg">${!holdOn && featOn(pv.cp, 'gold') ? `<span class="pool g" id="gold"><span class="ico">🕯️</span>${S.g}</span>` : ''}<span class="pool c" id="combat" title="Ton combat de ce tour : il rejoint l'attaque du navire"><span class="ico">⚔</span>${S.c}</span></span></div>
-    ${tab === 'hold' ? holdHTML(S) : `<div class="cards dgrid ${ui.purge ? 'purging' : ''}" id="hand" style="--cols:${cols}">${S.hand.map((c, i) => cardHTML(c, c === 'bl' ? `data-act="sach" data-h="${i}"` : `data-act="play" data-h="${i}"`, `${S.rd ? 'off' : ''} ${deal ? 'deal' : ''}`, {allyOn: CARDS[c].f && crewFactionCount(CARDS[c].f, s) >= 1, style:`--i:${i}`})).join('')}</div>`}
+      ${S.rb ? `<span class="rbchip" title="Plan de la cale : la prochaine carte que tu remontes coûte ${S.rb} bougie${S.rb > 1 ? 's' : ''} de moins">🗺️ −${S.rb}🕯️</span>` : ''}<span class="resg">${featOn(pv.cp, 'gold') ? `<span class="pool g" id="gold" ${S.dt ? `title="Soufflées : les ${S.dt} prochaines bougies allumées ce tour s'éteindront"` : 'title="Tes bougies : elles éclairent la cale sombre"'}><span class="ico">🕯️</span>${S.g}${S.dt ? `<small class="debt">−${S.dt}</small>` : ''}</span>` : ''}<span class="pool c" id="combat" title="Ton combat de ce tour : il rejoint l'attaque du navire"><span class="ico">⚔</span>${S.c}</span></span></div>
+    <div class="cards dgrid ${ui.purge ? 'purging' : ''}" id="hand" style="--cols:${cols}">${S.hand.map((c, i) => cardHTML(c, c === 'bl' ? `data-act="sach" data-h="${i}"` : `data-act="play" data-h="${i}"`, `${S.rd ? 'off' : ''} ${deal ? 'deal' : ''}`, {allyOn: CARDS[c].f && crewFactionCount(CARDS[c].f, s) >= 1, style:`--i:${i}`})).join('')}</div>
     <div class="bar">
       ${featOn(pv.cp, 'ecl') && !pv.sub ? `<button class="eclat ${S.eu ? 'used' : S.rd ? '' : 'charged'}" style="--rc:${R2.col}" id="eclatBtn" data-act="ecl" ${S.eu || S.rd ? 'disabled' : ''}>
         <span class="medal"><span class="emb">${R2.ecl.ic}</span></span>
@@ -3745,8 +3767,8 @@ function diffFx(prev, v){
   fx.reform = v.en.map((e, i) => e.rf && prev.en[i] && (e.rf || 0) > (prev.en[i].rf || 0) && prev.en[i].t === e.t ? i : -1).filter(i => i >= 0);
   fx.dive = v.en.map((e, i) => e.inv && prev.en[i] && !prev.en[i].inv && prev.en[i].t === e.t ? i : -1).filter(i => i >= 0);
   fx.hull = v.hull - prev.hull; fx.prot = v.prot - prev.prot; fx.plug = v.round === prev.round ? (prev.br || 0) - (v.br || 0) : 0;
-  if(v.round !== prev.round){ ui.deal = true; fx.newRound = true; ui.handDown = false; ui.purge = false; ui.dockTab = null; }
-  { const a0 = prev.seats[activeSeat()], b0 = v.seats[activeSeat()]; if(a0 && b0 && a0.hand.length && !b0.hand.length && ui.dockTab === 'hand') ui.dockTab = null; }
+  if(v.round !== prev.round){ ui.deal = true; fx.newRound = true; ui.handDown = false; ui.purge = false; ui.zone = null; }
+  { const a0 = prev.seats[activeSeat()], b0 = v.seats[activeSeat()]; if(a0 && b0 && a0.hand.length && !b0.hand.length && ui.zone === 'pont') ui.zone = null; }
   const s = activeSeat();
   const a = prev.seats[s], b = v.seats[s];
   if(a && b && v.round === prev.round){ fx.dg = b.g - a.g; fx.dc = b.c - a.c; fx.g = fx.dg > 0; fx.c = fx.dc > 0; }
@@ -4567,7 +4589,7 @@ function renderColl(app){
 // wait: what the player has to do (shown when there is no "Suivant" button)
 const attacked = v => v.en[0] && v.en[0].hp < v.en[0].mx;
 const COACH_P = [
-  {t:"Bienvenue à bord, capitaine ! Voici le <b>vieux crabe</b> qui squatte le quai. La bulle au-dessus de lui annonce son prochain coup : il va <b>frapper ta coque</b>.", hl:'#enemies', next:1},
+  {t:"Bienvenue à bord, capitaine ! Voici le <b>vieux crabe</b> qui squatte le quai. La bulle au-dessus de lui annonce son prochain coup : il va <b>frapper ta coque</b>.", hl:'#enemies, #enemies .intent', next:1},
   {t:"Ta <b>coque</b>, c'est la barre en haut du navire. Si elle tombe à zéro, c'est le naufrage : ne laisse pas traîner le crabe !", hl:'#hull', next:1},
   {t:"En bas, <b>ta main</b>. Chaque carte rapporte du <b>combat ⚔</b>. <b>Touche une carte</b> pour la jouer.", hl:'#hand', wait:'Touche une carte de ta main.', until:v => coachSeat(v).hand.length < 5 || !!v.sub || v.round >= 2},
   {t:"Son combat s'ajoute à ton compteur ⚔, en bas à droite. <b>Joue toutes tes cartes.</b>", hl:'#combat, #hand', wait:'Joue toutes tes cartes.', until:v => !coachSeat(v).hand.length || !!v.sub || v.round >= 2},
@@ -4580,11 +4602,11 @@ const COACH_P = [
 const coachSeat = v => v.seats[activeSeat()] || v.seats[0];
 const roleCardOf = v => ROLES[coachSeat(v).r].card;
 const COACH_M = [
-  {t:"Nouveau : les <b>bougies</b> 🕯️. Bout de chandelle et Lanterne en allument. <b>Joue toute ta main.</b>", hl:'#hand', wait:'Joue toutes tes cartes.', until:v => !coachSeat(v).hand.length || !!v.sub || v.round >= 2},
+  {t:"Nouveau : les <b>bougies</b> 🕯️. Les cartes Bougie et Allumettes en allument. <b>Joue toute ta main.</b>", hl:'#hand', wait:'Joue toutes tes cartes.', until:v => !coachSeat(v).hand.length || !!v.sub || v.round >= 2},
   {t:v => `Tes bougies éclairent <b>la cale sombre</b> : des cartes à ajouter à ton deck. La pastille 🕯️ d'une carte dit combien de bougies il faut pour l'atteindre. <b>Touche une carte éclairée</b> pour la remonter.`, hl:'#market .card.afford', wait:'Remonte une carte de la cale.', until:v => !!v.sub || v.round >= 2 || coachSeat(v).dk > (ui.coachDk || 10) || !v.mk.some(c => c && CARDS[c].$ <= coachSeat(v).g + (coachSeat(v).rb || 0))},
   {t:"Bien joué ! Elle file dans ta <b>défausse</b> : tu la piocheras dans un prochain tour. L'objet de derrière s'est avancé à sa place.", hl:'#market', next:1, until:v => !!v.sub || v.round >= 2},
-  {t:"Tes bougies <b>s'éteignent à la fin du tour</b> : dépense-les, puis <b>touche « Terminé »</b>. Au prochain tour, l'onglet <b>Cale</b> brillera dès que tes bougies éclairent une carte.", hl:'#holdTab, #readyBtn', wait:'Dépense tes bougies, puis « Terminé ».', until:v => !!v.sub || v.round >= 2},
-  {t:v => `En haut à droite, le <b>parcours</b> de l'épopée : ${routeFromView(v).length} étapes, le boss 👑 au bout. Les cartes remontées restent dans ton deck jusqu'à la fin de l'épopée.`, hl:'.route', next:1},
+  {t:"Tes bougies <b>s'éteignent à la fin du tour</b> : dépense-les, puis <b>touche « Terminé »</b>. Au prochain tour, l'onglet <b>La cale sombre</b>, au-dessus du pont, brillera dès que tes bougies éclairent une carte.", hl:'#holdTab, #readyBtn', wait:'Dépense tes bougies, puis « Terminé ».', until:v => !!v.sub || v.round >= 2},
+  {t:v => `En haut à droite, le <b>parcours</b> de l'épopée : ${routeFromView(v).length} étapes, le boss 👑 au bout. Les cartes remontées de la cale sombre restent dans ton deck jusqu'à la fin de l'épopée.`, hl:'.route', next:1},
 ];
 // 1.3: protection, the role card, the deck, burning
 const COACH_J = [
@@ -4592,8 +4614,8 @@ const COACH_J = [
   {t:"Le bouclier bleu 🛡 du navire compte ta protection. Elle absorbe les coups annoncés dans les bulles, puis <b>disparaît à la fin du tour</b> : protège-toi quand un gros coup arrive.", hl:'#prot, #enemies', next:1, until:v => !!v.sub || v.round >= 2},
   {t:v => { const C = CARDS[roleCardOf(v)]; return `Ta <b>carte de rôle</b>, ${esc(C.n)}, fait plusieurs choses d'un coup : ${esc(fxText(C.pl))}. <b>Joue-la.</b>`; }, hl:v => `#hand .card[data-c="${roleCardOf(v)}"]`, wait:'Joue ta carte de rôle.', until:v => !!v.sub || v.round >= 2 || !coachSeat(v).hand.includes(roleCardOf(v))},
   {t:"Le paquet <b>Deck</b> rassemble toutes tes cartes. <b>Touche-le</b> pour l'ouvrir.", hl:'#pile', wait:'Touche le paquet Deck.', until:v => !!v.sub || v.round >= 2 || ui.deckOpen != null},
-  {t:"<b>Pioche</b> : les cartes qu'il te reste à piocher, 5 par tour. <b>Défausse</b> : tes cartes jouées et remontées. Quand la pioche est vide, la défausse est mélangée pour en refaire une.", hl:'#sheet .where', over:1, close:1, next:1, until:v => !!v.sub || v.round >= 2 || ui.deckOpen == null},
-  {t:v => `Dernière nouveauté : dans la cale, le <b>🔥</b> sur une carte la brûle pour dégager le passage. Le prix, ${mkCost(v)} bougie${mkCost(v) > 1 ? 's' : ''} pour l'instant, est commun à l'équipage et monte à chaque objet brûlé. <b>Ouvre l'onglet Cale.</b>`, hl:'#holdTab', wait:"Touche l'onglet Cale.", until:v => !!v.sub || v.round >= 2 || ui.dockTab === 'hold' || (!ui.dockTab && !coachSeat(v).hand.length)},
+  {t:"<b>Pioche</b> : les cartes qu'il te reste à piocher, 5 par tour. <b>Défausse</b> : tes cartes jouées et celles remontées de la cale sombre. Quand la pioche est vide, la défausse est mélangée pour en refaire une.", hl:'#sheet .where', over:1, close:1, next:1, until:v => !!v.sub || v.round >= 2 || ui.deckOpen == null},
+  {t:v => `Dernière nouveauté : dans la cale, le <b>🔥</b> sur une carte la brûle pour dégager le passage. Le prix, ${mkCost(v)} bougie${mkCost(v) > 1 ? 's' : ''} pour l'instant, est commun à l'équipage et monte à chaque objet brûlé. <b>Ouvre l'onglet de la cale sombre.</b>`, hl:'#holdTab', wait:"Touche l'onglet La cale sombre.", until:v => !!v.sub || v.round >= 2 || ui.zone === 'cale' || (!ui.zone && !coachSeat(v).hand.length)},
   {t:"Remonte ou brûle avec tes bougies, puis touche « Terminé ». Bonne chasse !", hl:'#market .mkrm', next:1, until:v => !!v.sub || v.round >= 2},
 ];
 // 3.1: servants stay aboard and hold the deck
@@ -4626,7 +4648,7 @@ const COACH = [
   {t:"Ce que rapportent tes cartes s'additionne dans ces deux compteurs : <b>🕯️ les bougies</b> servent à fouiller la cale, <b>⚔ le combat</b> sert à attaquer. Attention : les deux repartent à zéro à la fin du tour, alors dépense-les !", hl:'#gold, #combat', next:1, until:v => v.seats[0].dk > 10 || attacked(v)},
   {t:"Ces infos se retrouvent aussi <b>sous le nom de chaque matelot</b>, dans l'équipage : 🕯️ ses bougies, ⚔ son combat, 🃏 le nombre de cartes qu'il peut encore jouer, et 🛡 ses serviteurs à bord. Pratique pour voir d'un coup d'œil où en sont tes coéquipiers… et qui n'a pas encore joué.", hl:'.seat[data-s="0"], .seat[data-s="1"]', next:1, until:v => v.seats[0].dk > 10 || attacked(v)},
   {t:"Tes cartes jouées restent posées <b>Sur le pont</b> jusqu'à la fin du tour. Tu y vois aussi celles de tes coéquipiers, et le compteur des factions en jeu (on y revient tout à l'heure).", hl:'#inplay', next:1, until:v => v.seats[0].dk > 10 || attacked(v)},
-  {t:"Voici <b>la cale sombre</b>, commune à tout l'équipage. Quatre cartes sont à portée, d'autres objets s'entassent derrière. La profondeur est en haut à gauche. Tant que tu as des bougies, tu fouilles, et chaque carte remontée est aussitôt remplacée.", hl:'#market', next:1, until:v => v.seats[0].dk > 10},
+  {t:"Voici <b>la cale sombre</b>, commune à tout l'équipage. Quatre cartes sont à portée, d'autres objets s'entassent derrière. La profondeur est en haut à gauche. Tant que tu as des bougies, tu fouilles, et chaque carte remontée de la cale sombre est aussitôt remplacée.", hl:'#market', next:1, until:v => v.seats[0].dk > 10},
   {t:"<b>Remonte une carte</b> que tes bougies éclairent : elles sont entourées de doré. Elle rejoint ta défausse et reviendra dans ta main lors d'un prochain tour.", hl:'#market', wait:'Touche une carte éclairée de la cale.', until:v => v.seats[0].dk > 10},
   {t:"Ta nouvelle carte fait maintenant partie de ton deck. Tu peux revoir tout ton deck à tout moment avec le raccourci <b>« Deck »</b> (ou la touche D sur ordinateur).", hl:'#pile', next:1, until:v => ui.deckSeen || attacked(v)},
   {t:"Tu as du combat ⚔. <b>Touche le requin</b> pour l'attaquer : tout ton combat part d'un coup.", hl:'#enemies', wait:'Touche le requin.', until:attacked},
@@ -4696,7 +4718,10 @@ function placeCoachArrow(el){
   placeCoachDim();
   if(!el || !document.body.contains(el)){ if(a) a.remove(); return; }
   if(!a){ a = document.createElement('div'); a.id = 'coachArrow'; a.className = 'coach-arrow'; document.body.appendChild(a); }
-  const r = el.getBoundingClientRect(), cb = $('.coach') ? $('.coach').getBoundingClientRect() : null;
+  // aim at the whole lit area (a foe and its intent bubble together) when the targets sit close to each other
+  let r = el.getBoundingClientRect(); const cb = $('.coach') ? $('.coach').getBoundingClientRect() : null;
+  const near = (ui.coachEls || []).filter(x => x !== el && document.body.contains(x) && x.getClientRects().length).map(x => x.getBoundingClientRect()).filter(q => Math.abs(q.top - r.top) < 120 && Math.abs(q.left - r.left) < 160);
+  if(near.length){ const L = Math.min(r.left, ...near.map(q => q.left)), T = Math.min(r.top, ...near.map(q => q.top)), Rr = Math.max(r.right, ...near.map(q => q.right)), B = Math.max(r.bottom, ...near.map(q => q.bottom)); r = {left:L, top:T, right:Rr, bottom:B, width:Rr - L, height:B - T}; }
   const below = (r.top < 170 || (cb && cb.bottom > r.top - 46 && cb.top < r.top)) && !el.closest('#dock');
   a.textContent = below ? '👆' : '👇'; a.classList.toggle('up', below);
   const x = Math.max(8, Math.min(innerWidth - 44, r.left + Math.min(r.width, 200) / 2 - 17));
@@ -4836,7 +4861,7 @@ document.addEventListener('click', ev => {
     case 'sach': if(S && !busy()){ if(ui.purge && S.ft){ ui.purge = false; act({a:'purge', s, h:+b.dataset.h, c:'bl'}); } else act({a:'sach', s, h:+b.dataset.h}); } break;
     case 'mkrm': if(S && !busy()){ if(!S.mf && S.g < mkCost(pv)){ toast(`Il te faut ${mkCost(pv)} 🕯️ pour brûler un objet (le prix revient à 1 à la prochaine étape).`); return; } act({a:'mkrm', s, m:+b.dataset.m}); } break;
     case 'cale-info': openCaleInfo(); break;
-    case 'dock-tab': ui.dockTab = b.dataset.t; ui.handDown = false; ui.purge = false; render(); break;
+    case 'zone': ui.zone = b.dataset.z; render(); break;
     case 'hand-toggle': ui.handDown = !ui.handDown; render(); break;
     case 'zoom': openCardZoom(b.dataset.c); break;
     case 'sact': if(pv && mySeats().includes(pv.cps)) act({a:'sact', s:pv.cps, k:b.dataset.k}); break;
