@@ -13,7 +13,7 @@
   --brass:#d9a441; --brass-dk:#6b4a10; --coral:#e0573f; --verdigris:#4fb3a0; --spray:#d4ecf0;
   --parch:#efe3c4; --parch-2:#dfcd9f; --parch-ink:#2b2317; --parch-line:rgba(90,62,24,.35);
   --wood:#6a4326; --wood-dk:#2e1c0f; --prot:#7cc4ee;
-  --fF:#d9a441; --fM:#4d9ad6; --fC:#9b6fd0; --fT:#4fae66; --neutral:#6f959c;
+  --fF:#d9a441; --fM:#4d9ad6; --fC:#9b6fd0; --fT:#4fae66; --neutral:#8f7a5c;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
@@ -128,9 +128,18 @@ body.docked #app{ padding-bottom:var(--dockh, 280px); }
 .rndbox.storm{ border-color:#ff6a45; background:radial-gradient(circle at 40% 30%, #74304f, #2a0f22 75%); box-shadow:0 0 14px rgba(255,90,60,.75); }
 .rndbox.tick{ animation:rndtick .8s cubic-bezier(.3,1.6,.5,1); }
 @keyframes rndtick{ 35%{ transform:scale(1.5) rotate(-10deg); box-shadow:0 0 24px rgba(255,220,140,.95); } }
-.scchips{ position:absolute; left:10px; bottom:6px; z-index:7; display:flex; flex-direction:column; align-items:flex-start; gap:3px; max-width:48%; }
+.scchips{ position:absolute; left:10px; bottom:6px; z-index:9; display:flex; flex-direction:column; align-items:flex-start; gap:3px; max-width:48%; }
 .scchips:empty{ display:none; }
-.srvchip{ font-size:11.5px; font-weight:800; color:#2a1b03; background:linear-gradient(#ffe7a8, #e8b85a); border-radius:20px; padding:2px 9px; white-space:nowrap; box-shadow:0 2px 0 rgba(0,0,0,.35); }
+.brchip, .srvchip, .seachip{ font-family:inherit; cursor:pointer; }
+.seachip{ font-size:11.5px; font-weight:800; color:#062019; background:linear-gradient(#c8f1ff, #7cc4ee); border:none; border-radius:20px; padding:2px 9px; white-space:nowrap; box-shadow:0 2px 0 rgba(0,0,0,.35); }
+.seachip i{ font-style:normal; display:inline-grid; place-items:center; width:15px; height:15px; margin-left:3px; border-radius:50%; font-size:10px; font-weight:900; background:rgba(255,255,255,.45); }
+.keg{ position:absolute; right:-14px; top:-6px; display:flex; align-items:center; gap:1px; font-size:16px; line-height:1; padding:2px 5px 2px 3px; border-radius:12px; background:rgba(40,14,4,.85); border:1.5px solid #ff9a4a; box-shadow:0 0 10px rgba(255,140,50,.6); }
+.keg b{ font:800 12px/1 var(--ui, system-ui); color:#ffd9a8; }
+.keg.hot{ animation:kegpulse .7s ease-in-out infinite; border-color:#ff5a30; }
+@keyframes kegpulse{ 50%{ transform:scale(1.18); box-shadow:0 0 16px 4px rgba(255,90,40,.8); } }
+.card .coin.inked{ background:linear-gradient(#3a2a55, #1c1230); color:#e6d2ff; box-shadow:0 0 0 2px #a98ad6, 0 2px 0 rgba(0,0,0,.4); }
+.brchip i, .srvchip i{ font-style:normal; display:inline-grid; place-items:center; width:15px; height:15px; margin-left:3px; border-radius:50%; font-size:10px; font-weight:900; background:rgba(255,255,255,.35); vertical-align:1px; }
+.srvchip{ border:none; font-size:11.5px; font-weight:800; color:#2a1b03; background:linear-gradient(#ffe7a8, #e8b85a); border-radius:20px; padding:2px 9px; white-space:nowrap; box-shadow:0 2px 0 rgba(0,0,0,.35); }
 .rndfx{ position:absolute; inset:0; z-index:8; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; pointer-events:none; animation:rndin 1.5s ease-out forwards; }
 .rndfx b{ font-family:"Pirata One", Georgia, serif; font-weight:400; font-size:46px; line-height:1; color:#fff4da; text-shadow:0 3px 0 rgba(0,0,0,.35), 0 0 18px rgba(0,0,0,.7); }
 .rndfx span{ max-width:88%; text-align:center; font-size:13px; font-weight:800; color:#fff; padding:5px 12px; border-radius:14px; background:rgba(10,24,32,.85); border:1px solid #d9b26a; box-shadow:0 3px 10px rgba(0,0,0,.5); }
@@ -161,7 +170,7 @@ body.docked #app{ padding-bottom:var(--dockh, 280px); }
 .ship.vuln{ filter:drop-shadow(0 0 14px rgba(255,60,40,.95)); }
 @media (max-width:420px){ .brchip{ font-size:10.5px; padding:2px 7px; } }
 
-.foe-row{ position:absolute; left:40%; right:2%; bottom:14px; top:40px; z-index:6; display:flex; justify-content:space-around; align-items:flex-end; pointer-events:none; }
+.foe-row{ position:absolute; left:40%; right:2%; bottom:14px; top:40px; z-index:8; display:flex; justify-content:space-around; align-items:flex-end; pointer-events:none; }
 .foe{ pointer-events:auto; position:relative; background:none; border:none; padding:0; display:flex; flex-direction:column; align-items:center; gap:4px; width:min(118px, 48%); animation:bob 3.2s ease-in-out infinite; }
 @keyframes bob{ 0%,100%{ translate:0 0; } 50%{ translate:0 -7px; } }
 .foe .fi{ font-size:clamp(44px, 12vw, 60px); line-height:1; filter:drop-shadow(0 5px 3px rgba(0,0,0,.4)); transition:transform .15s; }
@@ -695,7 +704,19 @@ body.enemy-turn #dock .dock-in{ opacity:.4; filter:saturate(.6); transition:opac
 .caleinfo .fi-list li{ display:flex; gap:10px; align-items:flex-start; font-size:14px; line-height:1.38; }
 .caleinfo .fi-list li > span{ font-size:20px; line-height:1.2; flex:none; width:26px; text-align:center; }
 /* a burnt object of the hold */
-.deckbtn.bump, #crew .seat.bump, .pools .who.bump{ animation:bump .45s; }
+.deckbtn.bump, .seat.bump, .pools .who.bump{ animation:bump .45s; }
+#inplay .prow{ display:block; padding:2px 6px 2px 8px; }
+#inplay .phead{ display:flex; align-items:center; gap:6px; width:100%; min-width:0; text-align:left; font:inherit; font-size:13px; color:#f0dcbc; background:none; border:none; padding:4px 0 2px; cursor:pointer; position:static; overflow:visible; }
+#inplay .phead::before{ display:none; }
+#inplay .phead .pwho{ width:24px; height:24px; font-size:13px; flex:none; }
+#inplay .phead .pn{ color:var(--rc); font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; text-shadow:0 1px 2px #000; }
+#inplay .phead .pst{ display:flex; gap:7px; margin-left:auto; font-size:12px; font-weight:700; color:#f0dcbc; white-space:nowrap; text-shadow:0 1px 2px #000; }
+#inplay .phead .es{ position:static; margin:0; padding:2px 3px; border-radius:50%; font-size:0; line-height:0; display:inline-flex; }
+#inplay .phead .es .eic{ font-size:12px; line-height:1; }
+#inplay .phead .ok{ color:#7fe0a0; font-weight:900; }
+#inplay .phead.away{ opacity:.5; }
+#inplay .prow.ready{ opacity:.92; }
+#inplay .prow .minis{ padding-top:4px; }
 .takefx{ position:fixed; z-index:41; pointer-events:none; animation:takeit .75s ease-in forwards; }
 @keyframes takeit{ 0%{ transform:none; filter:brightness(1); } 35%{ transform:translateY(-10px) scale(1.08); filter:brightness(1.45) drop-shadow(0 0 14px #ffcf7a); opacity:1; } 100%{ transform:translateY(46px) scale(.55); filter:brightness(1.2); opacity:0; } }
 .taketag{ position:fixed; z-index:42; pointer-events:none; translate:-50% 0; white-space:nowrap; font-weight:800; font-size:13px; color:#2a1b03; background:linear-gradient(#ffe7a8, #e8b85a); border-radius:20px; padding:3px 10px; box-shadow:0 3px 10px rgba(0,0,0,.45); animation:taketag 1.3s ease-out forwards; }
@@ -958,7 +979,7 @@ body.enemy-turn #dock .dock-in{ opacity:.4; filter:saturate(.6); transition:opac
 .sheet .where b{ display:block; font-size:19px; color:var(--ink); }
 .sheet .fnote{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 8px; font-size:13px; color:var(--muted); }
 .sheet .fclr{ font:inherit; font-size:12px; font-weight:700; cursor:pointer; border:1px solid var(--line); background:var(--sea-2); color:var(--ink); border-radius:14px; padding:3px 10px; }
-.sheet > *{ flex-shrink:0; }
+.sheet > *, .sheet .sbody > :not(.scroll){ flex-shrink:0; }
 .sheet .scroll{ flex:1 1 auto; min-height:0; overflow-y:auto; margin:0 -14px; padding:4px 14px 6px; }
 .sheet .group, #lighten .group{ font-size:13px; font-weight:700; color:var(--muted); margin:8px 0 2px; display:flex; align-items:center; gap:6px; }
 .sheet .group::after, #lighten .group::after{ content:""; flex:1; height:1px; background:var(--line); }
@@ -1187,6 +1208,7 @@ input.txt{ width:100%; font:inherit; font-size:17px; padding:10px 12px; border-r
   #inplay .tpip .ic{ width:20px; height:20px; font-size:11px; }
   #inplay .tpip .st{ display:none; }
   #inplay .prows{ display:block; }
+  #inplay .phead{ font-size:12px; }
   #inplay .prow{ margin-top:5px; }
   #inplay .minis{ padding:6px 2px 8px; gap:5px; overflow-x:auto; }
   #inplay .mini{ width:48px; height:62px; }
@@ -1212,6 +1234,15 @@ input.txt{ width:100%; font:inherit; font-size:17px; padding:10px 12px; border-r
   .ztab{ font-size:16px; padding:6px 10px 8px; }
   .zonetabs .mkinfo{ font-size:11.5px; gap:4px; }
   #market.dhold{ padding:0 6px 2px; }
+}
+@media (max-width:540px){
+  .foe-row{ top:34px; bottom:10px; }
+  .foe-row.many{ left:47%; }
+  .foe .fi{ font-size:clamp(34px, 10vw, 48px); }
+  .foe.boss .fi{ font-size:clamp(48px, 14vw, 64px); }
+  .foe-row.many .foe:not(.min) .fi{ transform:translateY(-4px) scale(.92); }
+  .foe-row.crowd .foe.min{ width:min(54px, 24%); }
+  .foe .intent{ font-size:11px; padding:3px 6px; }
 }
 @media (max-width:540px) and (max-height:780px){
   .scene{ height:clamp(172px, 46vw, 220px); }
@@ -1483,6 +1514,12 @@ const FOES = {
   dutch:{n:'Hollandais volant', the:'Le Hollandais volant', ic:'👻', hp:120, boss:1, it:[['summon','ghost',2],['curse',1],['multi',6,3],['board',9],['hit',17],['summon','ghost',2],['heal',10]]},
   // Aventure: gentle foes of the port and the bay, and bosses of the first sectors
   gulp:{n:'Goéland du port', ic:'🐦', hp:6, it:[['multi',1,2],['hit',2]]},
+  pelic:{n:'Pélican chapardeur', ic:'🦤', hp:10, it:[['snatch',3],['hit',4],['multi',2,2]]},
+  artif:{n:'Artificier pirate', ic:'🧨', hp:14, it:[['fuse',7],['hit',4],['shield',4]]},
+  seiche:{n:'Seiche des docks', ic:'🦑', hp:15, it:[['ink',0],['hit',5],['multi',2,3]]},
+  feufol:{n:'Feu follet', ic:'🔥', hp:18, it:[['snatch',5],['curse',1],['hit',6]]},
+  salam:{n:'Salamandre de lave', ic:'🦎', hp:32, it:[['fuse',11],['hit',8],['grow',1]]},
+  naut:{n:'Nautile des abysses', ic:'🐚', hp:30, it:[['ink',0],['pierce',9],['shield',8]]},
   qcrab:{n:'Vieux crabe du quai', the:'Le vieux crabe', ic:'🦀', hp:12, boss:1, it:[['hit',3],['shield',2],['hit',4]]},
   gulb:{n:'Nuée de goélands', the:'La nuée', ic:'🐦', hp:22, boss:1, it:[['multi',2,3],['hit',4],['multi',2,2]]},
   bshk:{n:'Requin du bassin', the:'Le requin du bassin', ic:'🦈', hp:30, boss:1, it:[['hit',7],['hit',2],['hit',8],['shield',4]]},
@@ -1684,6 +1721,9 @@ const CAMP_SECTORS = [
 ];
 const CAMP_ORDER = [], CAMP = {};
 CAMP_SECTORS.forEach((S, si) => S.eps.forEach((e, ei) => { const id = S.id + '.' + (ei + 1); CAMP_ORDER.push(id); CAMP[id] = {...e, id, sector:S.id, idx:ei, z:S.z, tr:S.tr}; }));
+// the newcomers join the threats of their sector: one more kind of fight on the road
+const NEW_FOES = {2:[['pelic', 'gulp'], ['pelic']], 3:[['artif', 'pir'], ['artif', 'bouc']], 4:[['seiche', 'maca'], ['pelic', 'perc']], 5:[['feufol', 'noye'], ['feufol']], 6:[['salam'], ['salam', 'varan']], 7:[['feufol', 'ombre']], 8:[['naut', 'calm'], ['naut']]};
+CAMP_ORDER.forEach(id => { const C = CAMP[id], L = NEW_FOES[C.sector]; if(L && !C.coach) C.pool = [...C.pool, L[C.idx % L.length]]; });
 const campIdx = id => { const [a, b] = String(id).split('.').map(Number); return (a - 1) * 4 + (b - 1); };
 const featOn = (id, k) => !id || campIdx(id) >= campIdx(CAMP_FEAT[k]);
 const campOf = G => G && G.camp ? CAMP[G.camp] : null;
@@ -1698,38 +1738,38 @@ const CAMP_DIFF = {
   '1.2':{dm:0.6, hp:0.58, cdm:{2:1.367}},
   '1.3':{dm:0.8, hp:0.61, cdm:{2:1.25}},
   '1.4':{dm:0.85, hp:0.65, cdm:{2:1.8}},
-  '2.1':{dm:0.8, hp:0.61, bhp:0.6, ehp:0.8, cdm:{2:1.88, 3:1.64, 4:1.26}},
-  '2.2':{dm:0.85, hp:0.65, bhp:0.6, ehp:0.8, cdm:{2:1.4, 3:1.44, 4:1.09}},
-  '2.3':{dm:0.9, hp:0.65, bhp:0.6, ehp:0.85, cdm:{2:1.78, 3:1.83, 4:1.5}},
-  '2.4':{dm:0.95, hp:0.68, bhp:0.6, ehp:0.85, cdm:{2:1.03, 3:0.9, 4:0.6}},
-  '3.1':{dm:1, hp:0.74, bhp:0.71, ehp:0.87, traits:.15, cdm:{2:2.023, 3:1.936, 4:1.509}},
-  '3.2':{dm:1, hp:0.65, bhp:0.77, ehp:1.23, traits:.15, cdm:{2:1.6, 3:1.554, 4:1.487}},
-  '3.3':{dm:1, hp:0.56, bhp:0.89, ehp:0.87, traits:.15, cdm:{2:1.321, 3:1.192, 4:1.209}},
-  '3.4':{dm:1, hp:0.46, bhp:0.86, ehp:0.89, traits:.15, cdm:{2:1.125, 3:1.192, 4:1.061}},
-  '4.1':{dm:1.05, hp:0.5, bhp:0.45, ehp:1.07, traits:.2, cdm:{2:0.565, 3:0.453, 4:0.287}},
+  '2.1':{dm:0.8, hp:0.61, bhp:0.6, ehp:0.8, cdm:{2:2.114, 3:1.739, 4:1.26}},
+  '2.2':{dm:0.85, hp:0.65, bhp:0.6, ehp:0.8, cdm:{2:2.519, 3:2.304, 4:1.09}},
+  '2.3':{dm:0.9, hp:0.65, bhp:0.6, ehp:0.85, cdm:{2:2.252, 3:2.183, 4:1.5}},
+  '2.4':{dm:0.95, hp:0.68, bhp:0.6, ehp:0.85, cdm:{2:1.554, 3:1.44, 4:0.6}},
+  '3.1':{dm:1, hp:0.74, bhp:0.71, ehp:0.87, traits:.15, cdm:{2:2.145, 3:2.053, 4:1.509}},
+  '3.2':{dm:1, hp:0.65, bhp:0.77, ehp:1.23, traits:.15, cdm:{2:1.6, 3:1.554, 4:1.577}},
+  '3.3':{dm:1, hp:0.56, bhp:0.89, ehp:0.87, traits:.15, cdm:{2:1.576, 3:1.422, 4:1.36}},
+  '3.4':{dm:1, hp:0.46, bhp:0.86, ehp:0.89, traits:.15, cdm:{2:1.342, 3:1.341, 4:1.265}},
+  '4.1':{dm:1.05, hp:0.5, bhp:0.45, ehp:1.07, traits:.2, cdm:{2:0.565, 3:0.453, 4:0.323}},
   '4.2':{dm:1.05, hp:0.71, bhp:0.62, ehp:0.93, traits:.2, cdm:{2:1.192, 3:1.046, 4:0.802}},
-  '4.3':{dm:1.05, hp:0.63, bhp:0.8, ehp:1.11, traits:.2, cdm:{2:1.648, 3:1.532, 4:1.444}},
-  '4.4':{dm:1.05, hp:0.57, bhp:0.84, ehp:1.12, traits:.2, cdm:{2:0.714, 3:0.626, 4:0.48}},
-  '5.1':{dm:1.1, hp:0.6, bhp:0.5, ehp:0.66, traits:.25, bm:0.6, cdm:{2:3.599, 3:3.154, 4:2.418}},
-  '5.2':{dm:1.1, hp:0.68, bhp:0.65, ehp:1.32, traits:.25, hex:1, bm:0.7, cdm:{2:2.053, 3:1.937, 4:1.644}},
-  '5.3':{dm:1.1, hp:0.58, bhp:0.62, ehp:1.27, traits:.65, bm:0.7, cdm:{2:1.601, 3:1.556, 4:1.465}},
-  '5.4':{dm:1.1, hp:0.57, bhp:0.88, ehp:0.77, traits:.3, rage:1, bm:0.8, cdm:{2:1.194, 3:1.16, 4:1.161}},
-  '6.1':{dm:1.15, hp:0.64, bhp:0.67, ehp:0.84, traits:.3, cdm:{2:1.322, 3:1.176, 4:1.091}},
-  '6.2':{dm:1.15, hp:0.54, bhp:0.65, ehp:0.87, traits:.3, arm:2, cdm:{2:1.193, 3:1.176, 4:1.176}},
-  '6.3':{dm:1.15, hp:0.45, bhp:0.72, ehp:0.91, traits:.3, cdm:{2:0.655, 3:0.574, 4:0.501}},
-  '6.4':{dm:1.15, hp:0.3, bhp:0.75, ehp:0.91, giant:1, cdm:{2:0.891, 3:0.814, 4:0.783}},
+  '4.3':{dm:1.05, hp:0.63, bhp:0.8, ehp:1.11, traits:.2, cdm:{2:1.554, 3:1.532, 4:1.444}},
+  '4.4':{dm:1.05, hp:0.57, bhp:0.84, ehp:1.12, traits:.2, cdm:{2:0.803, 3:0.747, 4:0.573}},
+  '5.1':{dm:1.1, hp:0.6, bhp:0.5, ehp:0.66, traits:.25, bm:0.6, cdm:{2:4.048, 3:3.154, 4:2.72}},
+  '5.2':{dm:1.1, hp:0.68, bhp:0.65, ehp:1.32, traits:.25, hex:1, bm:0.7, cdm:{2:2.449, 3:2.178, 4:2.079}},
+  '5.3':{dm:1.1, hp:0.58, bhp:0.62, ehp:1.27, traits:.65, bm:0.7, cdm:{2:2.025, 3:1.856, 4:1.747}},
+  '5.4':{dm:1.1, hp:0.57, bhp:0.88, ehp:0.77, traits:.3, rage:1, bm:0.8, cdm:{2:1.424, 3:1.304, 4:1.231}},
+  '6.1':{dm:1.15, hp:0.64, bhp:0.67, ehp:0.84, traits:.3, cdm:{2:1.322, 3:1.247, 4:1.157}},
+  '6.2':{dm:1.15, hp:0.54, bhp:0.65, ehp:0.87, traits:.3, arm:2, cdm:{2:1.265, 3:1.247, 4:1.176}},
+  '6.3':{dm:1.15, hp:0.45, bhp:0.72, ehp:0.91, traits:.3, cdm:{2:0.737, 3:0.685, 4:0.634}},
+  '6.4':{dm:1.15, hp:0.3, bhp:0.75, ehp:0.91, giant:1, cdm:{2:1.002, 3:0.915, 4:0.881}},
   '7.1':{dm:1.2, hp:0.72, bhp:0.72, ehp:1.1, traits:.35, bdm:1.35, cdm:{2:1.51, 3:1.403, 4:1.403}},
-  '7.2':{dm:1.2, hp:0.77, bhp:0.65, ehp:1.2, traits:.35, shuffle:1, bdm:1.7, cdm:{2:1.383, 3:1.339, 4:1.283}},
-  '7.3':{dm:1.2, hp:0.56, bhp:0.7, ehp:0.9, traits:.35, cdm:{2:1.621, 3:1.555, 4:1.696}},
-  '7.4':{dm:1.2, hp:0.55, bhp:0.79, ehp:1.31, traits:.35, hide:1, rage:1, bdm:1.35, cdm:{2:1.061, 3:1.06, 4:1.282}},
-  '8.1':{dm:1.25, hp:0.55, bhp:1.12, ehp:1.06, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.5, cdm:{2:1.8, 3:1.825, 4:1.623}},
-  '8.2':{dm:1.25, hp:0.43, bhp:1.2, ehp:0.99, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.6, cdm:{2:1.906, 3:1.906, 4:2.084}},
-  '8.3':{dm:1.25, hp:0.47, bhp:1.14, ehp:0.98, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.6, cdm:{2:1.96, 3:1.826, 4:1.648}},
-  '8.4':{dm:1.25, hp:0.45, bhp:1.19, ehp:0.99, traits:.5, rage:1, hex:1, str0:1, bdm:1.35, cdm:{2:1.002, 3:0.917, 4:0.958}},
-  '9.1':{dm:1.3, hp:0.45, bhp:1.2, ehp:0.97, traits:.5, rage:1, hex:1, str0:1, bdm:1.35, cdm:{2:0.654, 3:0.635, 4:0.628}},
-  '9.2':{dm:1.3, hp:0.44, bhp:1.2, ehp:1.06, traits:.5, rage:1, hex:1, str0:1, bdm:1.7, cdm:{2:0.988, 3:0.945, 4:0.942}},
-  '9.3':{dm:1.3, hp:0.26, bhp:1.2, ehp:1.15, traits:.5, rage:1, hex:1, str0:1, esc0:1, bdm:1.8, cdm:{2:1.247, 3:1.466, 4:1.724}},
-  '9.4':{dm:1.3, hp:0.26, bhp:1.2, ehp:1.13, traits:.5, rage:1, hex:1, str0:1, esc0:1, bdm:1.7, cdm:{2:1.247, 3:1.076, 4:1.061}},
+  '7.2':{dm:1.2, hp:0.77, bhp:0.65, ehp:1.2, traits:.35, shuffle:1, bdm:1.7, cdm:{2:1.383, 3:1.263, 4:1.283}},
+  '7.3':{dm:1.2, hp:0.56, bhp:0.7, ehp:0.9, traits:.35, cdm:{2:1.719, 3:1.749, 4:1.696}},
+  '7.4':{dm:1.2, hp:0.55, bhp:0.79, ehp:1.31, traits:.35, hide:1, rage:1, bdm:1.35, cdm:{2:1.193, 3:1.264, 4:1.36}},
+  '8.1':{dm:1.25, hp:0.55, bhp:1.12, ehp:1.06, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.5, cdm:{2:1.8, 3:1.935, 4:2.053}},
+  '8.2':{dm:1.25, hp:0.43, bhp:1.2, ehp:0.99, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.6, cdm:{2:2.144, 3:2.022, 4:2.21}},
+  '8.3':{dm:1.25, hp:0.47, bhp:1.14, ehp:0.98, traits:.45, rage:1, hex:1, bdm:1.9, rdm:0.6, cdm:{2:1.96, 3:1.826, 4:1.748}},
+  '8.4':{dm:1.25, hp:0.45, bhp:1.19, ehp:0.99, traits:.5, rage:1, hex:1, str0:1, bdm:1.35, cdm:{2:0.945, 3:0.917, 4:0.903}},
+  '9.1':{dm:1.3, hp:0.45, bhp:1.2, ehp:0.97, traits:.5, rage:1, hex:1, str0:1, bdm:1.35, cdm:{2:0.693, 3:0.673, 4:0.666}},
+  '9.2':{dm:1.3, hp:0.44, bhp:1.2, ehp:1.06, traits:.5, rage:1, hex:1, str0:1, bdm:1.7, cdm:{2:1.048, 3:0.945, 4:0.942}},
+  '9.3':{dm:1.3, hp:0.26, bhp:1.2, ehp:1.15, traits:.5, rage:1, hex:1, str0:1, esc0:1, bdm:1.8, cdm:{2:1.402, 3:1.466, 4:1.828}},
+  '9.4':{dm:1.3, hp:0.26, bhp:1.2, ehp:1.13, traits:.5, rage:1, hex:1, str0:1, esc0:1, bdm:1.7, cdm:{2:1.322, 3:1.141, 4:1.125}},
 };
 const CAMP_TARGET = {'1.1':.99, '1.2':.98, '1.3':.97, '1.4':.95, '2.1':.92, '2.2':.88, '2.3':.84, '2.4':.8, '3.1':.78, '3.2':.75, '3.3':.72, '3.4':.7, '4.1':.68, '4.2':.65, '4.3':.62, '4.4':.6,
   '5.1':.58, '5.2':.55, '5.3':.52, '5.4':.5, '6.1':.48, '6.2':.45, '6.3':.42, '6.4':.4, '7.1':.38, '7.2':.35, '7.3':.32, '7.4':.3, '8.1':.28, '8.2':.25, '8.3':.22, '8.4':.2, '9.1':.18, '9.2':.15, '9.3':.12, '9.4':.1};
@@ -1759,14 +1799,38 @@ function campRecord(v){
   campSave();
 }
 // each epic: 2 encounters, 1 elite, 1 mystery (ambush or event), 1 sheltered cove, 1 boss
+// the shapes a voyage can take (from the second sector on): 5 to 7 steps, in a changing order
+const ROUTE_T = [['f', 'f', 'el', 'my', 'rest', 'boss'], ['f', 'my', 'el', 'f', 'rest', 'boss'], ['f', 'el', 'sp', 'rest', 'boss'], ['f', 'f', 'my', 'el', 'sp', 'rest', 'boss'], ['my', 'f', 'el', 'f', 'rest', 'boss'], ['f', 'sp', 'f', 'el', 'rest', 'boss']];
+// the special steps met openly on the route, sector by sector
+const SECT_SPECIAL = {2:['bottle', 'tavern'], 3:['tavern', 'castaways', 'treasure'], 4:['tavern', 'bottle', 'treasure'], 5:['castaways', 'bottle'], 6:['treasure', 'castaways'], 7:['bottle', 'treasure'], 8:['castaways', 'treasure'], 9:['bottle', 'castaways']};
+// the last stop before the boss: a different cove each time
+const REST_V = {crique:{n:'Crique abritée', ic:'🏝️', heal:1, t:"Une crique abritée, à l'abri du vent. Le capitaine décide si l'équipage répare la coque ou explore les environs."},
+  village:{n:'Village de pêcheurs', ic:'🏘️', heal:1, t:"Des cabanes sur pilotis et des filets qui sèchent. On peut y réparer la coque, ou faire du troc au marché du village."},
+  lagon:{n:'Lagon aux tortues', ic:'🐢', heal:1.25, t:"Une eau claire et chaude où dorment des tortues géantes. Les charpentiers y travaillent en paix ; les plongeurs, eux, rapportent des merveilles du fond."},
+  grotte:{n:'Grotte des contrebandiers', ic:'🕳️', heal:.85, t:"Une grotte creusée dans la falaise, pleine de caisses oubliées. On y répare mal, mais on y trouve de tout… y compris des ennuis."}};
+const REST_CODE = {c:'crique', v:'village', l:'lagon', g:'grotte'};
+const SECT_REST = {1:['crique'], 2:['crique', 'lagon', 'village'], 3:['crique', 'grotte', 'village'], 4:['village', 'lagon', 'grotte'], 5:['grotte', 'crique'], 6:['lagon', 'grotte'], 7:['crique', 'lagon'], 8:['grotte', 'lagon'], 9:['village', 'crique', 'lagon']};
+// the state of the sea on some ordinary fights
+const SEAS = {brume:{n:'Banc de brume', ic:'🌫️', t:"Au premier tour, la brume cache les intentions des menaces."},
+  vent:{n:'Vent arrière', ic:'🌬️', t:"Le vent pousse le navire : il gagne 2 de protection par matelot à chaque tour."},
+  houle:{n:'Grosse houle', ic:'🌊', t:"Les menaces frappent plus fort (+1 de force), mais la houle les malmène : 15 % de vie en moins."},
+  lune:{n:'Pleine lune', ic:'🌕', t:"La lune éclaire la cale sombre : chaque matelot gagne 1 bougie de plus à chaque tour. Mais les menaces ont 15 % de vie en plus."}};
+let SEA_P = .4;
 function makeRoute(G){
   if(G.camp){   // campaign epic: its own steps, enemies and boss
-    const C = CAMP[G.camp], pk = a => a[Math.floor(Math.random() * a.length)], pool = shuffle([...C.pool]); let k = 0;
-    const R = (C.steps || CAMP_STEPS).map(t => t === 'boss' ? {f:Array.isArray(C.boss) ? [...C.boss] : [C.boss], z:C.z, boss:1} : t === 'rest' ? {f:[], z:C.z, rest:1} : t === 'el' ? {f:pk(C.elites || C.pool), z:C.z, el:1}
-      : t === 'my' ? (Math.random() < MYST_FIGHT ? {f:pool[(k++) % pool.length], z:C.z, myst:1} : {f:[], e:pk(SECT_EVENTS[C.sector] || ['wreck', 'merchant', 'storm', 'siren']), z:C.z, myst:1}) : {f:pool[(k++) % pool.length], z:C.z});
+    const C = CAMP[G.camp], pk = a => a[Math.floor(Math.random() * a.length)];
+    let pool = shuffle([...C.pool]), prev = [];
+    // the next group of threats, never the same faces as the fight just before
+    const take = (src, refill) => { if(!src.length) src.push(...shuffle([...refill])); const i = Math.max(0, src.findIndex(g => !g.some(t => prev.includes(t)))); const g = src.splice(i, 1)[0]; prev = g; return [...g]; };
+    const elites = shuffle([...(C.elites || C.pool)]);
+    const steps = C.steps || (C.sector >= 2 ? pk(ROUTE_T) : CAMP_STEPS);
+    const R = steps.map(t => t === 'boss' ? {f:Array.isArray(C.boss) ? [...C.boss] : [C.boss], z:C.z, boss:1} : t === 'rest' ? {f:[], z:C.z, rest:1, rv:pk(SECT_REST[C.sector] || ['crique'])} : t === 'el' ? {f:take(elites, C.elites || C.pool), z:C.z, el:1}
+      : t === 'sp' ? {f:[], e:pk(SECT_SPECIAL[C.sector] || ['bottle']), z:C.z, sp:1}
+      : t === 'my' ? (Math.random() < MYST_FIGHT ? {f:take(pool, C.pool), z:C.z, myst:1} : {f:[], e:pk(SECT_EVENTS[C.sector] || ['wreck', 'merchant', 'storm', 'siren']), z:C.z, myst:1})
+      : {f:take(pool, C.pool), z:C.z, ...(C.sector >= 2 && Math.random() < SEA_P ? {sea:pk(Object.keys(SEAS))} : {})});
     // a fork on the way (from the second sector on): the usual fight, or an elite guarding a treasure; the captain chooses
     const fi = C.sector >= 2 ? (R.findIndex((n, x) => x > 0 && !n.el && !n.boss && !n.rest && !n.myst && !n.e) >= 0 ? R.findIndex((n, x) => x > 0 && !n.el && !n.boss && !n.rest && !n.myst && !n.e) : R.findIndex(n => !n.el && !n.boss && !n.rest && !n.myst && !n.e)) : -1;
-    if(fi >= 0) R[fi] = {fork:[R[fi], {f:pk(C.elites || C.pool), z:C.z, el:1, loot:1}], f:[], z:C.z};
+    if(fi >= 0){ prev = R[fi].f; R[fi] = {fork:[R[fi], {f:take(elites, C.elites || C.pool), z:C.z, el:1, loot:1}], f:[], z:C.z}; }
     return R;
   }
   const E = EPICS[G.ep - 1], pick = a => a[Math.floor(Math.random() * a.length)];
@@ -1778,11 +1842,11 @@ function makeRoute(G){
   r.push({f:[G.bosses[G.ep - 1]], z:E.z, boss:1});
   return r;
 }
-const routeCode = N => N.fork ? 'Y' + N.fork.map(routeCode).join('|') : N.rest ? '~' : N.e ? '!' + N.e : (N.loot ? '$' : '') + (N.myst ? '?' : '') + (N.el ? '*' : '') + N.f.join('+');
+const routeCode = N => N.fork ? 'Y' + N.fork.map(routeCode).join('|') : N.rest ? '~' + (N.rv ? N.rv[0] : '') : N.e ? (N.sp ? '#' : '!') + N.e : (N.loot ? '$' : '') + (N.myst ? '?' : '') + (N.el ? '*' : '') + N.f.join('+');
 function routeFromView(v){ // rebuilds the route from its compact form: elite and boss come from the position
   if(!v || !v.rt) return TUT_ROUTE;
   const E = epOfV(v), last = v.rt.length - 1;
-  const dec = (f, i) => f === '~' ? {f:[], z:E.z, rest:1} : f[0] === 'Y' ? {f:[], z:E.z, myst:1, fork:f.slice(1).split('|').map(x => dec(x, -1))} : f[0] === '!' ? {f:[], e:f.slice(1), z:E.z, myst:1}
+  const dec = (f, i) => f[0] === '~' ? {f:[], z:E.z, rest:1, rv:REST_CODE[f[1]] || 'crique'} : f[0] === '#' ? {f:[], e:f.slice(1), z:E.z, sp:1} : f[0] === 'Y' ? {f:[], z:E.z, myst:1, fork:f.slice(1).split('|').map(x => dec(x, -1))} : f[0] === '!' ? {f:[], e:f.slice(1), z:E.z, myst:1}
     : {f:f.replace('$', '').replace('?', '').replace('*', '').split('+'), z:E.z, loot:f[0] === '$' ? 1 : 0, myst:f.replace('$', '')[0] === '?' ? 1 : 0, el:f.includes('*') || (!v.cp && i === 2) ? 1 : 0, boss:i === last ? 1 : 0};
   return v.rt.map(dec);
 }
@@ -1799,6 +1863,10 @@ const EVENTS = {
   tomb:{n:'La tombe des marins', ic:'🪦', t:"Un cercueil flotte dans la brume, cerclé de chaînes. Un trésor légendaire dort dedans… avec la malédiction de son propriétaire."},
   geyser:{n:'La source brûlante', ic:'♨️', t:"Au pied du volcan jaillit une eau bouillante. Le capitaine choisit : y colmater la coque, ou y tremper des armes de géant (une carte rare pour chacun)."},
   mirage:{n:'Le mirage', ic:'🏝️', t:"Une île apparaît là où aucune carte n'en montre. Ses ruines regorgent d'objets… mais rien ne dit qu'on en revient indemne."},
+  tavern:{n:'Taverne du port', ic:'🍺', t:"Une taverne enfumée sur le quai : on y recrute des gaillards, on y troque son matériel, et les charpentiers du coin réparent volontiers la coque contre une tournée."},
+  treasure:{n:"L'île au trésor", ic:'🗺️', t:"Une croix sur une vieille carte, une plage déserte. Creuser profond rapporte gros… mais réveille les crabes qui gardent le trésor."},
+  bottle:{n:'Une bouteille à la mer', ic:'🍾', t:"Une bouteille roule sur le pont. À l'intérieur, une carte griffonnée indique deux cachettes : chacun choisit la sienne."},
+  castaways:{n:'Les naufragés', ic:'🛟', t:"Des marins agrippés à une épave crient à l'aide. Les hisser à bord coûte des planches de la coque, mais ils sauront se rendre utiles."},
   whale:{n:'Le cimetière des baleines', ic:'🐋', t:"D'immenses squelettes reposent sur le fond. Entre leurs côtes brillent des épaves et des trésors engloutis."},
   shore:{n:'Le premier rivage', ic:'🏖️', t:"Une plage dorée, de l'eau douce, des fruits : l'équipage souffle un instant avant la dernière tempête. Le capitaine choisit : réparer la coque, ou explorer le rivage (une carte rare pour chacun)."},
 };
@@ -1977,6 +2045,7 @@ function advance(G){
   const N = R[G.node], n = G.seats.length, E = epOf(G), k = G.tut ? 1 : HPK(n) * E.hp;
   if(N.fork){ startFork(G, N); return; }
   if(N.rest || N.e){ startStop(G, N); return; }
+  if(G.camp && !G.tut && G.node > 0 && G.mk.length){ G.mdeck.push(...G.mk.filter(Boolean)); G.mdeck = shuffle(G.mdeck); G.mk = []; while(G.mk.length < mkN(G) && G.mdeck.length) G.mk.push(G.mdeck.pop()); }   // a new fight, a hold stirred up again
   G.phase = 'fight'; G.dm = G.tut ? 1 : DMG(n) * E.dm * ((E.cdm && E.cdm[n]) || 1) * (N.boss ? E.bdm || 1 : E.rdm || 1); G.bm = G.tut ? 1 : BOARD(n) * E.bm; G.prot = 0; G.breach = 0; G.vul = 0; G.net = 0; G.sub = null; G.atk = 0; G.round = 0; G.cur = 0;
   G.hk = k;
   const foes = hasUp(G, 'grey') && !N.boss && !N.el && N.f.length >= 2 ? N.f.slice(0, -1) : N.f;   // grey sails: one threat loses the ship in the haze
@@ -1989,14 +2058,17 @@ function advance(G){
   if(hasUp(G, 'diving')) G.en.forEach(e => { if(FOES[e.t].dive) e.nodv = 1; });
   if(hasUp(G, 'flag')) G.en.forEach(e => { if(FOES[e.t].min) e.sk = 1; });   // the black flag: minions dare not move on the first turn
   if(hasUp(G, 'ram')) G.en.forEach(e => { if(armorOf(e) > 0 || e.ar || FOES[e.t].arm) e.ca = (e.ca || 0) + 1; });
+  G.sea = !G.tut && N.sea ? N.sea : null; G.ink = 0; G.inkN = 0;
+  if(G.sea === 'houle') G.en.forEach(e => { e.str += 1; e.hp = e.mx = Math.max(1, Math.round(e.mx * .85)); });   // a heavy swell: harder blows, but the threats are shaken
+  if(G.sea === 'lune') G.en.forEach(e => { e.hp = e.mx = Math.round(e.mx * 1.15); });
   if(!G.tut && (G.node === 0 || N.boss)) freshMarket(G);   // the market is renewed at the start of each epic and before the boss
   G.mr = 0; G.seats.forEach(S => { S.draw = shuffle([...S.deck, ...Array(S.nw || 0).fill('bl')]); S.nw = 0; S.dt = 0; S.fog = 0; S.disc = []; S.hand = []; S.play = []; S.champ = []; S.eu = 0; });
   logf(G, `En vue : ${foes.map(t => FOES[t].n).join(', ')}`);
-  evt(G, {t:'fight', z:N.z, boss:N.boss ? 1 : 0, el:N.el ? 1 : 0, f:N.f[0], ep:G.tut ? 0 : G.ep, cp:G.camp || 0, first:G.node === 0 ? 1 : 0, myst:N.myst ? 1 : 0});
+  evt(G, {t:'fight', z:N.z, boss:N.boss ? 1 : 0, el:N.el ? 1 : 0, f:N.f[0], ep:G.tut ? 0 : G.ep, cp:G.camp || 0, first:G.node === 0 ? 1 : 0, myst:N.myst ? 1 : 0, sea:G.sea || 0});
   newRound(G);
 }
 function newRound(G){
-  G.round++; G.prot = 0; G.half = 0; G.sub = null; G.atk = 0; G.rev = G.round === 1 && hasUp(G, 'compass') ? 1 : 0; G.sacN = 0; G.en.forEach(e => e.tk = 0);
+  G.round++; G.ink = G.inkN || 0; G.inkN = 0; G.prot = 0; G.half = 0; G.sub = null; G.atk = 0; G.rev = G.round === 1 && hasUp(G, 'compass') ? 1 : 0; G.sacN = 0; G.en.forEach(e => e.tk = 0);
   if(G.camp && G.round > 1 && epOf(G).shuffle && G.mk.length){ G.mdeck.unshift(...G.mk.filter(Boolean)); G.mk = []; while(G.mk.length < mkN(G) && G.mdeck.length) G.mk.push(G.mdeck.pop()); evt(G, {t:'shuf'}); }   // the mad compass: the hold turns over every turn
   G.seats.forEach((S, i) => {
     S.disc.push(...S.hand, ...S.play.map(p => p.c)); S.hand = []; S.play = [];
@@ -2007,6 +2079,8 @@ function newRound(G){
     if(!S.ab){ if(rel.includes('bo')) addGold(S, 1); if(rel.includes('pa')) S.c += 1; if(rel.includes('fp')) addProt(G, 3); }
   });
   if(G.round > 1 && G.cmbL) comboRound(G);
+  if(G.sea === 'vent') addProt(G, 2 * present(G).length);   // a following wind: the ship slips past the blows
+  if(G.sea === 'lune') present(G).forEach(S => addGold(S, 1));   // a full moon lights the dark hold
   if(G.tut){
     const force = (i, h) => { const S = G.seats[i]; S.draw.unshift(...S.hand); S.hand = h; };   // drawn cards (wounds included) go back to the pile
     if(G.round === 1){ force(0, ['dou','dou','bou','sab','m2']); force(1, ['dou','dou','m1','dag','rcha']); }
@@ -2096,10 +2170,11 @@ function attack(G, s, e){
   checkWin(G);
   if(G.phase === 'fight' && G.stg === st && G.sub === 'atk' && (G.atk <= 0 || !G.en.some(x => canHit(G, x)))) endAttack(G);   // nothing left to shoot at
 }
+const mkPrice = (G, S, c) => Math.max(0, CARDS[c].$ - ((S && S.rb) || 0)) + (G && G.ink ? 1 : 0);
 function buy(G, s, m){
   const S = G.seats[s]; if(G.phase !== 'fight' || S.rd || !featOn(G.camp, 'mk')) return;
   const code = G.mk[m]; if(!code) return;
-  const cost = Math.max(0, CARDS[code].$ - (S.rb || 0)); if(S.g < cost) return;
+  const cost = mkPrice(G, S, code); if(S.g < cost) return;
   if(G.cs) G.cs.buys++;
   S.g -= cost; S.rb = 0; S.deck.push(code); S.disc.push(code);
   if(!G.mdeck.length) G.mdeck = shuffle(mkPool(G)); G.mk[m] = G.mdeck.pop();
@@ -2193,21 +2268,26 @@ function startStop(G, N){
   G.stg = (G.stg || 0) + 1;
   G.phase = 'port'; G.prot = 0; G.breach = 0; G.vul = 0; G.en = [];
   const n = present(G).length || 1, share = v => Math.max(2, Math.round(G.maxHull * v / n)), whole = v => Math.max(2, Math.round(G.maxHull * v));
-  const kind = N.rest ? 'rest' : N.e;
-  G.port = {k:N.rest ? 'rest' : 'evt', e:N.e || null, of:{}, pick:{}, rm:{}, base:{}, sp:-1, ship:null};
-  if(SHIP_DEC[kind]) G.port.ship = SHIP_DEC[kind].map(k => k === 'SR' ? 'SR:' + whole(kind === 'rest' ? REST_HEAL : kind === 'shore' ? .35 : .22) : k === 'SD' ? 'SD:' + whole(STORM_LOSS) : k);
+  const kind = N.rest ? 'rest' : N.e, rv = N.rest ? N.rv || 'crique' : null;
+  G.port = {k:N.rest ? 'rest' : 'evt', e:N.e || null, rv, of:{}, pick:{}, rm:{}, base:{}, sp:-1, ship:null};
+  if(SHIP_DEC[kind]) G.port.ship = SHIP_DEC[kind].map(k => k === 'SR' ? 'SR:' + whole(kind === 'rest' ? REST_HEAL * REST_V[rv].heal : kind === 'shore' ? .35 : .22) : k === 'SD' ? 'SD:' + whole(STORM_LOSS) : k);
   G.seats.forEach((S, i) => {
     S.rd = S.ab; S.hand = []; S.play = []; S.champ = []; S.g = 0; S.c = 0;
     const cap = mkCap(G), U = f => G.camp ? [...new Set(campPool(G))].filter(c => f(CARDS[c])) : unique(f), all = U(C => C.$ >= 1).sort((x, y) => CARDS[x].$ - CARDS[y].$), or = (l, alt) => l.length ? l : alt, rares = shuffle(or(U(C => C.$ >= cap - 3 && C.$ <= cap + 2), all.slice(-4))), mid = or(U(C => C.$ >= 3 && C.$ <= 7), all.slice(0, 6)), cheap = or(U(C => C.$ >= 1 && C.$ <= 4), all.slice(0, 4));   // rewards follow the market's price range for this epic (the richest holds have no cheap crates)
     const jc = shuffle([...new Set(S.deck.filter(c => !CARDS[c].role))]).slice(0, 3);
     G.port.base[i] = {r0:rares[0], r1:rares[1] || rares[0], cheap:pickOne(cheap), mid:pickOne(mid), jc, trade:S.deck.includes('dou'), cost:share(MERCHANT_COST)};
     let of = [];
-    if(N.e === 'wreck') of = ['C:' + pickOne(cheap), 'CW:' + rares[0], 'N'];
+    const srv = (() => { const l = G.camp && featOn(G.camp, 'srv') ? [...new Set(campPool(G))].filter(c => CARDS[c].ch && !CARDS[c].up) : []; return l.length ? pickOne(l) : pickOne(mid); })();
+    if(N.e === 'tavern') of = ['C:' + srv, S.deck.includes('dou') ? 'T:' + pickOne(mid) : 'C:' + pickOne(cheap), 'H:' + share(.25)];
+    else if(N.e === 'treasure') of = ['CW:' + rares[0], 'C:' + pickOne(mid), 'N'];
+    else if(N.e === 'bottle') of = ['C:' + pickOne(cheap), 'C:' + pickOne(mid)];
+    else if(N.e === 'castaways') of = ['HC:' + share(.12) + ':' + srv, 'N'];
+    else if(N.e === 'wreck') of = ['C:' + pickOne(cheap), 'CW:' + rares[0], 'N'];
     else if(N.e === 'mirage' || N.e === 'whale') of = ['C:' + pickOne(mid), 'CW:' + rares[0], 'N'];
     else if(!G.port.ship) of = ['LW:' + pickOne(LEGENDS.filter(c => featOn(G.camp, 'srv') || !CARDS[c].ch)), 'N'];
     G.port.of[i] = of; G.port.pick[i] = -1; G.port.rm[i] = [];
   });
-  if(N.rest){ logf(G, 'Escale dans une crique abritée'); evt(G, {t:'rest'}); }
+  if(N.rest){ logf(G, `Escale : ${REST_V[rv].n}`); evt(G, {t:'rest', rv}); }
   else { logf(G, EVENTS[N.e].n + ' !'); evt(G, {t:'evt', e:N.e}); }
 }
 // the sailors' own options, once the captain has decided for the ship
@@ -2217,7 +2297,8 @@ function stopOffers(G){
   G.seats.forEach((S, i) => {
     const b = P.base[i]; let of = [];
     if(k && b){
-      if(kind === 'rest') of = k === 'SR' ? ['N'] : ['X', 'C:' + b.r0, 'C:' + b.r1];
+      if(kind === 'rest'){ const v = P.rv || 'crique';
+        of = k === 'SR' ? ['N'] : v === 'village' ? ['X', b.trade ? 'T:' + b.mid : 'C:' + b.mid, 'C:' + b.r0] : v === 'lagon' ? ['X', 'C:' + b.r0, 'C:' + b.mid] : v === 'grotte' ? ['X', 'CW:' + b.r0, 'C:' + b.mid] : ['X', 'C:' + b.r0, 'C:' + b.r1]; }
       else if(kind === 'geyser' || kind === 'shore') of = k === 'SR' ? ['N'] : ['C:' + b.r0, 'C:' + b.r1];
       else if(kind === 'storm' || kind === 'fort') of = k === 'SD' ? ['N'] : (b.jc.length ? b.jc.map(c => 'J:' + c) : ['N']);
       else of = [b.trade ? 'T:' + b.mid : null, k === 'SM' ? `HC:${b.cost}:${b.r0}` : null, kind === 'bazar' ? 'C:' + b.cheap : null, 'N'].filter(Boolean);
@@ -2337,6 +2418,8 @@ function endRound(G){
       if(!F.keep) e.blk = 0;
       const dmg = v => Math.max(0, Math.round((v + e.str) * G.dm));
       const strikeHull = v => { const before = G.prot; const d = hullDmg(G, v); if(e.af === 'vor' && d > 0) e.hp = Math.min(e.mx, e.hp + Math.ceil(d / 2)); return [d, before - G.prot]; };
+      if(e.fz){ e.fz--; if(!e.fz){ const h = strikeHull(e.fd || 0); evt(G, {t:'foe', e:idx, k:'boom', hits:[h], v:e.fd}); logf(G, `💥 Le baril de ${F.n} explose : -${h[0]}`); e.fd = 0; } }   // the powder keg lit two turns ago
+      if(it[0] === 'fuse' && e.fz) it = ['hit', Math.round(it[1] / 2)];   // one keg at a time
       if(it[0] === 'hit'){ ev.hits = [strikeHull(dmg(it[1]))]; logf(G, `${F.n} frappe la coque : -${ev.hits[0][0]}`); }
       else if(it[0] === 'pierce'){ const keep = G.prot; G.prot = 0; ev.hits = [strikeHull(dmg(it[1]))]; ev.hits[0][1] = 0; G.prot = keep; logf(G, `${F.n} perce la coque : -${ev.hits[0][0]}`); }
       else if(it[0] === 'ram'){
@@ -2380,6 +2463,13 @@ function endRound(G){
       else if(it[0] === 'siphon'){ ev.v = G.prot; e.blk += G.prot; G.prot = 0; logf(G, ev.v ? `${F.n} aspire ${ev.v} protection du navire` : `${F.n} tourbillonne dans le vide`); }
       else if(it[0] === 'multi'){ ev.hits = []; for(let k = 0; k < it[2]; k++) ev.hits.push(strikeHull(dmg(it[1]))); logf(G, `${F.n} frappe ${it[2]} fois : -${ev.hits.reduce((t, h) => t + h[0], 0)}`); }
       else if(it[0] === 'shield'){ ev.v = Math.round(it[1] * G.dm); e.blk += ev.v; logf(G, `${F.n} se protège`); }
+      else if(it[0] === 'fuse'){ e.fz = 2; e.fd = dmg(it[1]); ev.v = e.fd; logf(G, `${F.n} allume la mèche d'un baril de poudre : ${e.fd} dans deux tours !`); }
+      else if(it[0] === 'snatch'){
+        const fr = G.mk.map((c, i) => [c, i]).filter(x => x[0]).sort((a, b) => CARDS[b[0]].$ - CARDS[a[0]].$)[0];
+        if(fr){ G.mdeck.unshift(fr[0]); G.mk[fr[1]] = G.mdeck.pop(); ev.c = fr[0]; ev.m = fr[1]; }
+        ev.v = Math.round(it[1] * G.dm); e.blk += ev.v; logf(G, fr ? `${F.n} file avec ${CARDS[fr[0]].n}, tiré de la cale sombre` : `${F.n} ne trouve rien à voler`);
+      }
+      else if(it[0] === 'ink'){ G.inkN = 1; logf(G, `${F.n} crache un nuage d'encre : la cale sombre s'assombrit`); }
       else if(it[0] === 'grow'){ ev.v = it[1]; e.str += it[1]; logf(G, `${F.n} devient plus forte`); }
       else if(it[0] === 'heal'){ ev.v = Math.round(it[1] * (G.hk || 1)); G.en.forEach(o => { if(o.hp > 0) o.hp = Math.min(o.mx, o.hp + ev.v); }); logf(G, `${F.n} soigne les menaces de ${ev.v}`); }
       else if(it[0] === 'curse'){
@@ -2489,10 +2579,10 @@ function dispatch(G, a, from){
   }
 }
 function view(G){
-  return {sub:G.sub === 'atk' ? 1 : 0, atk:G.atk || 0, cps:G.phase === 'fight' || G.phase === 'port' ? capSeat(G) : -1, ups:G.ups || [], used:G.used || {}, cmb:G.cmb || null, cmbL:G.cmbL || {}, cmbX:G.cmbX || {}, gc:G.gc || {}, bordee:G.bordee || 0, helm:G.helm || null, flags:G.flags || {}, cp:G.camp || 0, cst:G.cstars || null, ep:G.ep, port:G.port ? {...G.port, base:undefined} : null, rt:G.tut || !G.route ? null : G.route.map(routeCode), phase:G.phase, node:G.node, tut:G.tut ? 1 : 0, hull:G.hull, maxHull:G.maxHull, prot:G.prot, br:G.breach || 0, half:G.half ? 1 : 0, net:G.net || 0, rev:G.rev ? 1 : 0, cur:G.cur ? 1 : 0, mr:G.mr || 0, bm:G.bm || 1, dm:G.dm, hk:G.hk || 1, round:G.round, stg:G.stg || 0, mut:G.mut ? 1 : 0, host:G.host,
-    en:G.en.map(e => { const o = {t:e.t, hp:e.hp, mx:e.mx}; if(e.hp <= 0) return o; o.i = e.i; if(e.blk) o.blk = e.blk; if(e.str) o.str = e.str; if(e.sk) o.sk = 1; if(e.rg) o.rg = 1; if(e.cap){ o.cap = e.cap; o.tk = e.tk || 0; } if(e.af) o.af = e.af; if(e.rf) o.rf = e.rf; if(e.ar) o.ar = e.ar; if(e.ca) o.ca = e.ca; if(e.inv){ o.inv = 1; o.nx = e.nx ? e.nx[1] : 0; if(e.vn) o.vn = 1; } return o; }),   // compact: zero fields are restored by setView
+  return {sub:G.sub === 'atk' ? 1 : 0, atk:G.atk || 0, cps:G.phase === 'fight' || G.phase === 'port' ? capSeat(G) : -1, ups:G.ups || [], used:G.used || {}, sea:G.sea || 0, ink:G.ink ? 1 : 0, cmb:G.cmb || null, cmbL:G.cmbL || {}, cmbX:G.cmbX || {}, gc:G.gc || {}, bordee:G.bordee || 0, helm:G.helm || null, flags:G.flags || {}, cp:G.camp || 0, cst:G.cstars || null, ep:G.ep, port:G.port ? {...G.port, base:undefined} : null, rt:G.tut || !G.route ? null : G.route.map(routeCode), phase:G.phase, node:G.node, tut:G.tut ? 1 : 0, hull:G.hull, maxHull:G.maxHull, prot:G.prot, br:G.breach || 0, half:G.half ? 1 : 0, net:G.net || 0, rev:G.rev ? 1 : 0, cur:G.cur ? 1 : 0, mr:G.mr || 0, bm:G.bm || 1, dm:G.dm, hk:G.hk || 1, round:G.round, stg:G.stg || 0, mut:G.mut ? 1 : 0, host:G.host,
+    en:G.en.map(e => { const o = {t:e.t, hp:e.hp, mx:e.mx}; if(e.hp <= 0) return o; o.i = e.i; if(e.blk) o.blk = e.blk; if(e.str) o.str = e.str; if(e.sk) o.sk = 1; if(e.rg) o.rg = 1; if(e.cap){ o.cap = e.cap; o.tk = e.tk || 0; } if(e.af) o.af = e.af; if(e.rf) o.rf = e.rf; if(e.ar) o.ar = e.ar; if(e.ca) o.ca = e.ca; if(e.inv){ o.inv = 1; o.nx = e.nx ? e.nx[1] : 0; if(e.vn) o.vn = 1; } if(e.fz){ o.fz = e.fz; o.fd = e.fd; } return o; }),   // compact: zero fields are restored by setView
     mk:G.mk, md:G.mdeck.length, mc:mkCap(G), nc:(G.newCards || []).length, ncl:G.node <= 0 ? (G.newCards || []) : [],
-    seats:G.seats.map(S => ({r:S.r, n:S.n, p:S.p, g:S.g, c:S.c, hand:S.hand, play:S.play, champ:S.champ.map(p => { const o = {c:p.c, u:p.u ? 1 : 0}; if(p.lk) o.lk = 1; if(p.bd) o.bd = 1; return o; }), dr:S.draw.length, di:S.disc.length, dk:S.deck.length, deck:packDeck(S.deck), dw:packDeck(S.draw), ds:packDeck(S.disc), bl:[...S.draw, ...S.disc, ...S.hand].filter(c => c === 'bl').length, rd:S.rd ? 1 : 0, eu:S.eu >= eclMax(S) ? 1 : 0, eul:eclMax(S) - S.eu, rel:S.rel || [], pg:S.pg || 0, bot:S.bot ? 1 : 0, rb:S.rb || 0, mf:S.mf || 0, nw:S.nw || 0, dt:S.dt || 0, ft:S.ft || 0, mr:S.mr || 0, ed:S.ed || 0, ef:S.ef || 0, ab:S.ab ? 1 : 0})),
+    seats:G.seats.map(S => ({r:S.r, n:S.n, p:S.p, g:S.g, c:S.c, hand:S.hand, play:S.play.map(p => p.a ? p.c + '*' : p.c), champ:S.champ.map(p => { const o = {c:p.c, u:p.u ? 1 : 0}; if(p.lk) o.lk = 1; if(p.bd) o.bd = 1; return o; }), dr:S.draw.length, di:S.disc.length, dk:S.deck.length, deck:packDeck(S.deck), dw:packDeck(S.draw), ds:packDeck(S.disc), bl:[...S.draw, ...S.disc, ...S.hand].filter(c => c === 'bl').length, rd:S.rd ? 1 : 0, eu:S.eu >= eclMax(S) ? 1 : 0, eul:eclMax(S) - S.eu, rel:S.rel || [], pg:S.pg || 0, bot:S.bot ? 1 : 0, rb:S.rb || 0, mf:S.mf || 0, nw:S.nw || 0, dt:S.dt || 0, ft:S.ft || 0, mr:S.mr || 0, ed:S.ed || 0, ef:S.ef || 0, ab:S.ab ? 1 : 0})),
     log:G.log.slice(-3), ack:G.ack, ev:G.ev.slice(-12)};
 }
 
@@ -2509,7 +2599,7 @@ function aiScore(S, c){
   return draw * 3 + (C.ch ? 4 + aiFx(ex) : 0) + dmg + def * .8 + (C.f ? same * .15 : 0);
 }
 function aiIncoming(G){ let t = 0; G.en.forEach(e => { if(e.hp <= 0 || e.sk) return; const it = e.nx || FOES[e.t].it[e.i % FOES[e.t].it.length], d = v => Math.round((v + e.str) * G.dm);
-  if(it[0] === 'hit' || it[0] === 'pierce' || it[0] === 'ram') t += d(it[1]); else if(it[0] === 'multi') t += d(it[1]) * it[2]; }); return Math.max(0, t - G.prot); }
+  if(it[0] === 'hit' || it[0] === 'pierce' || it[0] === 'ram') t += d(it[1]); else if(it[0] === 'multi') t += d(it[1]) * it[2]; if(e.fz === 1) t += e.fd || 0; }); return Math.max(0, t - G.prot); }
 function aiTarget(G, S){
   const need = e => (e.cap ? Math.min(e.hp, Math.max(0, e.cap - (e.tk || 0))) : e.hp) + e.blk + armorOf(e);
   const live = G.en.map((e, i) => ({e, i})).filter(({e}) => e.hp > 0 && !e.inv && !guarded(G, e) && !(e.cap && (e.tk || 0) >= e.cap));
@@ -2534,7 +2624,7 @@ function aiTurn(G, i){
   for(let k = S.play.length - 1; k >= 0 && G.phase === 'fight' && G.stg === st; k--){ const pk = S.play[k]; if(!pk) continue; const C = CARDS[pk.c]; if(C.sac && !C.junk && (C.$ <= 2 || boss || S.dev)) sacrifice(G, i, k); }
   playAll(G, i); if(G.phase !== 'fight' || G.stg !== st) return;
   for(let n = 0; n < 8 && G.phase === 'fight' && G.stg === st; n++){
-    let best = -1, bs = -1; G.mk.forEach((c, m) => { if(c && CARDS[c].$ <= S.g){ const v = aiScore(S, c); if(v > bs){ bs = v; best = m; } } });
+    let best = -1, bs = -1; G.mk.forEach((c, m) => { if(c && mkPrice(G, S, c) <= S.g){ const v = aiScore(S, c); if(v > bs){ bs = v; best = m; } } });
     if(best >= 0 && bs >= 5){ buy(G, i, best); continue; }
     if(mkCost(G) <= 1 && S.g >= 3){ let w = -1, ws = 99;   // the price is shared: robots only burn while it is cheap, and leave the rest to the crew
       G.mk.forEach((c, m) => { const v = aiScore(S, c); if(v < ws){ ws = v; w = m; } }); if(w >= 0){ mkRemove(G, i, w); continue; } }
@@ -2569,7 +2659,7 @@ function aiStop(G, i){
   if(P.k === 'rest'){ const o = G.hull < .6 * G.maxHull ? 0 : S.deck.filter(c => c === 'dou').length >= 3 ? 1 : 2; portPick(G, i, o); if(o === 1){ portMark(G, i, 'dou', true); portMark(G, i, 'dou', true); } return; }
   const k = o => of.findIndex(x => x.split(':')[0] === o), healthy = G.hull > .5 * G.maxHull;
   const e = P.e;
-  let o = ['wreck', 'mirage', 'whale'].includes(e) ? (healthy ? k('CW') : k('C')) : ['merchant', 'bazar'].includes(e) ? (k('T') >= 0 ? k('T') : healthy ? k('HC') : k('N'))
+  let o = e === 'tavern' ? (G.hull < .6 * G.maxHull ? k('H') : 0) : e === 'bottle' ? 1 : e === 'castaways' ? (healthy ? k('HC') : k('N')) : ['wreck', 'mirage', 'whale', 'treasure'].includes(e) ? (healthy ? k('CW') : k('C')) : ['merchant', 'bazar'].includes(e) ? (k('T') >= 0 ? k('T') : healthy ? k('HC') : k('N'))
     : ['storm', 'fort'].includes(e) ? (['dou', 'dag', 'bou'].includes(of[1].split(':')[1]) || !healthy ? 1 : 0) : ['geyser', 'shore'].includes(e) ? (G.hull < .6 * G.maxHull ? 0 : 1) : (healthy ? k('LW') : k('N'));
   portPick(G, i, Math.max(0, o));
 }
@@ -2714,6 +2804,7 @@ function publish(){
 }
 function setView(v){
   if(v && Array.isArray(v.en)) v = {...v, en:v.en.map(e => ({i:0, blk:0, str:0, sk:0, rg:0, inv:0, nx:0, af:'', rf:0, ...e}))};
+  if(v && Array.isArray(v.seats)) v = {...v, seats:v.seats.map(S => Array.isArray(S.play) ? {...S, play:S.play.map(x => typeof x === 'string' ? {c:x.replace('*', ''), a:x.endsWith('*') ? 1 : 0} : x)} : S)};   // played cards travel as "code" or "code*" (allied)
   try{ track(v); }catch(e){}   // collections never break the game
   try{ campRecord(v); }catch(e){}
   if(ui.playing){ ui.queued = v; return; }
@@ -2772,7 +2863,8 @@ function stepLabel(v){
   if(v.phase === 'win') return {ic:'🗼', t:'Le phare !', sub:'La traversée est accomplie'};
   if(v.phase === 'tutend') return {ic:'🗼', t:'Baie tranquille', sub:'Fin du tutoriel'};
   const R = routeFromView(v), N = R[v.node]; if(!N) return {ic:'⛵', t:'En mer', sub:''};
-  if(N.rest) return {ic:'🏝️', t:'Crique abritée', sub:'Dernière escale avant le boss'};
+  if(N.rest){ const X = REST_V[N.rv] || REST_V.crique; return {ic:X.ic, t:X.n, sub:'Dernière escale avant le boss'}; }
+  if(N.sp && EVENTS[N.e]) return {ic:EVENTS[N.e].ic, t:EVENTS[N.e].n, sub:'Une escale sur la route'};
   if(N.fork) return {ic:'🔀', t:'La route se divise', sub:'Le capitaine choisit le chemin'};
   if(N.myst) return {ic:'❓', t:'Eaux inconnues', sub:'Embuscade ou rencontre étrange…'};
   if(N.boss){ const F = FOES[N.f[0]]; return {ic:'👑', t:F.the || F.n, sub:'Le boss de l\'épopée'}; }
@@ -2800,7 +2892,7 @@ async function playTransition(prev, v, fx){
   const R = routeFromView(v), L = stepLabel(v), E = epOfV(v);
   const inPort = v.phase === 'port' && v.port && v.port.k === 'port';
   const to = inPort || v.phase === 'win' ? R.length : Math.max(0, v.node), from = newEp ? -1 : inPort || v.phase === 'win' ? R.length - 1 : Math.max(-1, v.node - 1);
-  const icon = (n, i) => i < to ? '✓' : n.boss ? '👑' : n.el ? '🔥' : n.rest ? '🏝️' : n.fork ? '🔀' : n.myst ? '❓' : '⚔';
+  const icon = (n, i) => i < to ? '✓' : n.boss ? '👑' : n.el ? '🔥' : n.rest ? (REST_V[n.rv] || REST_V.crique).ic : n.fork ? '🔀' : n.sp ? EVENTS[n.e].ic : n.myst ? '❓' : '⚔';
   const o = document.createElement('div'); o.id = 'voyfx'; o.className = 'voyfx';
   o.innerHTML = `<div class="vbox">
       ${newEp ? `<div class="vep">${esc(E.n)}<small>${esc(E.z)} · ${esc(E.tr || '')}</small></div>` : `<div class="vep sm">${esc(E.z)}</div>`}
@@ -2969,7 +3061,7 @@ function cardHTML(code, attrs = '', extra = '', opts = {}){
   const ally = C.al ? `<span class="ally ${opts.allyOn ? 'on' : ''}" title="Alliance : se déclenche si tu as une autre carte ${FACTIONS[C.f].n} en jeu"><span class="medal">${FACTIONS[C.f].ic}</span><span class="bcol"><span class="bl">Alliance</span><span class="fxrow">${fxChips(C.al)}${specialText(C.al)}</span></span></span>` : '';
   const sac = C.sac && !C.junk ? `<span class="sacr" title="Sacrifier : retire la carte de ton deck pour cet effet"><span class="skull">☠</span><span class="bcol"><span class="bl">Sacrifice</span><span class="fxrow">${fxChips(C.sac)}</span></span></span>` : '';
   return `<button class="card ${C.f && !C.leg ? 'fac' : ''} ${C.ch ? 'champ' : ''} ${C.junk ? 'junk' : ''} ${C.leg ? 'leg' : ''} ${extra}" style="--fc:${colOf(code)};${opts.style || ''}" data-c="${code}" title="${esc(title)}" aria-label="${esc(title)}" ${attrs}>
-    ${opts.cost ? (eff => `<span class="coin ${eff < C.$ ? 'disc' : ''}" title="${eff} bougie${eff > 1 ? 's' : ''} pour l'atteindre${eff < C.$ ? ` au lieu de ${C.$} (réduction de ta prochaine carte)` : ''}"><i>🕯️</i>${eff < C.$ ? `<s>${C.$}</s>` : ''}${eff}</span>`)(Math.max(0, C.$ - (opts.rb || 0))) : ''}${opts.cnt ? `<span class="cnt">×${opts.cnt}</span>` : ''}${opts.rm ? `<span class="rmb">−${opts.rm}</span>` : ''}
+    ${opts.cost ? (eff => `<span class="coin ${eff < C.$ ? 'disc' : eff > C.$ ? 'inked' : ''}" title="${eff} bougie${eff > 1 ? 's' : ''} pour l'atteindre${eff < C.$ ? ` au lieu de ${C.$} (réduction de ta prochaine carte)` : ''}"><i>🕯️</i>${eff < C.$ ? `<s>${C.$}</s>` : ''}${eff}</span>`)(Math.max(0, C.$ - (opts.rb || 0))) : ''}${opts.cnt ? `<span class="cnt">×${opts.cnt}</span>` : ''}${opts.rm ? `<span class="rmb">−${opts.rm}</span>` : ''}
     <span class="face"><b class="nm">${esc(C.n)}</b>
       <span class="art"><span class="pic">${ART[code] || '⚓'}</span>${badge ? `<span class="fbadge">${badge}</span>` : ''}${C.ch ? `<span class="def" title="Défense">${C.ch}</span>` : ''}</span>
       <span class="kind">${kind}</span><span class="body">${body}</span>${ally}${sac}</span></button>`;
@@ -2994,6 +3086,7 @@ function intentOf(e){
   if(e.sk) return {t:'💨 Déroutée', calm:true, full:"N'agira pas ce tour"};
   if(e.inv) return e.vn ? {t:`👻 Ressurgit : ${dmg(e.nx)} !`, full:`S'est effacé dans la brume : impossible à toucher ce tour. Il va ressurgir et frapper la coque de ${dmg(e.nx)}. Prépare ta protection !`}
     : {t:`🌊 Remonte : ${dmg(e.nx)} !`, full:`A plongé hors d'atteinte : impossible à toucher ce tour. Il va jaillir des flots et frapper la coque de ${dmg(e.nx)}. Prépare ta protection !`};
+  if(pv.sea === 'brume' && pv.round === 1 && !pv.rev) return {t:'🌫️ ???', calm:true, hid:1, full:"Le banc de brume cache ses intentions pour ce premier tour."};
   if((F.hide || (!pv.tut && epOfV(pv).hide)) && !pv.rev) return {t:'❓ ???', calm:true, hid:1, full:"Ses intentions sont cachées. Une carte qui révèle (Boussole enchantée, Lanterne sourde) les montre pour le tour."};
   if(it[0] === 'tax'){ const n = pv.seats.filter(S => !S.ab).length; return {t:`⚖️ Prélève ${it[1]}`, full:`Va prélever ${it[1]} bougie${it[1] > 1 ? 's' : ''} à chaque matelot au prochain tour, et s'en faire un bouclier de ${Math.round(it[1] * n * 1.5 * pv.dm)}`}; }
   if(it[0] === 'vanish') return {t:'🌫️ Disparaît', calm:true, full:`Va s'effacer dans la brume : intouchable au prochain tour, puis il ressurgira en frappant de ${dmg(it[1])}`};
@@ -3013,6 +3106,10 @@ function intentOf(e){
   if(it[0] === 'buff') return {t:`📣 Renforce +${it[1]}`, full:`Va donner +${it[1]} de force à chaque autre menace`};
   if(it[0] === 'steal') return {t:`🕯️ Souffle ${it[1]}`, full:`Va souffler ${it[1]} bougie${it[1] > 1 ? 's' : ''} à chaque matelot : les ${it[1]} premières bougies gagnées au prochain tour s'éteindront`};
   if(it[0] === 'fog') return {t:`🌫️ Brouillard`, full:`Chaque matelot piochera ${it[1]} carte de moins au prochain tour`};
+  if(it[0] === 'fuse' && !e.fz) return {t:`🧨 Mèche`, full:`Va allumer un baril de poudre : il explosera deux tours plus tard pour ${dmg(it[1])} dégâts sur la coque. Abats l'artificier avant, et le baril ne sautera pas !`};
+  if(it[0] === 'fuse') return {t:`🗡 Frappe ${dmg(Math.round(it[1] / 2))}`, full:`Va frapper la coque : ${dmg(Math.round(it[1] / 2))} dégâts (un seul baril à la fois)`};
+  if(it[0] === 'snatch') return {t:'🦤 Vole', full:`Va voler l'objet le plus précieux du premier rang de la cale sombre (il retourne tout au fond), puis se protéger de ${Math.round(it[1] * pv.dm)}`};
+  if(it[0] === 'ink') return {t:'🦑 Encre', calm:true, full:"Va cracher un nuage d'encre : au prochain tour, chaque carte de la cale sombre coûte 1 bougie de plus"};
   if(it[0] === 'hit') return {t:`🗡 Frappe ${dmg(it[1])}`, full:`Va frapper la coque : ${dmg(it[1])} dégâts`};
   if(it[0] === 'multi') return {t:`🗡 ${dmg(it[1])} × ${it[2]}`, full:`Va frapper ${it[2]} fois ${dmg(it[1])}`};
   if(it[0] === 'board'){ const f = Math.round((it[1] + e.str) * (pv.bm || 1)); return {t:`🪝 Abordage ${f}`, full:`Abordage de force ${f} : ton serviteur le plus solide s'interpose. S'il a une défense inférieure ou égale à la force, il est jeté à l'eau et la force baisse d'autant, puis le suivant s'interpose. Force restante sans serviteur : brèche + 2 blessures`}; }
@@ -3054,6 +3151,31 @@ function openFoeInfo(i){
   document.body.appendChild(d);
 }
 // the hold, explained on demand (the ⓘ next to its title)
+function openInfo(title, rows){
+  const d = document.createElement('div'); d.className = 'collmodal'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
+  d.innerHTML = `<div class="cm-box caleinfo"><button class="close" data-act="coll-close" aria-label="Fermer">✕</button>
+    <h3>${esc(title)}</h3>
+    <ul class="fi-list">${rows.map(x => `<li><span>${x[0]}</span><div><b>${esc(x[1])}</b><br>${esc(x[2])}</div></li>`).join('')}</ul>
+    <button class="btn" data-act="coll-close">Compris</button></div>`;
+  d.addEventListener('click', ev => { if(ev.target === d) d.remove(); });
+  document.body.appendChild(d);
+}
+const INFO = {
+  sea:() => { const X = pv && SEAS[pv.sea]; if(X) openInfo(`${X.ic} ${X.n}`, [[X.ic, 'État de la mer', X.t], ['🧭', 'Pour ce combat', "Chaque combat ordinaire peut se dérouler dans une mer différente. L'étiquette disparaît au combat suivant."]]); },
+  breach:() => openInfo('La brèche', [
+    ['🪝', "D'où vient-elle ?", "Quand une menace aborde le navire et qu'aucun serviteur ne tient le pont, la force qui reste ouvre une brèche dans la coque, et deux blessures 🩹 sont glissées dans les decks de l'équipage."],
+    ['💥', 'Le danger', `Tant que la brèche n'est pas colmatée, le navire est vulnérable : à la fin du tour, tous les dégâts sur la coque font ×1,5.${pv && pv.br ? ` Ici, il reste ${pv.br} point${pv.br > 1 ? 's' : ''} à boucher.` : ''}`],
+    ['🪣', 'La colmater', "Toute la protection 🛡 gagnée ce tour (Écoper, Garde du pont, carte de rôle…) sert d'abord à reboucher la brèche, point par point. Le surplus protège le navire normalement."],
+    ['🛡️', "L'éviter", "Garde des serviteurs solides à bord : le plus solide s'interpose à chaque abordage, et repousse les abordages plus faibles que sa défense."],
+  ]),
+  srv:() => { const S = pv && pv.seats[activeSeat()], list = S ? S.champ : [];
+    openInfo('Tes serviteurs', [
+      ['🧍', 'Ils agissent tout seuls', "Chaque serviteur à bord agit au début de chaque tour, et dès qu'il monte à bord : tu n'as rien à faire. L'étiquette 🧍 additionne ce que les tiens te rapportent à chaque tour."],
+      ...list.map(p => [CARDS[p.c].ch ? '•' : '', CARDS[p.c].n, `${fxText(CARDS[p.c].ex)} à chaque tour, défense ${CARDS[p.c].ch}${CARDS[p.c].up ? ` (il mange ${CARDS[p.c].up} bougie : touche-le pour le nourrir, sinon il fond)` : ''}.`]),
+      ['🛡', 'Leur défense', "Le chiffre sur chaque serviteur, c'est sa défense contre les abordages 🪝. Il devient vert quand une carte la renforce pour le tour (Filet d'abordage…)."],
+      ['👑', 'Les tiens et ceux des autres', "Les tiens ont un anneau doré ; la pastille en haut à gauche montre le rôle de son propriétaire."],
+    ]); },
+};
 function openCaleInfo(){
   const burn = pv && featOn(pv.cp, 'mkrm'), mc = pv ? mkCost(pv) : 1;
   const rows = [
@@ -3206,6 +3328,11 @@ function renderScreen(){
 }
 // first-encounter tips for the new enemy behaviours (outside the tutorial)
 const TIPS = {
+  fuse:['🧨 Baril de poudre', "Un artificier a allumé une mèche : son baril explosera <b>deux tours plus tard</b> (le compte à rebours 🧨 est affiché sur lui). Abats-le avant et le baril ne sautera pas, ou garde de la protection pour encaisser l'explosion."],
+  snatch:['🦤 Voleur de la cale', "Cette menace chaparde l'objet le plus précieux du premier rang de la cale sombre : il retourne tout au fond. Remonte les bonnes cartes avant qu'elle ne passe à l'action !"],
+  ink:["🦑 Nuage d'encre", "Une menace crache de l'encre dans la cale sombre : au tour suivant, chaque carte y coûte <b>1 bougie de plus</b>. Allume davantage de bougies, ou attends que l'encre se dissipe."],
+  sea:['🌊 État de la mer', "Ce combat se déroule dans une mer particulière : regarde l'étiquette en bas du navire, et touche-la pour lire son effet. Chaque combat ordinaire peut changer de temps."],
+  breach:['💥 Une brèche !', "Un abordage a passé tes serviteurs : la coque est ouverte. Tant qu'elle n'est pas colmatée, le navire prend <b>×1,5 dégâts</b> à la fin du tour. Toute la <b>protection 🛡</b> gagnée ce tour la rebouche d'abord (Écoper, Garde du pont…). Touche l'étiquette rouge 💥 sur le navire pour relire l'explication."],
   ally:['🔗 Alliances', "Tes nouvelles cartes appartiennent à une <b>faction</b> : 🏴‍☠️ Flibuste, ⚓ Marine royale, 🐙 Culte des abysses ou 🌴 Tribu des îles. Dès que tu joues <b>2 cartes d'une même faction</b> dans le même tour, leurs <b>alliances</b> se déclenchent : chaque carte donne son bonus 🔗 en plus. Les pastilles sur le pont comptent tes cartes par faction. Seules tes propres cartes comptent."],
   guard:['🛡 Gardiens', "Tant qu'un gardien est en vie, les autres menaces sont intouchables : élimine-les d'abord. Les dégâts de zone 💥 touchent tout le monde. Quand le chef tombe, ses sbires s'enfuient."],
   sup:['🔗 Soutiens', "Un soutien ne protège personne : tu peux frapper le chef directement. Mais tant qu'il vit, il soigne ou renforce les autres menaces. À toi de choisir ta cible."],
@@ -3332,7 +3459,7 @@ function renderTip(){
   const live = pv.en.filter(e => e.hp > 0), itOf = e => { const F = FOES[e.t]; return F.it[e.i % F.it.length][0]; };
   const me = activeSeat();
   const Eh = !pv.tut && pv.cp ? epOfV(pv) : {};
-  const cond = {tax:live.some(e => itOf(e) === 'tax'), hide:live.some(e => FOES[e.t].hide) || !!Eh.hide, vanish:live.some(e => e.vn), shift:live.some(e => FOES[e.t].shift), fury:live.some(e => FOES[e.t].fury), cur:!!pv.cur || live.some(e => itOf(e) === 'courant'), shuf:!!Eh.shuffle, combo:!!pv.cmb, sact:(pv.ups || []).some(k => k === 'bell' || k === 'prow') && mySeats().includes(pv.cps), arm:live.some(e => e.ar), ally:Object.keys(FACTIONS).some(f => crewFactionCount(f, me) >= 2), guard:live.some(e => FOES[e.t].guard), sup:live.some(e => FOES[e.t].sup), steal:live.some(e => itOf(e) === 'steal') || pv.seats.some(S => S.dt),
+  const cond = {breach:!!pv.br, fuse:live.some(e => FOES[e.t].it.some(x => x[0] === 'fuse')), snatch:live.some(e => FOES[e.t].it.some(x => x[0] === 'snatch')), ink:live.some(e => FOES[e.t].it.some(x => x[0] === 'ink')), sea:!!pv.sea, tax:live.some(e => itOf(e) === 'tax'), hide:live.some(e => FOES[e.t].hide) || !!Eh.hide, vanish:live.some(e => e.vn), shift:live.some(e => FOES[e.t].shift), fury:live.some(e => FOES[e.t].fury), cur:!!pv.cur || live.some(e => itOf(e) === 'courant'), shuf:!!Eh.shuffle, combo:!!pv.cmb, sact:(pv.ups || []).some(k => k === 'bell' || k === 'prow') && mySeats().includes(pv.cps), arm:live.some(e => e.ar), ally:Object.keys(FACTIONS).some(f => crewFactionCount(f, me) >= 2), guard:live.some(e => FOES[e.t].guard), sup:live.some(e => FOES[e.t].sup), steal:live.some(e => itOf(e) === 'steal') || pv.seats.some(S => S.dt),
     fog:live.some(e => itOf(e) === 'fog'), dive:live.some(e => e.inv && !e.vn), rage:pv.ep >= 3 || !!Eh.rage,
     storm:pv.round >= ESC_ROUND - 1 && live.some(e => FOES[e.t].boss),
     mkrot:(() => { const S = pv.seats[activeSeat()]; return !!S && featOn(pv.cp, 'mkrm') && !S.rd && S.g >= 1 && !S.hand.some(c => !CARDS[c].junk) && !pv.mk.some(c => c && CARDS[c].$ <= S.g); })(),
@@ -3553,38 +3680,42 @@ function setFoeBar(el, hp, mx, blk){
 // the dark hold, in the dock behind its tab: the cards your candles can reach, and the burn buttons
 function holdHTML(S){
   const mc = mkCost(pv), burn = featOn(pv.cp, 'mkrm'), deep = Math.min(2, pv.md || 0), n = pv.mk.filter(Boolean).length;
-  return `<section id="market" class="sect dhold"><div class="cards dgrid" style="--cols:${Math.max(4, n)}">${pv.mk.map((c, i) => c ? `<div class="mkslot deep${deep}">${cardHTML(c, `data-act="buy" data-m="${i}"`, `${S && S.g + (S.rb || 0) >= CARDS[c].$ && !S.rd ? 'afford' : 'off'} ${ui.flip && ui.flip.has(i) ? 'flipin' : ''}`, {cost:1, rb:S ? S.rb || 0 : 0})}${burn ? `<button class="mkrm" data-act="mkrm" data-m="${i}" title="Brûler cet objet pour dégager le passage : celui qui est derrière s'avance. ${S && S.mf ? 'Gratuit ce tour' : `${mc} bougie${mc > 1 ? 's' : ''}`} ; le prix est commun à tout l'équipage, il monte de 1 à chaque objet brûlé et revient à 1 à chaque nouvelle étape." ${S && (S.mf || S.g >= mc) && !S.rd ? '' : 'disabled'}>🔥 Brûler <span>${S && S.mf ? 'gratuit' : mc + '🕯️'}</span></button>` : ''}</div>` : '').join('')}</div></section>`;
+  return `<section id="market" class="sect dhold"><div class="cards dgrid" style="--cols:${Math.max(4, n)}">${pv.mk.map((c, i) => c ? `<div class="mkslot deep${deep}">${cardHTML(c, `data-act="buy" data-m="${i}"`, `${S && S.g >= mkPrice(pv, S, c) && !S.rd ? 'afford' : 'off'} ${ui.flip && ui.flip.has(i) ? 'flipin' : ''}`, {cost:1, rb:(S ? S.rb || 0 : 0) - (pv.ink ? 1 : 0)})}${burn ? `<button class="mkrm" data-act="mkrm" data-m="${i}" title="Brûler cet objet pour dégager le passage : celui qui est derrière s'avance. ${S && S.mf ? 'Gratuit ce tour' : `${mc} bougie${mc > 1 ? 's' : ''}`} ; le prix est commun à tout l'équipage, il monte de 1 à chaque objet brûlé et revient à 1 à chaque nouvelle étape." ${S && (S.mf || S.g >= mc) && !S.rd ? '' : 'disabled'}>🔥 Brûler <span>${S && S.mf ? 'gratuit' : mc + '🕯️'}</span></button>` : ''}</div>` : '').join('')}</div></section>`;
 }
 const holdInfo = S => `<span class="mkinfo" title="${pv.md} objet${pv.md > 1 ? 's' : ''} entassé${pv.md > 1 ? 's' : ''} derrière le premier rang${pv.tut ? '' : `, jusqu'à ${pv.mc || 15} bougies de profondeur`}">📦${pv.md}<button class="infob" data-act="cale-info" aria-label="Comment marche la cale ?" title="Comment marche la cale ?">i</button></span>`;
 // the deck and the dark hold share the same place on the screen: a switch between them (the hold opens by itself once the hand is played)
 function zoneHTML(s, S){
   if(!featOn(pv.cp, 'mk')) return playedHTML(s);
-  const z = ui.zone || (S && !S.hand.length && !pv.sub ? 'cale' : 'pont'), glow = z !== 'cale' && holdGlow(S);
-  return `<div class="zonetabs" role="tablist" aria-label="Le pont ou la cale sombre"><button role="tab" aria-selected="${z === 'pont'}" class="ztab ${z === 'pont' ? 'on' : ''}" data-act="zone" data-z="pont">⚓ Sur le pont</button><button role="tab" aria-selected="${z === 'cale'}" class="ztab cale ${z === 'cale' ? 'on' : ''} ${glow ? 'glow' : ''}" id="holdTab" data-act="zone" data-z="cale">🏮 La cale sombre${glow ? ' ✨' : ''}</button>${z === 'cale' ? holdInfo(S) : ''}</div>
+  const z = ui.zone || 'cale', glow = z !== 'cale' && holdGlow(S);
+  return `<div class="zonetabs" role="tablist" aria-label="La cale sombre ou le pont"><button role="tab" aria-selected="${z === 'cale'}" class="ztab cale ${z === 'cale' ? 'on' : ''} ${glow ? 'glow' : ''}" id="holdTab" data-act="zone" data-z="cale">🏮 La cale sombre${glow ? ' ✨' : ''}</button><button role="tab" aria-selected="${z === 'pont'}" class="ztab ${z === 'pont' ? 'on' : ''}" id="pontTab" data-act="zone" data-z="pont">⚓ Sur le pont</button>${z === 'cale' ? holdInfo(S) : ''}</div>
     <div class="zone ${z}">${z === 'cale' ? holdHTML(S) : playedHTML(s)}</div>`;
 }
-const holdGlow = S => !!(S && !S.rd && pv.mk.some(c => c && S.g + (S.rb || 0) >= CARDS[c].$));
+const holdGlow = S => !!(S && !S.rd && pv.mk.some(c => c && S.g >= mkPrice(pv, S, c)));
 function playedHTML(s){
   const tally = Object.entries(FACTIONS).map(([f, F]) => {
     const n = crewFactionCount(f, s);
     const tip = `${F.n} : ${n} carte${n > 1 ? 's' : ''} en jeu chez toi` + (n === 1 ? ". Encore une pour déclencher tes alliances." : n >= 2 ? '. Tes alliances sont actives.' : '');
     return `<span class="tpip ${n >= 2 ? 'on' : n === 1 ? 'one' : ''}" data-f="${f}" style="--fc:${F.col}" title="${esc(tip)}"><span class="ic">${F.ic}</span><b>${n}</b>${n >= 2 ? '<span class="st">alliance</span>' : n === 1 ? '<span class="st">encore 1</span>' : ''}</span>`;
   }).join('');
-  const rows = pv.seats.map((S, si) => ({S, si})).filter(({S}) => S.play.length);
+  const rows = pv.seats.map((S, si) => ({S, si})), multi = pv.seats.filter(y => !y.ab).length > 1;
+  // one line per sailor: who he is, what he holds this turn, his special skill, ready or not
+  const head = (x, i) => `<button class="phead seat ${x.p === myId() ? 'mine' : ''} ${i === s ? 'active' : ''} ${x.ab ? 'away' : ''}" data-act="seat" data-s="${i}" title="${esc(x.n)}">
+      <span class="pwho">${ROLES[x.r].ic}</span><b class="pn">${esc(x.n)}</b>${i === pv.cps && multi ? '<span class="helmb" title="À la barre : répartit l\'attaque du navire">🎖️</span>' : ''}${x.rel && x.rel.length ? `<span class="rl" title="${esc(x.rel.map(r => RELICS[r].n).join(', '))}">${x.rel.map(r => RELICS[r].ic).join('')}</span>` : ''}
+      <span class="pst">${x.ab ? 'Absent·e' : `${featOn(pv.cp, 'gold') ? `<span title="Bougies">🕯️${x.g}</span>` : ''}<span title="Combat">⚔${x.c}</span><span title="Cartes en main">🃏${x.hand.length}</span>${x.champ.length ? `<span title="Serviteurs à bord">🧍${x.champ.length}</span>` : ''}`}</span>
+      ${featOn(pv.cp, 'ecl') && !x.ab ? `<span class="es ${x.eu ? 'off' : 'on'}" title="${esc(ROLES[x.r].ecl.n)} : ${x.eu ? 'déjà utilisée pendant ce combat' : 'compétence prête, une fois par combat'}"><span class="eic">${ROLES[x.r].ecl.ic}</span></span>` : ''}${x.rd && !x.ab ? '<span class="ok">✓</span>' : ''}</button>`;
   const cm = pv.cmb, n0 = pv.seats.filter(x => !x.ab).length, T = comboT(n0, pv.cp);
   const combos = cm ? `<button class="combos" data-act="combo-info" aria-label="Combos du combat"><span class="cl">⚡ Combos</span>${'MTFC'.split('').map(f => { const v = cm[f] || 0, L = (pv.cmbL || {})[f] || 0;
       return `<span class="cpip ${L >= 2 ? 'gr' : L ? 'on' : ''}" style="--fc:${FACTIONS[f].col}" title="${esc(FACTIONS[f].n)} : ${v} carte${v > 1 ? 's' : ''} en alliance pendant ce combat. Combo à ${T[0]}, grand combo à ${T[1]}."><span class="ic">${FACTIONS[f].ic}</span><b>${v}</b><small>/${L >= 1 ? T[1] : T[0]}</small>${L >= 2 ? '★' : ''}</span>`; }).join('')}</button>` : '';
   return `<section class="sect" id="inplay"><header><h2>Sur le pont</h2><div class="tally">${tally}</div></header>
     ${combos}
     ${pv.mut ? '<p class="mutiny">🏴 Mutinerie : aucune alliance ne se déclenche ce tour.</p>' : ''}
-    ${rows.length ? '<div class="prows">' + rows.map(({S, si}) => `<div class="prow ${si === s ? 'act' : ''}" data-seat="${si}" style="--rc:${ROLES[S.r].col}"><span class="pwho" title="${esc(S.n)}">${ROLES[S.r].ic}</span>
-      <div class="minis">${S.play.map((p, i) => miniHTML(p, S, si, i, S.p === myId())).join('')}</div></div>`).join('') + '</div>'
-      : `<p class="note empty">Les cartes jouées se posent ici.${featOn(pv.cp, 'mk') ? ' Deux cartes d\'une même faction déclenchent les alliances.' : ''}</p>`}
+    <div class="prows">${rows.map(({S, si}) => `<div class="prow ${si === s ? 'act' : ''} ${S.rd ? 'ready' : ''}" data-seat="${si}" style="--rc:${ROLES[S.r].col}">${head(S, si)}
+      ${S.play.length ? `<div class="minis">${S.play.map((p, i) => miniHTML(p, S, si, i, S.p === myId())).join('')}</div>` : ''}</div>`).join('')}</div>
   </section>`;
 }
 function playTarget(s, code){
   if(CARDS[code] && CARDS[code].ch) return '#ship';
-  return $(`.prow[data-seat="${s}"] .minis`) ? `.prow[data-seat="${s}"] .minis` : '#inplay';
+  return $(`.prow[data-seat="${s}"] .minis`) ? `.prow[data-seat="${s}"] .minis` : $(`.prow[data-seat="${s}"]`) ? `.prow[data-seat="${s}"]` : $('#inplay') ? '#inplay' : '#pontTab';
 }
 
 // short label of an option, shown under each sailor's name
@@ -3616,7 +3747,8 @@ function shipTile(P, opt, o, mine){
     return N.el ? tile('🔥', 'Braver l’élite', foes, '🎁 Butin : une carte rare pour chaque matelot', true) : tile(FOES[N.f[0]].ic, 'Passer au plus court', foes, 'Un combat ordinaire'); }
   const [k, a] = opt.split(':'), kind = P.k === 'rest' ? 'rest' : P.e;
   if(k === 'SR') return tile('🔧', 'Réparer la coque', `Tout l'équipage répare : la coque regagne ${a} points`, 'Personne ne prend de carte');
-  if(k === 'SE') return tile('🧭', kind === 'rest' ? 'Explorer la crique' : 'Explorer', 'Pas de réparation', kind === 'rest' ? 'Chacun allège son deck ou prend une carte rare' : 'Chacun choisit une carte rare');
+  if(k === 'SE'){ const v = P.rv || 'crique', T = {crique:['🧭', 'Explorer la crique', 'Chacun allège son deck ou prend une carte rare'], village:['⚖️', 'Faire du troc au village', 'Chacun allège son deck, troque une Bougie ou prend une carte rare'], lagon:['🤿', 'Plonger dans le lagon', 'Chacun allège son deck ou rapporte une carte du fond'], grotte:['🔦', 'Fouiller la grotte', 'Chacun allège son deck ou fouille : carte rare, mais des blessures']}[v];
+    return kind === 'rest' ? tile(T[0], T[1], 'Pas de réparation', T[2]) : tile('🧭', 'Explorer', 'Pas de réparation', 'Chacun choisit une carte rare'); }
   if(k === 'SD') return tile('⛵', 'Tenir la barre', `La coque perd ${a} points`, 'Les decks ne bougent pas', true);
   if(k === 'SJ') return tile('🌊', 'Alléger le navire', 'Chaque matelot jette une carte de son deck', 'Il choisit laquelle');
   if(k === 'SM') return tile('⚖️', 'Commercer', 'Chacun peut aussi acheter une carte rare', 'Payée en planches de la coque', true);
@@ -3629,14 +3761,15 @@ function renderStop(app){
   const rest = P.k === 'rest', fork = P.k === 'fork', E = rest || fork ? null : EVENTS[P.e];
   const cps = pv.cps, capX = pv.seats[cps], iCapt = mySeats().includes(cps), wait = !!P.ship && P.sp < 0;
   const capName = capX ? `${ROLES[capX.r].ic} ${esc(capX.n)}` : 'Le capitaine';
-  const title = fork ? 'La route se divise' : rest ? 'Crique abritée' : E.n, ic = fork ? '🔀' : rest ? '🏝️' : E.ic;
+  const RV = rest ? REST_V[P.rv] || REST_V.crique : null;
+  const title = fork ? 'La route se divise' : rest ? RV.n : E.n, ic = fork ? '🔀' : rest ? RV.ic : E.ic;
   const sec = pv.cp && CAMP[pv.cp] ? CAMP[pv.cp].sector : 0;
-  const text = fork ? `${esc(FORK_TXT[sec] || 'Deux chemins s’offrent au navire.')} Le capitaine à la barre choisit la route.` : rest ? `Dernière escale avant ${esc((bossF.the || bossF.n).replace(/^L/, 'l'))}. Le capitaine décide si l'équipage répare la coque ou explore la crique, puis chacun fait son choix.` : esc(E.t);
+  const text = fork ? `${esc(FORK_TXT[sec] || 'Deux chemins s’offrent au navire.')} Le capitaine à la barre choisit la route.` : rest ? `${esc(RV.t)} Dernière escale avant ${esc((bossF.the || bossF.n).replace(/^L/, 'l'))} : le capitaine décide pour le navire, puis chacun fait son choix.` : esc(E.t);
   const shipSec = P.ship ? `<section class="sect shipdec" id="shipdec"><header><h2>🎖️ ${fork ? 'Choix de la route' : 'Décision du capitaine'}</h2><span class="note">${iCapt ? (fork ? 'À toi de choisir le chemin' : 'À toi de décider pour tout le navire') : `${capName} décide${fork ? ' du chemin' : ' pour tout le navire'}`}</span></header>
       <div class="opts">${P.ship.map((x, o) => shipTile(P, x, o, iCapt)).join('')}</div></section>` : '';
   app.innerHTML = `
     <div class="topline">${quitBtn()}<div class="zone display">${esc(R[pv.node] ? R[pv.node].z : '')}${pv.cp ? `<span class="epb">${pv.cp} · ${esc(CAMP[pv.cp].n)}</span>` : `<span class="epb">Épopée ${pv.ep}/${EPICS.length}</span>`}</div>
-      <div class="route">${R.map((n, i) => `${i ? '<b></b>' : ''}<i class="${i < pv.node ? 'done' : i === pv.node ? 'now' : ''}">${i < pv.node ? '✓' : i === pv.node ? ic : n.boss ? '👑' : n.el ? '🔥' : n.rest ? '🏝️' : n.fork ? '🔀' : n.myst ? '❓' : '⚔'}</i>`).join('')}</div></div>
+      <div class="route">${R.map((n, i) => `${i ? '<b></b>' : ''}<i class="${i < pv.node ? 'done' : i === pv.node ? 'now' : ''}">${i < pv.node ? '✓' : i === pv.node ? ic : n.boss ? '👑' : n.el ? '🔥' : n.rest ? (REST_V[n.rv] || REST_V.crique).ic : n.fork ? '🔀' : n.sp ? EVENTS[n.e].ic : n.myst ? '❓' : '⚔'}</i>`).join('')}</div></div>
     ${sceneHTML({lighthouse:rest, amb:ambOf(pv), ratio:pv.hull / pv.maxHull, hull:`${hullHTML(pv.hull, pv.maxHull)}<div class="scchips"></div>`})}
     <div class="panel porthead evhead"><span class="evic">${ic}</span><h2>${esc(title)}</h2><p>${text}</p>
       ${S && S.nw ? `<p class="pendw">🩹 ${S.nw} blessures t'attendent au prochain combat.</p>` : ''}</div>
@@ -3652,8 +3785,7 @@ function renderStop(app){
     ${lim && !wait ? `<section class="sect" id="lighten"><header><h2>Alléger le deck</h2><span class="note">${rm.length}/${lim} carte${rm.length > 1 ? 's' : ''} à jeter</span></header>
       <p class="note">Touche une carte pour la jeter. Toucher une carte jetée la rend à ton deck.</p>
       ${deckGroups(deckOf(S)).map(g => `<div class="group">${g.label}</div><div class="grid">${g.items.map(([c, n]) => { const m = rm.filter(x => x === c).length; return cardHTML(c, `data-act="mark" data-c="${c}" data-m="${m}"`, m ? 'marked' : '', {cnt:n, rm:m}); }).join('')}</div>`).join('')}
-    </section>` : ''}` : ''}
-    <div class="log">${pv.log.slice(-3).map(l => `<div>${esc(l)}</div>`).join('')}</div>`;
+    </section>` : ''}` : ''}`;
   if(!S) return;
   const dock = $('#dock'), dockIn = $('#dockIn'); dock.hidden = false; document.body.classList.add('docked');
   const mine = mySeats(), allMineReady = mine.every(i => pv.seats[i].rd);
@@ -3691,8 +3823,7 @@ function renderPort(app){
     <section class="sect" id="lighten"><header><h2>Alléger le deck</h2><span class="note">${rm.length}/${PORT_REMOVALS} carte${rm.length > 1 ? 's' : ''} à jeter</span></header>
       <p class="note">Touche une carte pour la jeter (le badge rouge compte les exemplaires jetés). Quand tu as atteint la limite, toucher une carte jetée la rend à ton deck. Moins de cartes faibles, c'est plus de chances de piocher tes meilleures.</p>
       ${deckGroups(deckOf(S)).map(g => `<div class="group">${g.label}</div><div class="grid">${g.items.map(([c, n]) => { const m = rm.filter(x => x === c).length; return cardHTML(c, `data-act="mark" data-c="${c}" data-m="${m}"`, m ? 'marked' : '', {cnt:n, rm:m}); }).join('')}</div>`).join('')}
-    </section>` : ''}
-    <div class="log">${pv.log.slice(-3).map(l => `<div>${esc(l)}</div>`).join('')}</div>`;
+    </section>` : ''}`;
   if(!S) return;
   const dock = $('#dock'), dockIn = $('#dockIn'); dock.hidden = false; document.body.classList.add('docked');
   const mine = mySeats(), allMineReady = mine.every(i => pv.seats[i].rd);
@@ -3711,34 +3842,28 @@ function renderFight(app){
   const foes = `<div class="foe-row ${mins ? 'many' : ''} ${mins > 1 ? 'crowd' : ''}" id="enemies">${pv.en.map((e, i) => {
       const F = FOES[e.t], it = intentOf(e), prot = guardUp && !F.guard && e.hp > 0, reach = e.hp > 0 && !prot && !e.inv && !(e.cap && e.tk >= e.cap);
       const badge = F.guard ? '<span class="fbadge2 g" title="Gardien : protège les autres menaces">🛡</span>' : F.sup ? '<span class="fbadge2 s" title="Soutien : ne protège pas les autres">🔗</span>' : '';
-      const tip = F.n + ' : ' + it.full + (F.guard ? '. Gardien : tant qu\'il vit, les autres menaces sont intouchables.' : F.sup ? '. Soutien : il ne protège personne, mais aide les autres menaces.' : '') + (prot ? '. Protégé par ses gardiens.' : '') + (e.rg ? ' Enragé !' : '') + passiveText(e);
+      const tip = F.n + ' : ' + it.full + (e.fz && e.hp > 0 ? `. Un baril de poudre explosera ${e.fz === 1 ? 'à la fin de ce tour' : 'dans deux tours'} (${e.fd} dégâts) : abats-le avant !` : '') + (F.guard ? '. Gardien : tant qu\'il vit, les autres menaces sont intouchables.' : F.sup ? '. Soutien : il ne protège personne, mais aide les autres menaces.' : '') + (prot ? '. Protégé par ses gardiens.' : '') + (e.rg ? ' Enragé !' : '') + passiveText(e);
       return `<button class="foe ${e.hp <= 0 ? 'dead' : canAtk && reach ? 'can' : ''} ${F.boss ? 'boss' : ''} ${F.min ? 'min' : ''} ${F.min && e.hp <= 0 ? 'gone' : ''} ${prot ? 'guarded' : ''} ${e.inv ? 'dived' : ''} ${e.vn ? 'vanished' : ''} ${e.rg ? 'raged' : ''} ${ui.spawned && ui.spawned.has(i) ? 'spawn' : ''}" data-act="foe-info" data-e="${i}" style="${phase(3.2 + i * .7)}" title="${esc(tip)}" ${e.hp <= 0 ? 'disabled' : ''}>
         ${reach && canAtk ? `<span class="atk" role="button" tabindex="0" data-act="atk" data-e="${i}" aria-label="Tirer ${Math.min(pv.atk, e.hp + e.blk + armorOf(e))} sur ${esc(F.n)}">⚔ ${Math.min(pv.atk, e.hp + e.blk + armorOf(e))}</span>` : reach && spect ? `<span class="atk spect" aria-hidden="true">⚔ ${Math.min(pv.atk, e.hp + e.blk + armorOf(e))}</span>` : ''}
         <span class="intent ${it.calm ? 'calm' : ''}">${it.t}</span>
-        <span class="fi">${F.ic}${badge}${prot ? '<span class="gshield" aria-hidden="true"></span>' : ''}</span>
+        <span class="fi">${F.ic}${badge}${prot ? '<span class="gshield" aria-hidden="true"></span>' : ''}${e.fz && e.hp > 0 ? `<span class="keg ${e.fz === 1 ? 'hot' : ''}" title="Baril de poudre : ${e.fd} dégâts ${e.fz === 1 ? 'à la fin de ce tour' : 'dans deux tours'}, sauf si l'artificier tombe avant">🧨<b>${e.fz === 1 ? '!' : e.fz}</b></span>` : ''}</span>
         ${foeBarHTML(e, reach && (canAtk || spect) ? pv.atk : 0)}
         ${(F.min || mins) && !e.str && !e.rg ? '' : `<span class="fnum">${F.min || mins ? '' : esc(F.n)}${e.str ? ` 💪+${e.str}` : ''}${e.rg ? ' 😡' : ''}</span>`}${traitChips(e, i)}</button>`;
     }).join('')}</div>`;
   ui.spawned = null;
   const lasting = 'MTFC'.split('').filter(f => ((pv.cmbL || {})[f] || 0) >= 1).map(f => `<span class="cmbchip" style="--fc:${FACTIONS[f].col}" title="${esc(COMBO_FX[f][0][1])}">${FACTIONS[f].ic} ${esc(COMBO_FX[f][0][0])}</span>`).join('') + (pv.bordee ? '<span class="cmbchip" title="La prochaine attaque du navire ×1,5">⚓★ Bordée prête</span>' : '');
   const srvSum = {}; mySeats().forEach(i => pv.seats[i].champ.forEach(p => { if(!CARDS[p.c].up) for(const [k, v] of Object.entries(CARDS[p.c].ex)) srvSum[k] = (srvSum[k] || 0) + v; }));
-  const srvChip = Object.keys(srvSum).length ? `<span class="srvchip" title="Ce que tes serviteurs rapportent à chaque tour : ils agissent tout seuls au début du tour">🧍 ${fxShort(srvSum)} / tour</span>` : '';
-  const hull = `${roundHTML()}${hullHTML(pv.hull, pv.maxHull)}${shipActsHTML()}<div class="scchips">${lasting}${bossEsc() ? `<span class="escchip" title="À partir du ${ESC_ROUND}e tour, le boss gagne +${ESC} de force à chaque tour : ne traîne pas !">🌪️ ${pv.round >= ESC_ROUND ? 'La tempête enfle' : `Tempête au tour ${ESC_ROUND}`}</span>` : ''}${pv.net ? `<span class="halfchip" title="Filet d'abordage : tes serviteurs ont +${pv.net} de défense contre les abordages de ce tour">🕸️ Défense +${pv.net}</span>` : ''}${pv.half ? '<span class="halfchip" title="Contre-courant : les dégâts sur la coque sont réduits d\'un quart ce tour">🌀 Dégâts −¼</span>' : ''}${pv.cur ? '<span class="brchip" title="Le double du Cartographe a retourné le courant : votre prochaine attaque perd un quart">🌀 Attaque −¼</span>' : ''}${pv.br ? `<span class="brchip" title="Colmate la brèche avec de la protection (Écoper, Garde…) avant la fin du tour">💥 Brèche ${pv.br} : dégâts ×1,5</span>` : ''}${srvChip}</div>`;
+  const srvChip = Object.keys(srvSum).length ? `<button class="srvchip" data-act="info" data-k="srv" title="Touche pour comprendre">🧍 Serviteurs : ${fxShort(srvSum)} / tour <i>?</i></button>` : '';
+  const seaChip = pv.sea && SEAS[pv.sea] ? `<button class="seachip" data-act="info" data-k="sea" title="${esc(SEAS[pv.sea].t)}">${SEAS[pv.sea].ic} ${esc(SEAS[pv.sea].n)} <i>?</i></button>` : '';
+  const inkChip = pv.ink ? '<span class="brchip" title="Nuage d\'encre : chaque carte de la cale sombre coûte 1 bougie de plus ce tour">🦑 Cale +1🕯️</span>' : '';
+  const hull = `${roundHTML()}${hullHTML(pv.hull, pv.maxHull)}${shipActsHTML()}<div class="scchips">${seaChip}${inkChip}${lasting}${bossEsc() ? `<span class="escchip" title="À partir du ${ESC_ROUND}e tour, le boss gagne +${ESC} de force à chaque tour : ne traîne pas !">🌪️ ${pv.round >= ESC_ROUND ? 'La tempête enfle' : `Tempête au tour ${ESC_ROUND}`}</span>` : ''}${pv.net ? `<span class="halfchip" title="Filet d'abordage : tes serviteurs ont +${pv.net} de défense contre les abordages de ce tour">🕸️ Défense +${pv.net}</span>` : ''}${pv.half ? '<span class="halfchip" title="Contre-courant : les dégâts sur la coque sont réduits d\'un quart ce tour">🌀 Dégâts −¼</span>' : ''}${pv.cur ? '<span class="brchip" title="Le double du Cartographe a retourné le courant : votre prochaine attaque perd un quart">🌀 Attaque −¼</span>' : ''}${pv.br ? `<button class="brchip" data-act="info" data-k="breach" title="Touche pour comprendre la brèche">💥 Brèche ${pv.br} : dégâts ×1,5 <i>?</i></button>` : ''}${srvChip}</div>`;
 
   app.innerHTML = `
     <div class="topline">${quitBtn()}<div class="zone display">${esc(N.z)}${pv.tut ? '' : pv.cp ? `<span class="epb" title="${esc(CAMP[pv.cp].n)}">${pv.cp} · ${esc(CAMP[pv.cp].n)}</span>` : `<span class="epb" title="${esc(EPICS[(pv.ep || 1) - 1].n)}">Épopée ${pv.ep || 1}/${EPICS.length}</span>`}</div>
-      <div class="route">${R.map((n, i) => `${i ? '<b></b>' : ''}<i class="${i < pv.node ? 'done' : i === pv.node ? 'now' : ''}" title="${esc(n.z + (n.boss ? ', boss' : n.el ? ', élite' : n.rest ? ', crique abritée' : n.myst ? ', mystère' : ''))}">${i < pv.node ? '✓' : n.boss ? (i === pv.node ? FOES[n.f[0]].ic : '👑') : n.el ? '🔥' : n.rest ? '🏝️' : n.fork ? '🔀' : n.myst ? '❓' : '⚔'}</i>`).join('')}</div></div>
+      <div class="route">${R.map((n, i) => `${i ? '<b></b>' : ''}<i class="${i < pv.node ? 'done' : i === pv.node ? 'now' : ''}" title="${esc(n.z + (n.boss ? ', boss' : n.el ? ', élite' : n.rest ? ', crique abritée' : n.myst ? ', mystère' : ''))}">${i < pv.node ? '✓' : n.boss ? (i === pv.node ? FOES[n.f[0]].ic : '👑') : n.el ? '🔥' : n.rest ? (REST_V[n.rv] || REST_V.crique).ic : n.fork ? '🔀' : n.sp ? EVENTS[n.e].ic : n.myst ? '❓' : '⚔'}</i>`).join('')}</div></div>
     ${sceneHTML({ratio:pv.hull / pv.maxHull, shield:pv.prot > 0, hull, foes, mates:matesHTML(), prot:pv.prot, br:pv.br || 0, atk:shipAtk, atkOn:!!pv.sub, amb:ambOf(pv)})}
     ${pv.sub && pv.atk > 0 && pv.seats.filter(x => !x.ab).length > 1 ? `<div class="atkstrip ${iCap ? 'me' : ''}">${iCap ? `🎖️ <span>À toi de tirer ! Touche une bulle ⚔ pour envoyer les <b>${pv.atk} ⚔</b> du navire.</span>` : `🎖️ <span>${(X => X ? `<b>${esc(X.n)}</b>, à la barre,` : '<b>Le capitaine</b>')(pv.seats[pv.cps])} répartit les <b>${pv.atk} ⚔</b> du navire. Regarde où il tire !</span>`}</div>` : ''}
-    <div class="crew" id="crew" style="--n:${pv.seats.length}">${pv.seats.map((x, i) => {
-      const mine = x.p === myId();
-      return `<button class="seat ${mine ? 'mine' : ''} ${i === s ? 'active' : ''} ${x.ab ? 'away' : ''}" style="--rc:${ROLES[x.r].col}" data-act="seat" data-s="${i}" title="${esc(x.n)}">
-        <div class="tl"><span class="who">${ROLES[x.r].ic} <span class="rn">${esc(x.n)}</span>${i === pv.cps && pv.seats.filter(y => !y.ab).length > 1 ? '<span class="helmb" title="À la barre : répartit l\'attaque du navire">🎖️</span>' : ''}${x.rel && x.rel.length ? `<span class="rl" title="${esc(x.rel.map(r => RELICS[r].n).join(', '))}">${x.rel.map(r => RELICS[r].ic).join('')}</span>` : ''}</span>${x.rd && !x.ab ? '<span class="ok">✓<i> prêt</i></span>' : ''}</div>
-        <div class="st">${x.ab ? 'Absent·e' : `${featOn(pv.cp, 'gold') ? `<span title="Bougies">🕯️ ${x.g}</span>` : ''}<span title="Combat">⚔ ${x.c}</span><span title="Cartes en main">🃏 ${x.hand.length}</span>${x.champ.length ? `<span title="Serviteurs à bord">🧍 ${x.champ.length}</span>` : ''}`}</div>
-        ${featOn(pv.cp, 'ecl') && !x.ab ? `<div class="es ${x.eu ? 'off' : 'on'}" title="${esc(ROLES[x.r].ecl.n)} : ${x.eu ? 'déjà utilisée pendant ce combat, elle revient au prochain combat' : 'disponible, une fois par combat'}"><span class="eic">${ROLES[x.r].ecl.ic}</span>${x.eu ? 'Compétence utilisée' : 'Compétence prête'}</div>` : ''}</button>`;
-    }).join('')}</div>
-    ${zoneHTML(s, S)}
-    <div class="log">${pv.log.slice(-3).map(l => `<div>${esc(l)}</div>`).join('')}</div>`;
+    ${zoneHTML(s, S)}`;
 
   if(!S){ ui.flip = null; return; }
   const dock = $('#dock'), dockIn = $('#dockIn'); dock.hidden = false; document.body.classList.add('docked');
@@ -3787,7 +3912,6 @@ function diffFx(prev, v){
   fx.dive = v.en.map((e, i) => e.inv && prev.en[i] && !prev.en[i].inv && prev.en[i].t === e.t ? i : -1).filter(i => i >= 0);
   fx.hull = v.hull - prev.hull; fx.prot = v.prot - prev.prot; fx.plug = v.round === prev.round ? (prev.br || 0) - (v.br || 0) : 0;
   if(v.round !== prev.round){ ui.deal = true; fx.newRound = true; ui.handDown = false; ui.purge = false; ui.zone = null; }
-  { const a0 = prev.seats[activeSeat()], b0 = v.seats[activeSeat()]; if(a0 && b0 && a0.hand.length && !b0.hand.length && ui.zone === 'pont') ui.zone = null; }
   const s = activeSeat();
   const a = prev.seats[s], b = v.seats[s];
   if(a && b && v.round === prev.round){ fx.dg = b.g - a.g; fx.dc = b.c - a.c; fx.g = fx.dg > 0; fx.c = fx.dc > 0; }
@@ -4074,10 +4198,11 @@ function postFx(fx){
     else if(e.t === 'fight' && e.first && e.cp && CAMP[e.cp]) banner(CAMP[e.cp].n, `${campSector(e.cp).n} · épopée ${e.cp}`);
     else if(e.t === 'fight' && e.first && e.ep) banner(EPICS[e.ep - 1].n, `${EPICS[e.ep - 1].z} · ${EPICS[e.ep - 1].tr}`);
     else if(e.t === 'port') banner('Escale au port', `${EPICS[e.ep - 1].n} accomplie`);
-    else if(e.t === 'rest') banner('🏝️ Crique abritée', 'Dernière escale avant le boss');
+    else if(e.t === 'rest'){ const X = REST_V[e.rv] || REST_V.crique; banner(`${X.ic} ${X.n}`, 'Dernière escale avant le boss'); }
     else if(e.t === 'evt') banner(`${EVENTS[e.e].ic} ${EVENTS[e.e].n}`, 'Événement');
     else if(e.t === 'fight' && e.myst) banner('❓ Embuscade !', 'Des ennemis surgissent');
     else if(e.t === 'purge') floatAt('#hand', '🌊 Par-dessus bord !', '#bfe6ff');
+    else if(e.t === 'fight' && e.sea && SEAS[e.sea]) banner(`${SEAS[e.sea].ic} ${SEAS[e.sea].n}`, SEAS[e.sea].t, true);
     else if(e.t === 'fight') banner(e.boss ? `${FOES[e.f].the} !` : e.el ? `${FOES[e.f].n} !` : 'Menace en vue', e.boss ? `Boss · ${e.z}` : e.el ? 'Élite' : e.z);
     else if(e.t === 'ecl') eclatSplash(e.r);
     else if(e.t === 'atkph'){ const me = mySeats().includes(e.s); banner(`⚔ Phase d'attaque : ${e.v}`, me ? 'Touche une bulle ⚔ pour faire feu' : `${pv.seats[e.s] ? esc(pv.seats[e.s].n) : 'Le capitaine'} répartit l'attaque`, true); }
@@ -4271,6 +4396,25 @@ async function playEnemyTurn(turn, prev){
         prot -= ab; hull -= d; setHullDom(hull, prot, max, br); hitShip(d, ab, ev.vul);
         await sleep(ev.k === 'multi' ? 380 : 600);
       }
+    }
+    else if(ev.k === 'boom'){
+      const scn = $('#scene'); if(scn) scn.animate([{filter:'none', transform:'none'}, {filter:'brightness(2.2) saturate(1.6)', transform:'translateX(-6px)', offset:.15}, {transform:'translateX(5px)', offset:.35}, {filter:'none', transform:'none'}], {duration:700});
+      floatAt(foe || '#enemies', '💥 Le baril explose !', '#ffb36a'); splash(); await sleep(300);
+      for(const [d, ab] of ev.hits || []){ prot -= ab; hull -= d; setHullDom(hull, prot, max, br); hitShip(d, ab, ev.vul); }
+      await sleep(800);
+    }
+    else if(ev.k === 'fuse'){
+      if(fi) fi.animate([{filter:'none'}, {filter:'drop-shadow(0 0 16px #ff8a3a) brightness(1.4)', offset:.4}, {filter:'none'}], {duration:700});
+      floatAt(foe || '#enemies', `🧨 Mèche allumée : ${ev.v} dans 2 tours !`, '#ffb36a'); await sleep(950);
+    }
+    else if(ev.k === 'snatch'){
+      lunge(fi); await sleep(250);
+      floatAt('#holdTab', ev.c ? `🦤 ${CARDS[ev.c].n} volé dans la cale !` : '🦤 Rien à voler', '#ffe39a');
+      if(ev.v) floatAt(foe, `+${ev.v} 🛡`, '#bfe6ff'); await sleep(950);
+    }
+    else if(ev.k === 'ink'){
+      const scn = $('#scene'); if(scn) scn.animate([{filter:'none'}, {filter:'brightness(.45) saturate(.4)', offset:.5}, {filter:'none'}], {duration:1100});
+      floatAt('#holdTab', "🦑 Encre : la cale +1🕯️ au prochain tour", '#e6d2ff'); await sleep(1000);
     }
     else if(ev.k === 'shield'){
       if(fi) fi.animate([{filter:'none'}, {filter:'drop-shadow(0 0 18px #7cc4ee) brightness(1.3)', offset:.4}, {filter:'none'}], {duration:800});
@@ -4516,7 +4660,7 @@ function trophyPop(b){
   document.body.appendChild(d); setTimeout(() => d.classList.add('out'), 3200); setTimeout(() => d.remove(), 3700);
 }
 // ---- the collections screen
-const INTENT_NAMES = {hit:'Frappe', multi:'Frappes multiples', board:'Abordage', shield:'Se protège', grow:'Se renforce', heal:'Soigne', curse:'Malédiction', summon:'Appelle des sbires', buff:'Renforce les autres', steal:'Souffle les bougies', fog:'Brouillard', pierce:'Morsure perçante', ram:'Éperonnage', bind:'Étreinte', siphon:'Aspire la protection', charm:'Ensorcelle', wave:'Raz-de-marée', devour:'Dévore une carte', mutiny:'Mutinerie', tax:'Prélèvement', vanish:'Disparition', bordee:'Bordée', courant:'Contre-courant', radoub:'Radoub', voiles:'Hisse les voiles'};
+const INTENT_NAMES = {fuse:'Baril de poudre', snatch:'Vole un objet de la cale', ink:"Nuage d'encre", hit:'Frappe', multi:'Frappes multiples', board:'Abordage', shield:'Se protège', grow:'Se renforce', heal:'Soigne', curse:'Malédiction', summon:'Appelle des sbires', buff:'Renforce les autres', steal:'Souffle les bougies', fog:'Brouillard', pierce:'Morsure perçante', ram:'Éperonnage', bind:'Étreinte', siphon:'Aspire la protection', charm:'Ensorcelle', wave:'Raz-de-marée', devour:'Dévore une carte', mutiny:'Mutinerie', tax:'Prélèvement', vanish:'Disparition', bordee:'Bordée', courant:'Contre-courant', radoub:'Radoub', voiles:'Hisse les voiles'};
 function foeWhere(t){
   const F = FOES[t], ep = [];
   EPICS.forEach((E, i) => { if([...E.pool, ...E.elites].some(g => g.includes(t))) ep.push('T' + (i + 1)); });
@@ -4533,6 +4677,7 @@ function intentLine(x){
     : k === 'ram' ? (featOn(pv && pv.cp, 'srv') ? `Éperonne (${a}) et renverse ton serviteur le plus faible` : `Éperonne (${a})`) : k === 'bind' ? `Enserre tes ${a} serviteurs les plus solides` : k === 'siphon' ? 'Aspire toute la protection du navire'
     : k === 'charm' ? `Ensorcelle tes ${a} serviteurs les plus solides` : k === 'wave' ? `Raz-de-marée : tous les serviteurs de défense ${a} ou moins à l'eau` : k === 'devour' ? 'Dévore pour de bon une carte jouée' : k === 'mutiny' ? 'Mutinerie : aucune alliance au tour suivant'
     : k === 'tax' ? `Prélève ${a} bougie${a > 1 ? 's' : ''} par matelot et s'en fait un bouclier` : k === 'vanish' ? `Disparaît dans la brume, puis ressurgit (${a})` : k === 'bordee' ? `Bordée (${a}) puis se protège (${b})`
+    : k === 'fuse' ? `Allume un baril de poudre qui explose deux tours plus tard (${a})` : k === 'snatch' ? `Vole l'objet le plus précieux de la cale sombre, et se protège (${a})` : k === 'ink' ? "Nuage d'encre : la cale sombre coûte 1 bougie de plus au tour suivant"
     : k === 'courant' ? 'Contre-courant : votre prochaine attaque perd un quart' : k === 'radoub' ? `Radoub : soigne les menaces (${a}) et se protège (${b})` : k === 'voiles' ? `Hisse les voiles : +${a} force et protection pour toutes les menaces` : k;
 }
 function collInfoHTML(k, id){
@@ -4680,18 +4825,18 @@ const eclOf = v => ROLES[coachSeat(v).r].ecl;
 const COACH_E = [
   {t:v => { const E = eclOf(v); return `Nouveau : ta <b>compétence spéciale</b>, le médaillon en bas de l'écran. Celle de ton rôle s'appelle <b>${E.ic} ${esc(E.n)}</b> : ${esc(E.t.charAt(0).toLowerCase() + E.t.slice(1))}.`; }, hl:'#eclatBtn', next:1, until:v => !!v.sub || v.round >= 2},
   {t:"Elle ne sert qu'<b>une fois par combat</b>. Touche le médaillon quand tu veux la déclencher : son effet s'applique aussitôt, puis il s'éteint jusqu'au combat suivant.", hl:'#eclatBtn', next:1, until:v => !!v.sub || v.round >= 2},
-  {t:"Sur la fiche de chaque matelot, tu vois si sa compétence est <b>prête</b> ou déjà <b>utilisée</b>. Chaque rôle a la sienne, et les robots déclenchent la leur quand ça compte.", hl:'#crew .seat .es', next:1, until:v => !!v.sub || v.round >= 2},
+  {t:"Sur le pont, à côté du nom de chaque matelot, tu vois si sa compétence est <b>prête</b> ou déjà <b>utilisée</b>. Chaque rôle a la sienne, et les robots déclenchent la leur quand ça compte.", hl:'#inplay .seat .es', next:1, until:v => !!v.sub || v.round >= 2},
   {t:"Garde-la pour le bon moment : une grosse frappe annoncée, un boss coriace, une coque en danger… Bonne traversée !", hl:'#eclatBtn', next:1, until:v => !!v.sub || v.round >= 2},
 ];
 const coachScript = () => pv && (pv.tut ? COACH : pv.cp === '1.1' ? COACH_P : pv.cp === '1.2' ? COACH_M : pv.cp === '1.3' ? COACH_J : pv.cp === '3.1' ? COACH_S : pv.cp === '5.1' ? COACH_X : pv.cp === '1.4' ? COACH_E : null);
 const COACH = [
-  {t:"Bienvenue à bord ! Pour ce tutoriel, tu diriges deux rôles de l'équipage : le <b>Canonnier</b> et le <b>Charpentier</b>. En partie à plusieurs, chaque matelot joue le sien sur son téléphone.", hl:'#crew', next:1},
+  {t:"Bienvenue à bord ! Pour ce tutoriel, tu diriges deux rôles de l'équipage : le <b>Canonnier</b> et le <b>Charpentier</b>. En partie à plusieurs, chaque matelot joue le sien sur son téléphone.", hl:'#inplay .seat', next:1},
   {t:"Voici ton navire. La <b>coque</b> est commune à tout l'équipage : si elle tombe à zéro, tout le monde coule. Le <b>bouclier bleu</b> au-dessus du navire compte la protection du tour : elle absorbe les dégâts avant la coque.", hl:'#hull, #prot', next:1},
   {t:"Voici la menace. La bulle au-dessus d'elle annonce ce qu'elle fera quand tout l'équipage aura terminé son tour : ici, frapper la coque.", hl:'#enemies', next:1},
   {t:"Tes cartes sont en bas de l'écran. Jouer une carte ne coûte rien : chacune rapporte des bougies 🕯️, du combat ⚔ ou un autre effet. <b>Touche une de tes cartes pour la jouer.</b>", hl:'#hand', wait:'Touche une carte de ta main.', until:v => v.seats[0].hand.length < 5},
   {t:"Bien joué ! <b>Joue le reste de ta main</b>, carte par carte. Astuce : appuie longuement sur une carte pour la lire en grand.", hl:'#hand', wait:'Joue toutes tes cartes.', until:v => v.seats[0].hand.length === 0},
   {t:"Ce que rapportent tes cartes s'additionne dans ces deux compteurs : <b>🕯️ les bougies</b> servent à fouiller la cale, <b>⚔ le combat</b> sert à attaquer. Attention : les deux repartent à zéro à la fin du tour, alors dépense-les !", hl:'#gold, #combat', next:1, until:v => v.seats[0].dk > 10 || attacked(v)},
-  {t:"Ces infos se retrouvent aussi <b>sous le nom de chaque matelot</b>, dans l'équipage : 🕯️ ses bougies, ⚔ son combat, 🃏 le nombre de cartes qu'il peut encore jouer, et 🛡 ses serviteurs à bord. Pratique pour voir d'un coup d'œil où en sont tes coéquipiers… et qui n'a pas encore joué.", hl:'.seat[data-s="0"], .seat[data-s="1"]', next:1, until:v => v.seats[0].dk > 10 || attacked(v)},
+  {t:"Ces infos se retrouvent aussi <b>à côté du nom de chaque matelot</b>, sur le pont : 🕯️ ses bougies, ⚔ son combat, 🃏 le nombre de cartes qu'il peut encore jouer, et 🛡 ses serviteurs à bord. Pratique pour voir d'un coup d'œil où en sont tes coéquipiers… et qui n'a pas encore joué.", hl:'.seat[data-s="0"], .seat[data-s="1"]', next:1, until:v => v.seats[0].dk > 10 || attacked(v)},
   {t:"Tes cartes jouées restent posées <b>Sur le pont</b> jusqu'à la fin du tour. Tu y vois aussi celles de tes coéquipiers, et le compteur des factions en jeu (on y revient tout à l'heure).", hl:'#inplay', next:1, until:v => v.seats[0].dk > 10 || attacked(v)},
   {t:"Voici <b>la cale sombre</b>, commune à tout l'équipage. Quatre cartes sont à portée, d'autres objets s'entassent derrière. La profondeur est en haut à gauche. Tant que tu as des bougies, tu fouilles, et chaque carte remontée de la cale sombre est aussitôt remplacée.", hl:'#market', next:1, until:v => v.seats[0].dk > 10},
   {t:"<b>Remonte une carte</b> que tes bougies éclairent : elles sont entourées de doré. Elle rejoint ta défausse et reviendra dans ta main lors d'un prochain tour.", hl:'#market', wait:'Touche une carte éclairée de la cale.', until:v => v.seats[0].dk > 10},
@@ -4722,7 +4867,10 @@ function renderCoach(){
     <div class="ctop"><span>Étape ${ui.coach + 1}/${SCRIPT.length}</span><span class="cbar"><i style="width:${(ui.coach + 1) / SCRIPT.length * 100}%"></i></span><button class="cskip" data-act="coach-skip">Passer</button></div>
     <p>${typeof step.t === 'function' ? step.t(pv) : step.t}</p>
     <div class="cact">${ui.coach > 0 ? '<button class="cprev" data-act="coach-prev" aria-label="Bulle précédente">‹ Retour</button>' : ''}${step.next || rev ? '<button data-act="coach-next">Suivant</button>' : `<span class="cwait">👉 ${step.wait || ''}</span>`}</div></div>`);
-  const hl = typeof step.hl === 'function' ? step.hl(pv) : step.hl, els = hl ? [...document.querySelectorAll(hl)] : [];
+  const hl = typeof step.hl === 'function' ? step.hl(pv) : step.hl;
+  if(fresh && hl && featOn(pv.cp, 'mk') && $('#holdTab')){ const want = /#market|holdTab/.test(hl) ? 'cale' : /#inplay|\.seat|\.prow|\.mini|\.sacb/.test(hl) ? 'pont' : null;
+    if(want && (ui.zone || 'cale') !== want){ ui.zone = want; ui.coachShown = -1; setTimeout(render, 0); return; } }
+  const els = hl ? [...document.querySelectorAll(hl)] : [];
   els.forEach(el => el.classList.add('coach-hl'));
   const target = els.find(el => el.getClientRects().length);
   if(fresh){
@@ -4835,7 +4983,7 @@ function showReward(){
 document.addEventListener('click', ev => {
   if(ui.lpDone && Date.now() - ui.lpDone < 1500 && !ev.target.closest('.cardzoom')){ ui.lpDone = 0; return; }   // end of a long press: only the zoom
   const b = ev.target.closest('[data-act]'); if(!b || b.disabled) return;
-  if(ui.playing && !['reward-ok','menu','quit','ask-quit','quit-ok','foe-info','coll-close','deck','deck-close','deck-f','zoom','cale-info','hand-toggle','combo-info'].includes(b.dataset.act)) return; // the enemy turn is being replayed
+  if(ui.playing && !['info','reward-ok','menu','quit','ask-quit','quit-ok','foe-info','coll-close','deck','deck-close','deck-f','zoom','cale-info','hand-toggle','combo-info'].includes(b.dataset.act)) return; // the enemy turn is being replayed
   const A = b.dataset.act, s = activeSeat(), S = s >= 0 && pv ? pv.seats[s] : null;
   const busy = () => { if(S && S.rd){ toast('Tu as terminé ton tour. Touche « Annuler » pour rejouer.'); return true; } return false; };
   switch(A){
@@ -4896,7 +5044,9 @@ document.addEventListener('click', ev => {
     case 'take': act({a:'join', n:cleanName(ui.nick), r:b.dataset.r}); break;
     case 'drop': act({a:'drop', r:b.dataset.r}); break;
     case 'start': act({a:'start'}); break;
-    case 'seat': { const i = +b.dataset.s; if(mySeats().includes(i) && i !== ui.as){ const y = window.scrollY; ui.as = i; ui.deal = true; ui.purge = false; render(); window.scrollTo(0, y); } break; }
+    case 'seat': { const i = +b.dataset.s; if(mySeats().includes(i)){ if(i !== ui.as){ const y = window.scrollY; ui.as = i; ui.deal = true; ui.purge = false; render(); window.scrollTo(0, y); } }
+      else if(pv && pv.phase === 'fight' && b.classList.contains('phead')){ ui.deckOpen = i; ui.deckF = 'all'; renderSheet(); }   // a crewmate's line on the deck: his deck
+      break; }
     case 'play': {
       if(!S || busy()) return;
       if(ui.purge){ ui.purge = false; act({a:'purge', s, h:+b.dataset.h, c:b.dataset.c}); break; }
@@ -4909,6 +5059,7 @@ document.addEventListener('click', ev => {
     case 'sach': if(S && !busy()){ if(ui.purge && S.ft){ ui.purge = false; act({a:'purge', s, h:+b.dataset.h, c:'bl'}); } else act({a:'sach', s, h:+b.dataset.h}); } break;
     case 'mkrm': if(S && !busy()){ if(!S.mf && S.g < mkCost(pv)){ toast(`Il te faut ${mkCost(pv)} 🕯️ pour brûler un objet (le prix revient à 1 à la prochaine étape).`); return; } act({a:'mkrm', s, m:+b.dataset.m}); } break;
     case 'cale-info': openCaleInfo(); break;
+    case 'info': if(INFO[b.dataset.k]) INFO[b.dataset.k](); break;
     case 'zone': ui.zone = b.dataset.z; render(); break;
     case 'hand-toggle': ui.handDown = !ui.handDown; render(); break;
     case 'zoom': openCardZoom(b.dataset.c); break;
@@ -4949,7 +5100,7 @@ document.addEventListener('click', ev => {
     }
     case 'buy': {
       if(!S || busy()) return; const m = +b.dataset.m, code = pv.mk[m];
-      if(S.g + (S.rb || 0) < CARDS[code].$){ toast(`Il te faut ${Math.max(0, CARDS[code].$ - (S.rb || 0))} 🕯️ pour atteindre cette carte : elle est trop loin dans le noir.`); return; }
+      if(S.g < mkPrice(pv, S, code)){ toast(`Il te faut ${mkPrice(pv, S, code)} 🕯️ pour atteindre cette carte : elle est trop loin dans le noir.`); return; }
       const from = b.getBoundingClientRect(), html = b.outerHTML;
       act({a:'buy', s, m});
       flyGhost(html, from, '#pile');
