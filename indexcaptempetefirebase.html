@@ -614,16 +614,35 @@ body.docked #app{ padding-bottom:var(--dockh, 280px); }
 .mini .lk{ position:absolute; top:-8px; right:-7px; width:21px; height:21px; border-radius:50%; display:grid; place-items:center; font-size:11px; background:var(--abyss); border:1.5px dashed var(--fc); }
 .mini.linked{ box-shadow:0 3px 0 rgba(0,0,0,.35), 0 0 0 2px #fff4d0, 0 0 16px 2px var(--fc); }
 .mini.linked .lk{ background:var(--fc); border:2px solid #fff4d0; }
-.mini .sacb{ position:absolute; left:50%; bottom:-10px; translate:-50% 0; display:flex; align-items:center; gap:2px; white-space:nowrap; border:none; border-radius:10px; padding:1px 6px; font-size:11px; font-weight:700; color:#fff; background:#7a2415; box-shadow:0 2px 0 rgba(0,0,0,.4); }
+.mini .sacb{ position:absolute; z-index:3; left:50%; bottom:-11px; translate:-50% 0; display:flex; align-items:center; gap:2px; white-space:nowrap; font:inherit; border:1px solid #2a0d12; border-radius:10px; padding:2px 7px; font-size:11.5px; font-weight:800; color:#fff; cursor:pointer; background:linear-gradient(#8e2c3c, #5a1622); box-shadow:0 2px 0 rgba(0,0,0,.5), 0 0 10px -2px rgba(220,80,110,.7); touch-action:manipulation; }
+.minis:has(.sacb){ padding-bottom:16px !important; }
 .mini .sacb .fx{ background:rgba(255,255,255,.2); color:#fff; font-size:10px; }
 .mini .sacb:disabled{ opacity:.5; }
+.handsize{ display:flex; flex-direction:column; gap:6px; align-items:center; margin:0 0 14px; padding:0 0 12px; border-bottom:1px solid var(--line); }
+.handsize .seg button{ display:flex; flex-direction:column; align-items:center; line-height:1.15; }
+.handsize .seg button small, .handsize > small{ font-size:11px; color:var(--muted); font-weight:600; }
+@media (max-width:540px){
+  #hand.big{ gap:5px 6px; padding-top:6px; }
+  #hand.big .card{ min-height:110px; padding:3px; }
+  #hand.big .card .nm{ font-size:13.5px; min-height:28px; padding:3px 3px 1px; }
+  #hand.big .card .art{ height:32px; margin:0 4px; }
+  #hand.big .card .pic{ font-size:25px; }
+  #hand.big .card .art svg.match{ width:30px; height:30px; }
+  #hand.big .card .fx{ font-size:13px; padding:1px 4px; }
+  #hand.big .card .ctx, #hand.big .card .when{ font-size:10.5px; }
+  #hand.big .card .ally .medal, #hand.big .card .sacr .skull{ width:17px; height:17px; font-size:9.5px; }
+  #hand.big .card .fbadge{ width:17px; height:17px; font-size:9.5px; }
+  #hand.big .card .def{ width:23px; height:23px; font-size:12.5px; }
+  #hand.big .hslot{ margin-bottom:6px; }
+}
 #hand .hslot{ position:relative; min-width:0; display:flex; }
 #hand .hslot > .card{ flex:1; min-width:0; }
 .sacbtn{ position:absolute; left:50%; bottom:-9px; translate:-50% 0; z-index:3; display:flex; align-items:center; gap:2px; white-space:nowrap; font:inherit; font-size:11px; font-weight:800; color:#fff; border:1px solid #2a0d12; border-radius:10px; padding:2px 7px; cursor:pointer; background:linear-gradient(#8e2c3c, #5a1622); box-shadow:0 2px 0 rgba(0,0,0,.5), 0 0 10px -2px rgba(220,80,110,.7); touch-action:manipulation; }
 .sacbtn .fx{ background:rgba(255,255,255,.2); color:#fff; font-size:10px; padding:0 3px; }
 .sacbtn:disabled{ opacity:.45; }
 @media (max-width:540px){ .sacbtn{ font-size:11px; padding:2px 6px; bottom:-8px; } .sacbtn .sl{ display:none; } }
-@media (max-width:540px){ #inplay{ overflow-y:auto; overscroll-behavior:contain; } }
+@media (max-width:540px){ #inplay{ overflow-y:auto; overscroll-behavior:contain; display:flex; flex-direction:column; }
+  #inplay > .prows{ order:1; } #inplay > header{ order:2; margin-top:8px; } #inplay > .combos{ order:3; } #inplay > .mutiny{ order:0; } }   /* my own line (and its ☠) first, the counters after */
 .pulse{ animation:pulseglow .9s ease-out 2; }
 @keyframes pulseglow{ 40%{ transform:scale(1.12); filter:brightness(1.35); } }
 .empty{ margin:8px 0 2px; }
@@ -3077,7 +3096,7 @@ async function playTransition(prev, v, fx){
 }
 function clearPresence(){ if(room) room.presence({k:null, h:null, q:null, g:null}).catch(() => {}); }
 function hostLost(){ mode = null; pv = null; G = null; ui.screen = 'menu'; clearPresence(); render(); toast("L'hôte a quitté la table. La partie est terminée."); }
-function quitToMenu(){ trk.prev = null; trk.fight = null; clearTimeout(ui.botT); ui.botT = null; ui.deckOpen = null; ui.purge = false; ui.coachTarget = null; ui.coachShown = -1; placeCoachArrow(null); if(mode === 'host' || mode === 'guest') clearPresence(); mode = null; G = null; pv = null; ui.screen = 'menu'; ui.coach = -1; render(); }
+function quitToMenu(){ trk.prev = null; trk.fight = null; clearTimeout(ui.botT); ui.botT = null; ui.deckOpen = null; ui.purge = false; ui.coachTarget = null; ui.coachShown = -1; ui.lesson = null; placeCoachArrow(null); if(mode === 'host' || mode === 'guest') clearPresence(); mode = null; G = null; pv = null; ui.screen = 'menu'; ui.coach = -1; render(); }
 
 // robot crewmates act one after another, a moment after the human can see the new turn
 function scheduleBots(){
@@ -3390,7 +3409,9 @@ function askQuit(){
   else if(host) lines.push('La partie s\'arrêtera pour tout l\'équipage.');
   if(!guest && !over) lines.push(pv.cp ? `Il faudra reprendre l'épopée ${pv.cp} depuis le début.` : pv.tut ? 'Tu pourras relancer le tutoriel depuis le menu.' : 'La traversée ne pourra pas être reprise.');
   const d = document.createElement('div'); d.className = 'collmodal'; d.id = 'quitask'; d.setAttribute('role', 'alertdialog'); d.setAttribute('aria-modal', 'true');
-  d.innerHTML = `<div class="cm-box quitbox"><h3>Retour au menu ?</h3>${lines.map(l => `<p>${l}</p>`).join('')}
+  const tall = innerHeight >= BIG_MIN_H;
+  const sizer = fight && innerWidth <= 540 ? `<div class="handsize"><b>Cartes en main</b><div class="seg"><button class="${bigHand() ? '' : 'on'}" data-act="hand-size" data-v="small">Normales<small>5 par ligne</small></button><button class="${bigHand() ? 'on' : ''}" data-act="hand-size" data-v="big" ${tall ? '' : 'disabled'}>Grandes<small>4 par ligne</small></button></div><small>${tall ? 'Les grandes cartes prennent deux lignes : la scène de bataille rapetisse.' : 'Ton écran est trop court pour deux lignes de grandes cartes.'}</small></div>` : '';
+  d.innerHTML = `<div class="cm-box quitbox">${sizer}<h3>Retour au menu ?</h3>${lines.map(l => `<p>${l}</p>`).join('')}
     <div class="row"><button class="btn ghost" data-act="coll-close">Rester à bord</button><button class="btn danger" data-act="quit-ok">Quitter</button></div></div>`;
   d.addEventListener('click', ev => { if(ev.target === d) d.remove(); });
   document.body.appendChild(d); d.querySelector('[data-act="coll-close"]').focus();
@@ -3593,7 +3614,7 @@ function startCamp(id){
   const fixed = C.coach || C.lock;   // the first guided epics always sail with the Captain (you) and a robot Gunner
   if(fixed) L = {cap:'me', can:'bot', cha:'off', car:'off'};
   const roles = Object.keys(ROLES).filter(r => (fixed || have.includes(r)) && L[r] && L[r] !== 'off');
-  clearTimeout(ui.botT); ui.botT = null; mode = 'local'; ui.coach = C.coach || (C.guide && !campStarsOf(id)) ? 0 : -1; ui.coachShown = -1; ui.coachMax = 0; ui.campRec = null; ui.campNew = null;
+  clearTimeout(ui.botT); ui.botT = null; mode = 'local'; ui.coach = C.coach || (C.guide && !campStarsOf(id)) ? 0 : -1; ui.lesson = null; ui.lessonR = 1; ui.coachShown = -1; ui.coachMax = 0; ui.campRec = null; ui.campNew = null;
   const seats = roles.map(r => { if(L[r] === 'bot'){ const S = newSeat(r, '🤖 ' + ROLES[r].n, 'bot'); S.bot = 1; return S; } return newSeat(r, ROLES[r].n, 'local'); });
   ui.as = Math.max(0, seats.findIndex(S => !S.bot));
   G = newGame(seats, 'local', false); G.camp = id; ui.last = {k:'camp', id};
@@ -3601,7 +3622,7 @@ function startCamp(id){
   if(flagsOn(id)) G.flags = Object.fromEntries(seats.map(S => [S.r, (ui.cflag || {})[S.r] || 'M']));
   startVoyage(G); ui.screen = 'game';
   if((C.lock || C.first) && ui.coach >= 0){   // the guided epic deals the card it teaches in the first hand (the role card, a servant, a card to sacrifice), before anything is shown
-    const S = G.seats[ui.as]; ui.coachDk = S ? S.deck.length : 10;
+    const S = G.seats[ui.as]; ui.coachDk = S ? S.deck.length : 10; ui.lesson = null; ui.lessonR = 1;
     if(S) [].concat(C.first || ROLES[S.r].card).map(c => c === 'ROLE' ? ROLES[S.r].card : c).forEach((rc, j) => { const k = S.draw.indexOf(rc);
       if(k >= 0 && !S.hand.includes(rc) && S.hand.length > j){ const out = S.hand[j]; S.hand[j] = rc; S.draw[k] = out; } });
   }
@@ -3631,7 +3652,6 @@ function renderTip(){
     fog:live.some(e => itOf(e) === 'fog'), dive:live.some(e => e.inv && !e.vn), rage:pv.ep >= 3 || !!Eh.rage,
     storm:pv.round >= ESC_ROUND - 1 && live.some(e => FOES[e.t].boss),
     mkrot:(() => { const S = pv.seats[activeSeat()]; return !!S && featOn(pv.cp, 'mkrm') && !S.rd && S.g >= 1 && !S.hand.some(c => !CARDS[c].junk) && !pv.mk.some(c => c && CARDS[c].$ <= S.g); })(),
-    sac:(() => { const S = pv.seats[me]; return !!S && pv.cp !== '5.1' && featOn(pv.cp, 'sac') && !S.rd && S.hand.some(c => CARDS[c].sac && !CARDS[c].junk); })(),
     traits:live.some(e => e.af), titan:live.some(e => e.cap), bsir:live.some(e => e.t === 'bsir'), seer:live.some(e => FOES[e.t].seer), rat:live.some(e => e.t === 'rat'), mutn:live.some(e => e.t === 'mutn'), bind:live.some(e => itOf(e) === 'bind'), siphon:live.some(e => itOf(e) === 'siphon')};
   const k = Object.keys(TIPS).find(k => cond[k] && !ui.tipsSeen.has(k)); if(!k) return;
   const d = document.createElement('div'); d.id = 'tipcard'; d.className = 'tipcard'; d.dataset.k = k; d.setAttribute('role', 'status');
@@ -4031,6 +4051,7 @@ function renderPort(app){
 }
 
 function renderFight(app){
+  maybeLesson();
   const arriving = ui.arrive; ui.arrive = false;
   if(arriving) requestAnimationFrame(() => { const sc = $('#scene'); if(sc){ sc.classList.add('arrive'); setTimeout(() => sc.classList.remove('arrive'), 1400); } });
   const R = routeFromView(pv), N = R[pv.node];
@@ -4073,7 +4094,7 @@ function renderFight(app){
   const lowered = !!ui.handDown && S.hand.length > 0 && !ui.purge;
   const compact = (!S.hand.length || lowered) && !ui.purge;   // empty or lowered hand: the dock shrinks to its counters and buttons, the hold and the deck behind stay visible
   const pw = ui.pileWarn && Date.now() < ui.pileWarn.until ? ui.pileWarn.t : '';
-  const nh = S.hand.length, cols = 5;   // always the size of a 5-card hand: more cards wrap onto a second row
+  const nh = S.hand.length, big = bigHand(), cols = big ? 4 : 5;   // always the same card size: 5 per line, or 4 bigger ones; more cards wrap onto another line
   dockIn.classList.toggle('compact', compact);
   ui.flip = null;
   dockIn.innerHTML = `
@@ -4085,7 +4106,7 @@ function renderFight(app){
       ${featOn(pv.cp, 'purge') ? `<button class="btn ghost small purgebtn ${ui.purge ? 'on' : ''}" data-act="purge-mode" title="Jeter une carte de ta main par-dessus bord : elle quitte ton deck pour de bon" ${!S.rd && (ui.purge || (S.ft && S.hand.length) || (S.g >= PURGE_COST(S) && S.hand.some(c => c !== 'bl'))) ? '' : 'disabled'}>${S.ft ? `🗑 gratuit${S.ft > 1 ? ' ×' + S.ft : ''}` : `🗑 🕯️${PURGE_COST(S)}`}</button>` : ''}
       ${featOn(pv.cp, 'deck') ? `<button class="pile deckbtn ${pw ? 'warn' : ''}" id="pile" data-act="deck" data-s="${s}" title="Voir ton deck (touche D)" aria-label="Voir ton deck, ${S.dk} cartes"><span class="dk-stack" aria-hidden="true"><i></i><i></i><i></i></span><b>Deck</b><span>${S.dk}</span><small class="drw ${S.dr ? '' : 'empty'}" title="Pioche : ${S.dr} carte${S.dr > 1 ? 's' : ''} · Défausse : ${S.di} carte${S.di > 1 ? 's' : ''}. La défausse est remélangée dans la pioche au début d'un tour, quand la pioche ne suffit plus.">${IC_DRAW}${S.dr} ${IC_DISC}${S.di}</small>${pw ? `<span class="pilewarn">${pw}</span>` : ''}</button>` : ''}
       ${S.rb ? `<span class="rbchip" title="Plan de la cale : la prochaine carte que tu remontes coûte ${S.rb} bougie${S.rb > 1 ? 's' : ''} de moins">🗺️ −${S.rb}🕯️</span>` : ''}<span class="resg">${featOn(pv.cp, 'gold') ? `<span class="pool g" id="gold" ${S.dt ? `title="Soufflées : les ${S.dt} prochaines bougies allumées ce tour s'éteindront"` : 'title="Tes bougies : elles éclairent la cale sombre"'}><span class="ico">🕯️</span>${S.g}${S.dt ? `<small class="debt">−${S.dt}</small>` : ''}</span>` : ''}<span class="pool c" id="combat" title="Ton combat de ce tour : il rejoint l'attaque du navire"><span class="ico">⚔</span>${S.c}</span></span></div>
-    <div class="cards dgrid ${ui.purge ? 'purging' : ''}" id="hand" style="--cols:${cols}">${S.hand.map((c, i) => { const html = cardHTML(c, c === 'bl' ? `data-act="sach" data-h="${i}"` : `data-act="play" data-h="${i}"`, `${S.rd ? 'off' : ''} ${deal ? 'deal' : ''}`, {allyOn: CARDS[c].f && crewFactionCount(CARDS[c].f, s) >= 1, style:`--i:${i}`});
+    <div class="cards dgrid ${ui.purge ? 'purging' : ''} ${big ? 'big' : ''}" id="hand" style="--cols:${cols}">${S.hand.map((c, i) => { const html = cardHTML(c, c === 'bl' ? `data-act="sach" data-h="${i}"` : `data-act="play" data-h="${i}"`, `${S.rd ? 'off' : ''} ${deal ? 'deal' : ''}`, {allyOn: CARDS[c].f && crewFactionCount(CARDS[c].f, s) >= 1, style:`--i:${i}`});
       return CARDS[c].sac && !CARDS[c].junk && !CARDS[c].ch && featOn(pv.cp, 'sac') && !ui.purge ? `<div class="hslot">${html}<button class="sacbtn" data-act="sacp" data-h="${i}" data-c="${c}" ${S.rd ? 'disabled' : ''} title="Jouer et sacrifier : ${esc(fxText(CARDS[c].pl || {}))}, puis ${esc(fxText(CARDS[c].sac))} ; la carte quitte ton deck pour de bon">☠<span class="sl"> Sacrifier</span> ${fxChips(CARDS[c].sac)}</button></div>` : html; }).join('')}</div>
     <div class="bar">
       ${featOn(pv.cp, 'ecl') && !pv.sub ? `<button class="eclat ${S.eu ? 'used' : S.rd ? '' : 'charged'}" style="--rc:${R2.col}" id="eclatBtn" data-act="ecl" ${S.eu || S.rd ? 'disabled' : ''}>
@@ -4097,11 +4118,16 @@ function renderFight(app){
     </div>`;
   requestAnimationFrame(() => { document.body.style.setProperty('--dockh', (dock.offsetHeight + 16) + 'px'); fitScene(dock, S.hand.length); });
 }
+// hand size on phones: 4 big cards per line when the screen is tall enough (or when the player chose it in the menu), else 5
+const handPref = () => { try{ return localStorage.getItem('cap-hand'); }catch(e){ return null; } };
+const BIG_MIN_H = 820;   // below this height, two lines of big cards would push the dark hold under the dock
+const bigHand = () => innerWidth <= 540 && innerHeight >= BIG_MIN_H && handPref() === 'big';
 // phones: the battle scene takes all the height left once the dock (a normal hand) and the dark hold are placed: no scrolling needed
 function fitScene(dock, nh){
   const scn = $('#scene'), din = $('#dockIn'); if(!scn || !dock || innerWidth > 540) return;
   { const ip = $('#inplay'); if(ip){ const room = Math.round(dock.getBoundingClientRect().top - ip.getBoundingClientRect().top - 8); ip.style.maxHeight = Math.max(140, room) + 'px'; } }
-  if(nh >= 1 && nh <= 5 && din && !din.classList.contains('compact')) ui.dockRef = dock.offsetHeight;
+  const big = bigHand(); if(ui.dockMode !== big){ ui.dockMode = big; ui.dockRef = 0; }
+  if((big ? nh >= 5 && nh <= 8 : nh >= 1 && nh <= 5) && din && !din.classList.contains('compact')) ui.dockRef = dock.offsetHeight;   // a big hand of 5 takes two lines: keep room for them
   const mk = $('#market'); if(mk && mk.offsetHeight) ui.zoneRef = Math.round(mk.getBoundingClientRect().bottom - scn.getBoundingClientRect().bottom);   // what the hold really takes on this phone
   const dk = ui.dockRef || 250, top = scn.getBoundingClientRect().top + window.scrollY, zone = featOn(pv.cp, 'mk') ? (ui.zoneRef || ZONE_H) : 120;
   const h = Math.round(Math.max(176, Math.min(340, innerHeight - top - zone - dk - 6)));
@@ -5030,12 +5056,25 @@ const COACH_S = [
 ];
 // 5.1: sacrificing a card for a big immediate bonus
 const sacDone = v => coachSeat(v).dk < (ui.coachDk || 99);
+const isSacC = c => CARDS[c] && CARDS[c].sac && !CARDS[c].junk && !CARDS[c].ch;
+const sacC = v => coachSeat(v).hand.find(isSacC) || (coachSeat(v).play.find(p => isSacC(p.c)) || {}).c || ui.lessonC || 'c1';
+const lessonOver = v => !!v.sub || v.round > (ui.lessonR || 1);
 const COACH_X = [
-  {t:"Nouveau : le <b>sacrifice ☠</b>. Les cartes marquées ☠, comme l'<b>Acolyte noyé</b>, peuvent être sacrifiées : elles quittent ton deck <b>pour de bon</b>, en échange d'un gros bonus immédiat.", hl:'#hand .hslot', next:1, until:v => !!v.sub || v.round >= 2 || sacDone(v)},
-  {t:"Touche le bouton rouge <b>☠</b> sous l'Acolyte : il est joué (+2 ⚔), puis sacrifié, et te donne <b>3 bougies</b> tout de suite.", hl:'#hand .sacbtn', wait:"Touche ☠ sous l'Acolyte, dans ta main, pour le sacrifier.", until:v => !!v.sub || v.round >= 2 || sacDone(v) || !coachSeat(v).hand.includes('c1')},
-  {t:"Tu as joué l'Acolyte sans le sacrifier : pas de souci, tu peux encore le faire <b>pendant tout ton tour</b>, depuis le pont. Touche ☠ sous la carte.", hl:'#inplay .sacb', wait:"Touche ☠ sous l'Acolyte, sur le pont.", until:v => !!v.sub || v.round >= 2 || sacDone(v) || !coachSeat(v).play.some(p => p.c === 'c1')},
-  {t:"Quand sacrifier ? Quand le bonus tombe à pic : achever une menace, remonter une carte chère de la cale… Mais c'est définitif : garde assez de cartes pour les combats suivants, un deck trop maigre s'essouffle.", next:1, until:v => !!v.sub || v.round >= 2},
+  {t:v => { const C = CARDS[sacC(v)]; return `Nouveau : le <b>sacrifice ☠</b>. Ta carte <b>${esc(C.n)}</b> porte le signe ☠ : tu peux la <b>sacrifier</b>. Elle quitte alors ton deck <b>pour de bon</b>, mais te donne tout de suite un gros bonus : <b>${esc(fxText(C.sac))}</b>.`; }, hl:'#hand .hslot', next:1, until:v => lessonOver(v) || sacDone(v)},
+  {t:v => { const C = CARDS[sacC(v)]; return `Pour la sacrifier, touche le <b>bouton rouge ☠</b> collé sous la carte, dans ta main. La carte est d'abord jouée (${esc(fxText(C.pl || {}))}), puis sacrifiée : tu reçois <b>${esc(fxText(C.sac))}</b>.`; }, hl:'#hand .sacbtn', wait:"Touche le bouton rouge ☠ sous la carte, dans ta main.", until:v => lessonOver(v) || sacDone(v) || !coachSeat(v).hand.some(isSacC)},
+  {t:"Tu as joué la carte sans la sacrifier : pas de souci, tu peux encore le faire <b>jusqu'à la fin de ton tour</b>. Sur le pont, sous la carte, touche le bouton rouge <b>☠</b>.", hl:'#inplay .sacb', wait:"Touche le bouton rouge ☠ sous la carte, sur le pont.", until:v => lessonOver(v) || sacDone(v) || !coachSeat(v).play.some(p => isSacC(p.c))},
+  {t:"Sacrifiée ! Elle a quitté ton deck : regarde, ton paquet a une carte de moins. Quand sacrifier ? Quand le bonus tombe à pic : achever une menace, remonter une carte chère de la cale… Mais garde assez de cartes pour les combats suivants : un deck trop maigre s'essouffle.", next:1, until:v => lessonOver(v) || !sacDone(v)},
 ];
+// lessons that come when the mechanism shows up, whatever the epic: remembered once learnt
+const LESSONS = {sac:COACH_X};
+const learnt = k => { try{ return (JSON.parse(localStorage.getItem('cap-learn') || '[]')).includes(k); }catch(e){ return false; } };
+const learn = k => { try{ const l = JSON.parse(localStorage.getItem('cap-learn') || '[]'); if(!l.includes(k)){ l.push(k); localStorage.setItem('cap-learn', JSON.stringify(l)); } }catch(e){} };
+function maybeLesson(){
+  if(!pv || pv.tut || pv.phase !== 'fight' || pv.sub || ui.coach >= 0 || ui.playing || !featOn(pv.cp, 'sac') || learnt('sac')) return;
+  const S = pv.seats[activeSeat()]; if(!S || S.rd || !mySeats().includes(activeSeat())) return;
+  const c = S.hand.find(isSacC); if(!c) return;
+  learn('sac'); ui.lesson = 'sac'; ui.lessonC = c; ui.lessonR = pv.round; ui.coachDk = S.dk; ui.coach = 0; ui.coachShown = -1; ui.coachMax = 0;
+}
 // 1.4: the special skill of each role, once per fight
 const eclOf = v => ROLES[coachSeat(v).r].ecl;
 const COACH_E = [
@@ -5044,7 +5083,7 @@ const COACH_E = [
   {t:"Sur le pont, à côté du nom de chaque matelot, tu vois si sa compétence est <b>prête</b> ou déjà <b>utilisée</b>. Chaque rôle a la sienne, et les robots déclenchent la leur quand ça compte.", hl:'#inplay .seat .es', next:1, until:v => !!v.sub || v.round >= 2},
   {t:"Garde-la pour le bon moment : une grosse frappe annoncée, un boss coriace, une coque en danger… Bonne traversée !", hl:'#eclatBtn', next:1, until:v => !!v.sub || v.round >= 2},
 ];
-const coachScript = () => pv && (pv.tut ? COACH : pv.cp === '1.1' ? COACH_P : pv.cp === '1.2' ? COACH_M : pv.cp === '1.3' ? COACH_J : pv.cp === '3.1' ? COACH_S : pv.cp === '5.1' ? COACH_X : pv.cp === '1.4' ? COACH_E : null);
+const coachScript = () => pv && (ui.lesson && LESSONS[ui.lesson] ? LESSONS[ui.lesson] : pv.tut ? COACH : pv.cp === '1.1' ? COACH_P : pv.cp === '1.2' ? COACH_M : pv.cp === '1.3' ? COACH_J : pv.cp === '3.1' ? COACH_S : pv.cp === '5.1' ? COACH_X : pv.cp === '1.4' ? COACH_E : null);
 const COACH = [
   {t:"Bienvenue à bord ! Pour ce tutoriel, tu diriges deux rôles de l'équipage : le <b>Canonnier</b> et le <b>Charpentier</b>. En partie à plusieurs, chaque matelot joue le sien sur son téléphone.", hl:'#inplay .seat', next:1},
   {t:"Voici ton navire. La <b>coque</b> est commune à tout l'équipage : si elle tombe à zéro, tout le monde coule. Le <b>bouclier bleu</b> au-dessus du navire compte la protection du tour : elle absorbe les dégâts avant la coque.", hl:'#hull, #prot', next:1},
@@ -5072,11 +5111,13 @@ const COACH = [
   {t:"Brèche colmatée ! Retiens-le : sans serviteurs solides à bord, chaque abordage coûte cher. Dernière arme : chaque rôle a un <b>coup d'éclat</b>, le médaillon en bas, utilisable une fois par combat. Déclenche-le au bon moment, puis achevez le requin !", hl:'#eclatBtn', wait:'Achève le requin.', until:v => v.phase !== 'fight'},
 ];
 function renderCoach(){
+  if(ui.coach < 0 && ui.lesson) ui.lesson = null;
   const SCRIPT = coachScript();
   if(ui.coach < 0 || !SCRIPT){ placeCoachArrow(null); return; }
   const rev = ui.coach < (ui.coachMax || 0);   // going back over bubbles already read: no auto-skip, a "Suivant" on every one
   if(!rev) while(ui.coach < SCRIPT.length && SCRIPT[ui.coach].until && SCRIPT[ui.coach].until(pv)) ui.coach++;
-  if(ui.coach >= SCRIPT.length || pv.phase !== 'fight'){ ui.coach = -1; ui.coachMax = 0; placeCoachArrow(null); return; }
+  if(ui.coach >= SCRIPT.length || pv.phase !== 'fight'){ ui.coach = -1; ui.coachMax = 0; ui.lesson = null; placeCoachArrow(null); return; }
+  if(SCRIPT === COACH_X){ learn('sac'); if(!ui.lessonR) ui.lessonR = pv.round; }
   if(!rev) ui.coachMax = ui.coach;
   const step = SCRIPT[ui.coach], fresh = ui.coachShown !== ui.coach;
   $('#app').insertAdjacentHTML('afterbegin', `<div class="coach ${fresh ? 'fresh' : ''} ${step.over ? 'over' : ''}" role="status">
@@ -5094,6 +5135,7 @@ function renderCoach(){
     const inPage = els.find(el => el.getClientRects().length && !el.closest('#dock'));
     if(inPage && !target.closest('#dock')) setTimeout(() => coachScroll(inPage), 60);
   }
+  if(fresh && target && target.closest('#inplay')){ const box = target.closest('#inplay'); setTimeout(() => { const r = target.getBoundingClientRect(), b = box.getBoundingClientRect(); if(r.bottom + 14 > b.bottom || r.top < b.top) box.scrollTop += r.bottom + 14 - b.bottom; }, 60); }   // inside the pont's own scroll
   ui.coachTarget = step.over ? null : target || null;
   ui.coachEls = step.over ? [] : els.filter(el => el.getClientRects().length).slice(0, 6);   // over a sheet: the golden outline is enough (the sheet is still sliding in)
   requestAnimationFrame(() => placeCoachArrow(ui.coachTarget));
@@ -5205,6 +5247,7 @@ document.addEventListener('click', ev => {
   switch(A){
     case 'menu': case 'quit': quitToMenu(); break;
     case 'ask-quit': askQuit(); break;
+    case 'hand-size': { try{ localStorage.setItem('cap-hand', b.dataset.v); }catch(e){} ui.dockRef = 0; ui.sceneH = 0; const q = $('#quitask'); if(q) q.remove(); render(); toast(b.dataset.v === 'big' ? 'Grandes cartes : 4 par ligne.' : 'Cartes normales : 5 par ligne.'); break; }
     case 'quit-ok': { const q = $('#quitask'); if(q) q.remove(); quitToMenu(); break; }
     case 'tuto': startTutorial(); break;
     case 'camp': quitToMenu(); ui.screen = 'camp'; render(); window.scrollTo(0, 0); break;
@@ -5353,7 +5396,7 @@ document.addEventListener('click', ev => {
     case 'coach-prev': ui.coach = Math.max(0, ui.coach - 1); render(); break;
     case 'coach-next': { const SC = coachScript(), st = SC && SC[ui.coach]; if(st && st.close) ui.deckOpen = null; ui.coach++; render(); break; }
     case 'tip-ok': { const d = $('#tipcard'); if(d){ ui.tipsSeen.add(d.dataset.k); try{ localStorage.setItem('cap-tips', JSON.stringify([...ui.tipsSeen])); }catch(e){} d.remove(); } renderTip(); break; }
-    case 'coach-skip': ui.coach = -1; ui.coachTarget = null; placeCoachArrow(null); render(); toast('Tutoriel masqué. Achève le requin pour voir la suite.'); break;
+    case 'coach-skip': { const ls = !!ui.lesson; ui.coach = -1; ui.lesson = null; ui.coachTarget = null; placeCoachArrow(null); render(); toast(ls ? 'Leçon masquée.' : pv && pv.tut ? 'Tutoriel masqué. Achève le requin pour voir la suite.' : 'Tutoriel masqué.'); break; }
   }
 });
 addEventListener('resize', () => { const d = $('#dock'); if(d && !d.hidden) document.body.style.setProperty('--dockh', (d.offsetHeight + 16) + 'px'); });
