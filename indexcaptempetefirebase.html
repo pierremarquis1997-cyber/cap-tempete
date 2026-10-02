@@ -635,13 +635,24 @@ body.docked #app{ padding-bottom:var(--dockh, 280px); }
   #hand.big .card .def{ width:23px; height:23px; font-size:12.5px; }
   #hand.big .hslot{ margin-bottom:6px; }
 }
+.sacbox h3{ margin:0 0 8px; font-family:"Pirata One", Georgia, serif; font-weight:400; font-size:28px; color:var(--parch); }
+.sacard{ display:flex; justify-content:center; margin:2px 0 8px; pointer-events:none; }
+.sacard .card{ width:120px; }
+.sacopts{ display:grid; gap:8px; margin:6px 0 10px; }
+.sacopt{ display:flex; flex-direction:column; gap:2px; text-align:left; font:inherit; padding:10px 12px; border-radius:12px; cursor:pointer; touch-action:manipulation; }
+.sacopt b{ font-size:16px; } .sacopt span{ font-size:13.5px; } .sacopt small{ font-size:12px; opacity:.85; }
+.sacopt.keep{ background:var(--sea-2); color:var(--ink); border:1px solid var(--line); }
+.sacopt.sac{ background:linear-gradient(#8e2c3c, #5a1622); color:#fff; border:1px solid #2a0d12; box-shadow:0 0 14px -4px rgba(220,80,110,.8); }
+.sacopt.sac em{ font-style:normal; font-weight:800; color:#ffd6a8; }
+.sacopt small b{ font-size:inherit; }
+@media (max-height:720px){ .sacard .card{ width:92px; } .sacard .card .kind{ display:none; } .sacbox h3{ font-size:24px; margin-bottom:4px; } .sacopt{ padding:8px 10px; } }
 #hand .hslot{ position:relative; min-width:0; display:flex; }
 #hand .hslot > .card{ flex:1; min-width:0; }
 .sacbtn{ position:absolute; left:50%; bottom:-9px; translate:-50% 0; z-index:3; display:flex; align-items:center; gap:2px; white-space:nowrap; font:inherit; font-size:11px; font-weight:800; color:#fff; border:1px solid #2a0d12; border-radius:10px; padding:2px 7px; cursor:pointer; background:linear-gradient(#8e2c3c, #5a1622); box-shadow:0 2px 0 rgba(0,0,0,.5), 0 0 10px -2px rgba(220,80,110,.7); touch-action:manipulation; }
 .sacbtn .fx{ background:rgba(255,255,255,.2); color:#fff; font-size:10px; padding:0 3px; }
 .sacbtn:disabled{ opacity:.45; }
 @media (max-width:540px){ .sacbtn{ font-size:11px; padding:2px 6px; bottom:-8px; } .sacbtn .sl{ display:none; } }
-@media (max-width:540px){ #inplay{ overflow-y:auto; overscroll-behavior:contain; display:flex; flex-direction:column; }
+@media (max-width:540px){ #inplay.sect{ overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; touch-action:pan-y; display:flex; flex-direction:column; } #inplay.sect > *{ flex-shrink:0; }
   #inplay > .prows{ order:1; } #inplay > header{ order:2; margin-top:8px; } #inplay > .combos{ order:3; } #inplay > .mutiny{ order:0; } }   /* my own line (and its ☠) first, the counters after */
 .pulse{ animation:pulseglow .9s ease-out 2; }
 @keyframes pulseglow{ 40%{ transform:scale(1.12); filter:brightness(1.35); } }
@@ -870,7 +881,12 @@ body.enemy-turn #dock .dock-in{ opacity:.4; filter:saturate(.6); transition:opac
 .dock-in.compact .eclat .medal{ width:46px; height:46px; }
 .dock-in.compact .eclat-off{ flex:1; }
 .dock-in.compact .ready:not(.atkend):not(.atkwait){ flex:1; }
-.pools{ display:flex; gap:8px; align-items:center; }
+.pools{ display:flex; gap:8px; align-items:center; min-width:0; }
+.pools > *{ flex-shrink:0; }
+.pools > .pile{ flex-shrink:1; min-width:0; overflow:hidden; }   /* the deck button gives way first: candles and combat always stay in view */
+.pools > .resg{ flex:none; }
+.pool.g{ position:relative; }
+.rbtag{ position:absolute; top:-11px; right:-4px; font-style:normal; font-size:10.5px; font-weight:800; color:#2a1b03; background:#ffe39a; border-radius:8px; padding:0 5px; white-space:nowrap; box-shadow:0 1px 2px rgba(0,0,0,.5); pointer-events:auto; }
 .dtabs{ display:flex; gap:3px; padding:3px; border-radius:22px; background:rgba(0,0,0,.3); border:1px solid var(--line); flex:none; }
 .dtab{ display:inline-flex; align-items:center; gap:5px; font:inherit; font-size:13.5px; font-weight:800; color:var(--muted); background:none; border:none; border-radius:18px; padding:3px 11px 3px 9px; cursor:pointer; white-space:nowrap; min-height:34px; touch-action:manipulation; }
 .dtab b{ color:var(--ink); }
@@ -1318,6 +1334,7 @@ input.txt{ width:100%; font:inherit; font-size:17px; padding:10px 12px; border-r
   #market .dgrid{ padding-top:15px; }
 }
 /* short phones (iPhone with Safari bars, small Android): a tighter dock and hold leave more height to the battle */
+@media (max-width:400px){ .pools{ gap:5px; } .pools .pool{ padding:2px 7px 2px 3px; gap:3px; font-size:17px; } .pools .pool .debt{ font-size:10px; } .lowerbtn{ padding-left:5px !important; padding-right:5px !important; } .purgebtn{ padding-left:6px !important; padding-right:6px !important; } }
 @media (max-width:540px){ .srvchip .pt{ display:none; } .srvchip{ padding:2px 7px; } }
 @media (max-width:540px) and (max-height:760px){
   .dock{ padding-top:6px; }
@@ -1787,7 +1804,7 @@ const CAMP_SECTORS = [
            ['c3',2,1],['n54',2,1],['c9',2,1],['c5',2,1],['m10',2,1],
            ['c6',3,1],['c7',3,1],['c14',3,1],['c15',3,1],['m4',3,1]],
    eps:[
-    {n:'Le Cimetière des Navires', boss:'galb', pool:[['skel'], ['noye', 'jelly'], ['skel', 'noye'], ['pleur']], elites:[['gal']], gift:['c1', 'c1'], guide:1, first:'c1', mech:['Sacrifice', "Certaines cartes ☠ peuvent être sacrifiées pendant ton tour : touche le bouton rouge ☠ sous la carte, dans ta main (ou ☠ sur le pont si tu l'as déjà jouée). Elle quitte ton deck pour de bon, mais donne un gros bonus tout de suite. Tu embarques avec deux Acolytes noyés à sacrifier."], star:['full', 'Finir avec la coque pleine']},
+    {n:'Le Cimetière des Navires', boss:'galb', pool:[['skel'], ['noye', 'jelly'], ['skel', 'noye'], ['pleur']], elites:[['gal']], gift:['c1', 'c1'], guide:1, first:'c1', mech:['Sacrifice', "Certaines cartes portent ☠ : quand tu en joues une, une fenêtre te demande si tu la sacrifies. Si oui, elle quitte ton deck pour de bon, mais donne un gros bonus tout de suite. Le choix se fait une fois, au moment de la jouer. Tu embarques avec deux Acolytes noyés à sacrifier."], star:['full', 'Finir avec la coque pleine']},
     {n:"L'Île de la Sorcière", boss:'veuve', pool:[['witch'], ['noye', 'pleur'], ['jelly', 'jelly'], ['witch', 'noye']], elites:[['witch', 'skel']], gift:['n52'], mech:['Malédictions tenaces', "Ici, les blessures 🩹 des malédictions restent dans ton deck jusqu'à la fin de l'épopée. L'Eau bénite et la Cale sèche, qui jettent une carte, deviennent précieuses."], star:['full', 'Finir avec la coque pleine']},
     {n:'La Crypte Engloutie', boss:'skelc', pool:[['skel', 'skel'], ['wrai'], ['pleur', 'noye'], ['witch', 'skel']], elites:[['wrai', 'skel']], gift:['c13'], mech:['Traits', "Presque toutes les menaces naissent avec un trait : 🗿 Géant, 🔩 Cuirassé, 🩸 Vorace, 😤 Frénétique ou 🌵 Épineux. Touche-les pour lire le détail. Et le capitaine squelette se relève deux fois !"], star:['full', 'Finir avec la coque pleine']},
     {n:'Le Hollandais volant', boss:'dutch', steps:['f', 'my', 'el', 'my', 'rest', 'boss'], pool:[['wrai'], ['skel', 'noye'], ['pleur', 'jelly'], ['wrai', 'noye']], elites:[['gal', 'skel']], gift:['n51'], mech:['Rage', "Dans ces brumes, chaque menace s'enrage sous la moitié de sa vie : +3 de force. Achève-les vite une fois entamées."], star:['full', 'Finir avec la coque pleine']},
@@ -3456,6 +3473,7 @@ function sceneHTML(o = {}){ // o.mates: champions standing on the deck, o.prot: 
 
 function render(){
   renderScreen(); renderOrders();
+  if(ui.sacAsk){ const S = pv && pv.seats[activeSeat()]; if(!S || pv.phase !== 'fight' || S.rd || S.hand[ui.sacAsk.h] !== ui.sacAsk.c) closeSacAsk(); }
   const cp = document.querySelector('.cpicks .cpk.on');   // keep the chosen epic in view in its strip
   if(cp){ const c = cp.parentNode; c.scrollLeft += cp.getBoundingClientRect().left - c.getBoundingClientRect().left - (c.clientWidth - cp.offsetWidth) / 2; }
 }
@@ -3789,6 +3807,23 @@ function pendingOrders(){
     S.champ.forEach((p, k) => { if(p.u || p.lk) return; const C = CARDS[p.c]; out.push({si, k, S, C, c:p.c, ok:!C.up || S.g >= C.up}); }); });
   return out;
 }
+// a ☠ card is played: keep it, or sacrifice it for good (the choice is final)
+function openSacAsk(h, c, from, html){
+  const C = CARDS[c]; ui.sacAsk = {h, c, from, html};
+  let m = $('#sacAsk'); if(!m){ m = document.createElement('div'); m.id = 'sacAsk'; m.className = 'collmodal sacmodal'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true');
+    m.addEventListener('click', ev => { if(ev.target === m){ closeSacAsk(); render(); } }); document.body.appendChild(m); }
+  const pl = fxText(C.pl || {}), sc = fxText(C.sac);
+  m.innerHTML = `<div class="cm-box sacbox"><h3>☠ Sacrifier cette carte ?</h3>
+    <div class="sacard">${cardHTML(c, 'tabindex="-1"', '')}</div>
+    <p class="note">Tu la joues maintenant. Choisis <b>une fois pour toutes</b> :</p>
+    <div class="sacopts">
+      <button class="sacopt keep" data-act="sacask" data-v="play"><b>▶ La jouer</b><span>${esc(pl.charAt(0).toUpperCase() + pl.slice(1))}</span><small>Elle reste dans ton deck, tu la repiocheras.</small></button>
+      <button class="sacopt sac" data-act="sacask" data-v="sac"><b>☠ La jouer et la sacrifier</b><span>${esc(pl.charAt(0).toUpperCase() + pl.slice(1))}, <em>puis ${esc(sc)}</em></span><small>Elle quitte ton deck <b>pour de bon</b>.</small></button>
+    </div>
+    <button class="btn ghost" data-act="sacask" data-v="no">Annuler</button></div>`;
+  render();
+}
+function closeSacAsk(){ ui.sacAsk = null; const m = $('#sacAsk'); if(m) m.remove(); }
 function renderOrders(){
   let m = $('#ordersModal'); const L = pendingOrders();
   if(!ui.orders || !L.some(o => o.ok)){ if(m) m.remove(); if(ui.orders && L.length === 0 && pv && pv.phase === 'fight') toast('Tous tes serviteurs ont reçu leurs ordres.'); ui.orders = null; return; }
@@ -3827,7 +3862,7 @@ function miniHTML(p, S, si, i, mine){
   return `<div class="mini ${st}" style="--fc:${colOf(p.c)}" data-f="${C.f || ''}" data-act="zoom" data-c="${p.c}" title="${esc(tip)}">
     <div class="mf"><span class="pic">${ART[p.c] || '⚓'}</span><span class="mn">${esc(C.sn || C.n)}</span><span class="fxrow">${fxChips(gain)}</span></div>
     ${C.al ? `<span class="lk">${p.a ? '🔗' : FACTIONS[C.f].ic}</span>` : ''}
-    ${C.sac && mine && featOn(pv.cp, 'sac') ? `<button class="sacb" data-act="sac" data-s="${si}" data-i="${i}" title="Sacrifier : retire la carte de ton deck pour ${esc(fxText(C.sac))}" ${S.rd ? 'disabled' : ''}>☠ ${fxChips(C.sac)}</button>` : ''}</div>`;
+    </div>`;
 }
 // the ship's hull: a short notched bar with a big number, under which the crew reads « Coque »
 function hullHTML(h, mx){
@@ -4105,9 +4140,9 @@ function renderFight(app){
       ${S.hand.length && !ui.purge ? `<button class="lowerbtn ${lowered ? 'down' : ''}" data-act="hand-toggle" aria-label="${lowered ? 'Remonter ta main' : 'Baisser ta main'}" title="${lowered ? 'Remonter ta main' : 'Baisser ta main pour voir le jeu'}"><b>${lowered ? '▲' : '▼'}</b><small>${lowered ? `Main · ${S.hand.length}` : 'Baisser'}</small></button>` : ''}
       ${featOn(pv.cp, 'purge') ? `<button class="btn ghost small purgebtn ${ui.purge ? 'on' : ''}" data-act="purge-mode" title="Jeter une carte de ta main par-dessus bord : elle quitte ton deck pour de bon" ${!S.rd && (ui.purge || (S.ft && S.hand.length) || (S.g >= PURGE_COST(S) && S.hand.some(c => c !== 'bl'))) ? '' : 'disabled'}>${S.ft ? `🗑 gratuit${S.ft > 1 ? ' ×' + S.ft : ''}` : `🗑 🕯️${PURGE_COST(S)}`}</button>` : ''}
       ${featOn(pv.cp, 'deck') ? `<button class="pile deckbtn ${pw ? 'warn' : ''}" id="pile" data-act="deck" data-s="${s}" title="Voir ton deck (touche D)" aria-label="Voir ton deck, ${S.dk} cartes"><span class="dk-stack" aria-hidden="true"><i></i><i></i><i></i></span><b>Deck</b><span>${S.dk}</span><small class="drw ${S.dr ? '' : 'empty'}" title="Pioche : ${S.dr} carte${S.dr > 1 ? 's' : ''} · Défausse : ${S.di} carte${S.di > 1 ? 's' : ''}. La défausse est remélangée dans la pioche au début d'un tour, quand la pioche ne suffit plus.">${IC_DRAW}${S.dr} ${IC_DISC}${S.di}</small>${pw ? `<span class="pilewarn">${pw}</span>` : ''}</button>` : ''}
-      ${S.rb ? `<span class="rbchip" title="Plan de la cale : la prochaine carte que tu remontes coûte ${S.rb} bougie${S.rb > 1 ? 's' : ''} de moins">🗺️ −${S.rb}🕯️</span>` : ''}<span class="resg">${featOn(pv.cp, 'gold') ? `<span class="pool g" id="gold" ${S.dt ? `title="Soufflées : les ${S.dt} prochaines bougies allumées ce tour s'éteindront"` : 'title="Tes bougies : elles éclairent la cale sombre"'}><span class="ico">🕯️</span>${S.g}${S.dt ? `<small class="debt">−${S.dt}</small>` : ''}</span>` : ''}<span class="pool c" id="combat" title="Ton combat de ce tour : il rejoint l'attaque du navire"><span class="ico">⚔</span>${S.c}</span></span></div>
+      <span class="resg">${featOn(pv.cp, 'gold') ? `<span class="pool g" id="gold" ${S.dt ? `title="Soufflées : les ${S.dt} prochaines bougies allumées ce tour s'éteindront"` : 'title="Tes bougies : elles éclairent la cale sombre"'}><span class="ico">🕯️</span>${S.g}${S.dt ? `<small class="debt">−${S.dt}</small>` : ''}${S.rb ? `<i class="rbtag" title="Plan de la cale : la prochaine carte que tu remontes coûte ${S.rb} bougie${S.rb > 1 ? 's' : ''} de moins">🗺️−${S.rb}</i>` : ''}</span>` : ''}<span class="pool c" id="combat" title="Ton combat de ce tour : il rejoint l'attaque du navire"><span class="ico">⚔</span>${S.c}</span></span></div>
     <div class="cards dgrid ${ui.purge ? 'purging' : ''} ${big ? 'big' : ''}" id="hand" style="--cols:${cols}">${S.hand.map((c, i) => { const html = cardHTML(c, c === 'bl' ? `data-act="sach" data-h="${i}"` : `data-act="play" data-h="${i}"`, `${S.rd ? 'off' : ''} ${deal ? 'deal' : ''}`, {allyOn: CARDS[c].f && crewFactionCount(CARDS[c].f, s) >= 1, style:`--i:${i}`});
-      return CARDS[c].sac && !CARDS[c].junk && !CARDS[c].ch && featOn(pv.cp, 'sac') && !ui.purge ? `<div class="hslot">${html}<button class="sacbtn" data-act="sacp" data-h="${i}" data-c="${c}" ${S.rd ? 'disabled' : ''} title="Jouer et sacrifier : ${esc(fxText(CARDS[c].pl || {}))}, puis ${esc(fxText(CARDS[c].sac))} ; la carte quitte ton deck pour de bon">☠<span class="sl"> Sacrifier</span> ${fxChips(CARDS[c].sac)}</button></div>` : html; }).join('')}</div>
+      return html; }).join('')}</div>
     <div class="bar">
       ${featOn(pv.cp, 'ecl') && !pv.sub ? `<button class="eclat ${S.eu ? 'used' : S.rd ? '' : 'charged'}" style="--rc:${R2.col}" id="eclatBtn" data-act="ecl" ${S.eu || S.rd ? 'disabled' : ''}>
         <span class="medal"><span class="emb">${R2.ecl.ic}</span></span>
@@ -5059,11 +5094,12 @@ const sacDone = v => coachSeat(v).dk < (ui.coachDk || 99);
 const isSacC = c => CARDS[c] && CARDS[c].sac && !CARDS[c].junk && !CARDS[c].ch;
 const sacC = v => coachSeat(v).hand.find(isSacC) || (coachSeat(v).play.find(p => isSacC(p.c)) || {}).c || ui.lessonC || 'c1';
 const lessonOver = v => !!v.sub || v.round > (ui.lessonR || 1);
+const sacHl = v => `#hand .card[data-c="${sacC(v)}"]`;
 const COACH_X = [
-  {t:v => { const C = CARDS[sacC(v)]; return `Nouveau : le <b>sacrifice ☠</b>. Ta carte <b>${esc(C.n)}</b> porte le signe ☠ : tu peux la <b>sacrifier</b>. Elle quitte alors ton deck <b>pour de bon</b>, mais te donne tout de suite un gros bonus : <b>${esc(fxText(C.sac))}</b>.`; }, hl:'#hand .hslot', next:1, until:v => lessonOver(v) || sacDone(v)},
-  {t:v => { const C = CARDS[sacC(v)]; return `Pour la sacrifier, touche le <b>bouton rouge ☠</b> collé sous la carte, dans ta main. La carte est d'abord jouée (${esc(fxText(C.pl || {}))}), puis sacrifiée : tu reçois <b>${esc(fxText(C.sac))}</b>.`; }, hl:'#hand .sacbtn', wait:"Touche le bouton rouge ☠ sous la carte, dans ta main.", until:v => lessonOver(v) || sacDone(v) || !coachSeat(v).hand.some(isSacC)},
-  {t:"Tu as joué la carte sans la sacrifier : pas de souci, tu peux encore le faire <b>jusqu'à la fin de ton tour</b>. Sur le pont, sous la carte, touche le bouton rouge <b>☠</b>.", hl:'#inplay .sacb', wait:"Touche le bouton rouge ☠ sous la carte, sur le pont.", until:v => lessonOver(v) || sacDone(v) || !coachSeat(v).play.some(p => isSacC(p.c))},
-  {t:"Sacrifiée ! Elle a quitté ton deck : regarde, ton paquet a une carte de moins. Quand sacrifier ? Quand le bonus tombe à pic : achever une menace, remonter une carte chère de la cale… Mais garde assez de cartes pour les combats suivants : un deck trop maigre s'essouffle.", next:1, until:v => lessonOver(v) || !sacDone(v)},
+  {t:v => { const C = CARDS[sacC(v)]; return `Nouveau : le <b>sacrifice ☠</b>. Ta carte <b>${esc(C.n)}</b> porte le signe ☠ : quand tu la joues, tu peux la <b>sacrifier</b>. Elle quitte alors ton deck <b>pour de bon</b>, mais te donne en plus un gros bonus : <b>${esc(fxText(C.sac))}</b>.`; }, hl:sacHl, next:1, until:v => lessonOver(v) || sacDone(v)},
+  {t:"<b>Touche la carte</b> pour la jouer : une fenêtre te demandera si tu veux la sacrifier. Pour cette fois, choisis <b>☠ La jouer et la sacrifier</b>.", hl:sacHl, wait:"Touche la carte ☠ dans ta main.", until:v => lessonOver(v) || sacDone(v) || !!ui.sacAsk || !coachSeat(v).hand.some(isSacC)},
+  {t:"Choisis <b>☠ La jouer et la sacrifier</b> dans la fenêtre.", wait:"Choisis dans la fenêtre.", until:v => lessonOver(v) || sacDone(v) || !ui.sacAsk},
+  {t:v => sacDone(v) ? "Sacrifiée ! Elle a quitté ton deck : ton paquet a une carte de moins, et tu as reçu le bonus. Ce choix se fait <b>une seule fois</b>, au moment où tu joues la carte. Quand sacrifier ? Quand le bonus tombe à pic : achever une menace, remonter une carte chère de la cale… Mais garde assez de cartes pour les combats suivants." : "Tu l'as jouée sans la sacrifier : elle reste dans ton deck. La prochaine fois que tu la joueras, la question te sera reposée. Sacrifie quand le bonus tombe à pic, mais garde assez de cartes pour les combats suivants.", next:1, until:v => lessonOver(v)},
 ];
 // lessons that come when the mechanism shows up, whatever the epic: remembered once learnt
 const LESSONS = {sac:COACH_X};
@@ -5309,6 +5345,7 @@ document.addEventListener('click', ev => {
     case 'play': {
       if(!S || busy()) return;
       if(ui.purge){ ui.purge = false; act({a:'purge', s, h:+b.dataset.h, c:b.dataset.c}); break; }
+      if(isSacC(b.dataset.c) && featOn(pv.cp, 'sac') && !S.rd){ openSacAsk(+b.dataset.h, b.dataset.c, b.getBoundingClientRect(), b.outerHTML); break; }   // a ☠ card: sacrifice it or not? asked once, now
       const from = b.getBoundingClientRect(), html = b.outerHTML;
       act({a:'play', s, h:+b.dataset.h, c:b.dataset.c});
       flyGhost(html, from, playTarget(s, b.dataset.c));
@@ -5366,8 +5403,10 @@ document.addEventListener('click', ev => {
       break;
     }
     case 'ecl': if(S && !busy()) act({a:'ecl', s}); break;
-    case 'sacp': { if(!S || busy() || S.rd) return; const el = b.parentNode && b.parentNode.querySelector('.card'); const from = el ? el.getBoundingClientRect() : null, html = el ? el.outerHTML : '';
-      act({a:'sacp', s, h:+b.dataset.h, c:b.dataset.c}); if(from) flyGhost(html, from, '#gold'); break; }
+    case 'sacask': { const A = ui.sacAsk; closeSacAsk(); if(!A || !S || S.rd || S.hand[A.h] !== A.c) { render(); break; }
+      if(b.dataset.v === 'sac'){ act({a:'sacp', s, h:A.h, c:A.c}); flyGhost(A.html, A.from, '#combat'); }
+      else if(b.dataset.v === 'play'){ act({a:'play', s, h:A.h, c:A.c}); flyGhost(A.html, A.from, playTarget(s, A.c)); }
+      render(); break; }
     case 'orders': ui.orders = 'open'; renderOrders(); break;
     case 'orders-close': ui.orders = null; renderOrders(); break;
     case 'orders-end': { ui.orders = null; ui.confirm = false; renderOrders(); mySeats().forEach(i => { if(!pv.seats[i].ab && !pv.seats[i].rd) act({a:'rdy', s:i, v:true}); }); break; }
